@@ -16,7 +16,7 @@
 @import "~@ionic/angular/css/normalize.css";
 @import "~@ionic/angular/css/structure.css";
 @import "~@ionic/angular/css/typography.css";
-@import '~@ionic/angular/css/display.css';
+@import "~@ionic/angular/css/display.css";
 
 /* Optional CSS utils that can be commented out */
 @import "~@ionic/angular/css/padding.css";
@@ -24,3 +24,114 @@
 @import "~@ionic/angular/css/text-alignment.css";
 @import "~@ionic/angular/css/text-transformation.css";
 @import "~@ionic/angular/css/flex-utils.css";
+
+// @import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
+@font-face {
+  font-family: Circular-medium;
+  src: url("./fonts/Circular/CircularSpotifyTxT-Medium.ttf");
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: Circular-bold;
+  src: url("./fonts/Circular/CircularSpotifyTxT-Bold.ttf");
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: Circular;
+  src: url("./fonts/Circular/CircularSpotifyTxT-Book.ttf");
+}
+
+@font-face {
+  font-family: Circular-light;
+  src: url("./fonts/Circular/CircularSpotifyTxT-Light.ttf");
+  font-weight: 300;
+}
+
+body,
+html {
+  font-family: Circular !important;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  color: var(--white-color);
+  background: var(--black-color) !important;
+  overflow: hidden;
+
+  --black-color: #191414;
+  --green-color: #1db954;
+  --white-color: white;
+  --background-color-light-grey: #333333;
+  --background-color-grey: #262626;
+  --background-color-dark-grey: #1a1a1a;
+
+  &::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  @media screen and (max-width: 600px) {
+    font-size: 14px;
+  }
+
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.search-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  border: 1px solid var(--background-color-grey);
+  border-radius: 8px;
+  background-color: var(--background-color-grey);
+  align-items: center;
+
+  img {
+    height: 1.5rem;
+    object-fit: contain;
+    margin: 0 0.4rem;
+  }
+
+  input,
+  input::placeholder {
+    font-family: Circular;
+    color: var(--white-color);
+    background-color: var(--background-color-grey);
+    border: none;
+    border-radius: 8px;
+    width: 80%;
+    flex-grow: 1;
+    height: 100%;
+  }
+
+  input:focus {
+    outline: none !important;
+  }
+}
+
+input::placeholder {
+  color: rgb(177, 177, 177);
+}
+
+.primary-button {
+  box-sizing: border-box;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  background-color: var(--green-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  color: white;
+  border: 1px solid var(--green-color);
+  padding: 6px 12px;
+  height: 2.5rem;
+}
+
+.mat-dialog-container {
+  background-color: var(--background-color-grey);
+  color: white;
+}

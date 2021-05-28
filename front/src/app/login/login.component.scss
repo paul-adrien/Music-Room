@@ -1,0 +1,125 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 1rem 3rem;
+
+  .title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    font-family: Circular-bold;
+    text-align: center;
+  }
+
+  .logo {
+    display: flex;
+    flex-direction: column;
+    margin-top: 1rem;
+    width: 38%;
+    max-width: 17rem;
+    z-index: 0;
+  }
+
+  .img {
+    object-fit: contain;
+    width: 100%;
+  }
+
+  .log-button {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .form-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    align-items: center;
+    position: relative;
+
+    .inputs {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    input {
+      height: 2.5rem;
+      width: 100%;
+      padding: 6px 12px;
+      border-radius: 4px;
+      box-sizing: border-box;
+      margin-bottom: 1rem;
+      background-color: var(--background-color-light-grey);
+      color: var(--color-text);
+      border: none;
+      &.error-input.ng-invalid {
+        margin: 0;
+      }
+    }
+  }
+
+  .separator {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+
+    .bar {
+      width: 44%;
+      height: 0;
+      border-top: 1px solid;
+    }
+  }
+
+  .error {
+    font-size: 12px;
+    padding: 6px 12px;
+    color: red;
+    font-family: Circular-light;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .buttons-auth {
+    display: flex;
+    flex-direction: column;
+
+    .primary-button {
+      margin-top: 1rem;
+
+      .img-button {
+        height: 100%;
+        object-fit: contain;
+        margin-right: 1rem;
+      }
+    }
+
+    .forty-two {
+      background-color: #02b9bb;
+      border-color: #02b9bb;
+    }
+
+    .google {
+      background-color: #d94f40;
+      border-color: #d94f40;
+    }
+
+    .github {
+      background-color: #f7f8fa;
+      border-color: #f7f8fa;
+      color: black;
+    }
+  }
+
+  .forgot-password {
+    text-align: center;
+    margin-top: 1rem;
+    color: lightsteelblue;
+  }
+}
