@@ -168,7 +168,7 @@ function ValidatorPass(control: FormControl) {
         </div>
       </div>
       <div class="error">{{ this.errorMessageReg }}</div>
-      <button class="primary-button" (click)="test()">
+      <button class="primary-button green" (click)="test()">
         {{ !this.loginMode ? 'signUp' : 'signIn' }}
       </button>
     </form>
@@ -211,7 +211,7 @@ function ValidatorPass(control: FormControl) {
         />
       </div>
       <div class="error">{{ this.errorMessageLog }}</div>
-      <button class="primary-button" (click)="test()">
+      <button class="primary-button green" (click)="test()">
         {{ !this.loginMode ? 'signUp' : 'signIn' }}
       </button>
     </form>

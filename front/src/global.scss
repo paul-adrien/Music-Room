@@ -115,20 +115,42 @@ input::placeholder {
   color: rgb(177, 177, 177);
 }
 
+// .primary-button {
+//   box-sizing: border-box;
+//   cursor: pointer;
+//   width: 100%;
+//   text-align: center;
+//   background-color: var(--green-color);
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   border-radius: 4px;
+//   color: white;
+//   border: 1px solid var(--green-color);
+//   padding: 6px 12px;
+//   height: 2.5rem;
+// }
+
 .primary-button {
   box-sizing: border-box;
   cursor: pointer;
-  width: 100%;
   text-align: center;
-  background-color: var(--green-color);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  color: white;
-  border: 1px solid var(--green-color);
-  padding: 6px 12px;
-  height: 2.5rem;
+  border-radius: 100px;
+  border: 1px solid;
+  padding: 1rem;
+  text-transform: uppercase;
+  font-family: "Circular-bold";
+  font-size: 1rem !important;
+  letter-spacing: 2px;
+
+  &.green {
+    color: white;
+    border-color: var(--green-color);
+    background-color: var(--green-color);
+  }
 }
 
 .mat-dialog-container {

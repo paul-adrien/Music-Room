@@ -1,0 +1,20 @@
+:host {
+  .top-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 3rem;
+
+    .picture {
+      object-fit: contain;
+      height: 7rem;
+      border-radius: 50%;
+    }
+
+    .name {
+      font-family: "Circular-bold";
+      font-size: 1.3rem;
+      margin-top: 1rem;
+    }
+  }
+}
