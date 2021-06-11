@@ -1,3 +1,6 @@
+const { authJwt } = require("../middlewares");
+const controller = require("../controllers/user-controller");
+
 module.exports = function (app) {
     app.use(function (req, res, next) {
         res.header(
@@ -6,4 +9,8 @@ module.exports = function (app) {
         );
         next();
     });
+
+    app.get("/token", [authJwt.verifyToken], controller.userBoard);
+    app.get("/user/:id", [authJwt.verifyToken], controller.getProfile);
+    app.put("/user/:id", [authJwt.verifyToken], controller.userUpdate);
 };

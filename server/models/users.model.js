@@ -10,9 +10,27 @@ const User = mongoose.model(
     password: String,
     id: String,
     picture: String,
-    moviesWatched: Array,
     rand: Number,
-    lang: String,
+    validEmail: Boolean,
+    friends: [{ id: String }],
+    notifs: {
+      playlist: [{
+        id: String,
+        friend: String,
+        right: Boolean,
+        date: String
+      }],
+      friends: [{
+        id: String,
+        date: String,
+      }],
+      events: [{
+        id: String,
+        right: Boolean,
+        friend: String,
+        date: String
+      }]
+    }
   })
 );
 

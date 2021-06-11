@@ -1,38 +1,16 @@
-var express = require('express');
-const cors = require("cors");
-const dbConfig = require("./config/db");
-const db = require("./models");
-const passport = require("passport");
+const http = require('http');
+const app = require('./app');
 
-var app = express();
+app.set('port', 8080);
 
-var corsOptions = {
-    origin: "*",
-};
-app.use(cors(corsOptions));
-app.use(express.json());
+const server = http.createServer(app);
 
-db.mongoose
-    .connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    })
-    .then(() => {
-        //console.log("Successfully connect to MongoDB.");
-    })
-    .catch((err) => {
-        process.exit();
-    });
-
-app.get('/', function (req, res) {
-    res.send('Hello World');
+server.on('listening', () => {
+    const address = server.address();
+    const bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + 8080;
+    console.log('Listening on ' + bind);
 });
 
-require("./routes/auth-routes")(app);
-require("./routes/user-routes")(app);
-require("./routes/music-routes")(app);
-require("./routes/Oauth-routes")(app);
-
-var server = app.listen(8080, function () {
-    console.log("Example app listening at 8080")
-})
+server.listen(8080, () => {
+    console.log(`Server is running on port 8080.`);
+});
