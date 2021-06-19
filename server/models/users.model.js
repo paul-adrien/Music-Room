@@ -16,7 +16,6 @@ const User = mongoose.model(
     notifs: {
       playlist: [{
         id: String,
-        friend: String,
         right: Boolean,
         date: String
       }],
@@ -27,7 +26,6 @@ const User = mongoose.model(
       events: [{
         id: String,
         right: Boolean,
-        friend: String,
         date: String
       }]
     }

@@ -305,6 +305,409 @@ module.exports = {
         },
       },
     },
+    "/user/:id/friends/:friendId": {
+      delete: {
+        tags: ["CRUD operations"],
+        description: "Check token",
+        parameters: [
+          {
+            name: "x-access-token",
+            in: "header",
+            required: true,
+          },
+        ],
+        responses: {
+          true: {
+            description: "Friends invite",
+            content: {
+              "application/json": {
+                example: {
+                  message: "",
+                },
+              },
+            },
+          },
+          false: {
+            description: "Missing parameters",
+            content: {
+              "application/json": {
+                example: {
+                  message: "this friend doesn't exist",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/user/:id/friends/:friendId/invite": {
+      post: {
+        tags: ["CRUD operations"],
+        description: "Check token",
+        parameters: [
+          {
+            name: "x-access-token",
+            in: "header",
+            required: true,
+          },
+        ],
+        responses: {
+          true: {
+            description: "Friends invite",
+            content: {
+              "application/json": {
+                example: {
+                  message: "invitation was send",
+                },
+              },
+            },
+          },
+          false: {
+            description: "Missing parameters",
+            content: {
+              "application/json": {
+                example: {
+                  message: "this friend doesn't exist",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/user/:id/friends/:friendId/acceptInvite": {
+      post: {
+        tags: ["CRUD operations"],
+        description: "Check token",
+        parameters: [
+          {
+            name: "x-access-token",
+            in: "header",
+            required: true,
+          },
+        ],
+        responses: {
+          true: {
+            description: "Accept friends invite",
+            content: {
+              "application/json": {
+                example: {
+                  message: "you have a new friend !",
+                },
+              },
+            },
+          },
+          false: {
+            description: "Missing parameters",
+            content: {
+              "application/json": {
+                example: {
+                  message: "this friend doesn't exist",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/user/:id/friends/:friendId/refuseInvite": {
+      delete: {
+        tags: ["CRUD operations"],
+        description: "Check token",
+        parameters: [
+          {
+            name: "x-access-token",
+            in: "header",
+            required: true,
+          },
+        ],
+        responses: {
+          true: {
+            description: "Friends invite",
+            content: {
+              "application/json": {
+                example: {
+                  message: "",
+                },
+              },
+            },
+          },
+          false: {
+            description: "Missing parameters",
+            content: {
+              "application/json": {
+                example: {
+                  message: "this friend doesn't exist",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/:userId/playlist": {
+      get: {
+        tags: ["CRUD operations"],
+        description: "get list of playlist public or where user is in playlist",
+        parameters: [
+          {
+            name: "x-access-token",
+            in: "header",
+            required: true,
+          },
+        ],
+        responses: {
+          true: {
+            description: "List of playlist",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                    playlist: {
+                      type: "array",
+                      items: {
+                        $ref: "#/components/schemas/Playlist"
+                      }
+                    }
+                  },
+                },
+              },
+            },
+          },
+          false: {
+            description: "Missing parameters",
+            content: {
+              "application/json": {
+                example: {
+                  message: "",
+                },
+              },
+            },
+          },
+        },
+      },
+      post: {
+        tags: ["CRUD operations"],
+        description: "create a new playlist",
+        parameters: [
+          {
+            name: "x-access-token",
+            in: "header",
+            required: true,
+          },
+        ],
+        requestBody: {
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  name: {
+                    type: "string",
+                  },
+                  type: {
+                    type: "string",
+                  },
+                  right: {
+                    type: "string",
+                  },
+                  style: {
+                    type: "string",
+                  },
+                },
+              },
+            },
+          },
+          required: true,
+        },
+        responses: {
+          true: {
+            description: "List of playlist",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                    playlist: {
+                      type: "array",
+                      items: {
+                        $ref: "#/components/schemas/Playlist"
+                      }
+                    }
+                  },
+                },
+              },
+            },
+          },
+          false: {
+            description: "Missing parameters",
+            content: {
+              "application/json": {
+                example: {
+                  message: "error",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    "/:userId/playlist/:playlistId": {
+      get: {
+        tags: ["CRUD operations"],
+        description: "get detail of a playlist",
+        parameters: [
+          {
+            name: "x-access-token",
+            in: "header",
+            required: true,
+          },
+        ],
+        responses: {
+          true: {
+            description: "New playlist",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                    playlist: {
+                      $ref: "#/components/schemas/Playlist"
+                    }
+                  },
+                },
+              },
+            },
+          },
+          false: {
+            description: "Missing parameters",
+            content: {
+              "application/json": {
+                example: {
+                  message: "",
+                },
+              },
+            },
+          },
+        },
+      },
+      put: {
+        tags: ["CRUD operations"],
+        description: "edit playlist",
+        parameters: [
+          {
+            name: "x-access-token",
+            in: "header",
+            required: true,
+          },
+        ],
+        requestBody: {
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                properties: {
+                  name: {
+                    type: "string",
+                  },
+                  type: {
+                    type: "string",
+                  },
+                  right: {
+                    type: "string",
+                  },
+                  style: {
+                    type: "string",
+                  },
+                },
+              },
+            },
+          },
+          required: true,
+        },
+        responses: {
+          true: {
+            description: "edited playlist",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    },
+                    playlist: {
+                      type: "array",
+                      items: {
+                        $ref: "#/components/schemas/Playlist"
+                      }
+                    }
+                  },
+                },
+              },
+            },
+          },
+          false: {
+            description: "Missing parameters",
+            content: {
+              "application/json": {
+                example: {
+                  message: "error",
+                },
+              },
+            },
+          },
+        },
+      },
+      delete: {
+        tags: ["CRUD operations"],
+        description: "Delete a playlist",
+        parameters: [
+          {
+            name: "x-access-token",
+            in: "header",
+            required: true,
+          },
+        ],
+        responses: {
+          true: {
+            description: "",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                    }
+                  },
+                },
+              },
+            },
+          },
+          false: {
+            description: "Missing parameters",
+            content: {
+              "application/json": {
+                example: {
+                  message: "",
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     // "/user/authenticate/42": {
     //   get: {
     //     tags: ["CRUD operations"],
@@ -534,6 +937,57 @@ module.exports = {
               type: "string",
             }
           }
+        },
+      },
+      Playlist: {
+        type: "object",
+        properties: {
+          name: {
+            type: "string",
+          },
+          created_by: {
+            type: "string",
+          },
+          users: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                id: {
+                  type: "string"
+                },
+                username: {
+                  type: "string"
+                },
+                right: {
+                  type: "boolean"
+                },
+              }
+            },
+          },
+          musics: {
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                trackId: {
+                  type: "string"
+                },
+                duration: {
+                  type: "string"
+                },
+              }
+            },
+          },
+          type: {
+            type: "boolean",
+          },
+          right: {
+            type: "boolean",
+          },
+          style: {
+            type: "string",
+          },
         },
       },
     },

@@ -59,7 +59,6 @@ exports.getFriendsList = (req, res) => {
 
 exports.deleteFriend = (req, res) => {
     const { userId, friendId } = req.params;
-    console.log(userId, friendId);
 
     User.findOne({ id: userId }).exec(async (err, user) => {
         if (err) {
@@ -85,8 +84,8 @@ exports.deleteFriend = (req, res) => {
                         message: "this friend doesn't exist"
                     });
                 } else {
-                    let indexFriend = friend.friends.indexOf(friendId);
-                    let indexUser = user.friends.indexOf(userId);
+                    let indexFriend = friend.friends.map((u) => { return u.id }).indexOf(userId);
+                    let indexUser = user.friends.map((u) => { return u.id }).indexOf(friendId);
                     if (indexFriend != -1 && indexUser != -1) {
                         user.friends.splice(indexUser, 1);
                         const finalUser = new User(user);
@@ -236,9 +235,9 @@ exports.acceptInvitation = (req, res) => {
 }
 
 exports.refuseInvitation = (req, res) => {
-    const { userId, friendId } = req.query;
+    const { userId, friendId } = req.params;
 
-    User.find({ $query: { id: userId } }).exec(async (err, user) => {
+    User.findOne({ id: userId }).exec(async (err, user) => {
         if (err) {
             return res.json({
                 status: false,
@@ -250,30 +249,31 @@ exports.refuseInvitation = (req, res) => {
                 message: "this user doesn't exist"
             });
         } else {
-            User.find({ $query: { id: friendId } }).exec(async (err, friend) => {
+            User.findOne({ id: friendId }).exec(async (err, friend) => {
                 if (err) {
                     return res.json({
                         status: false,
                         message: err
                     });
-                } else if (!friend) {
+                } else if (!user) {
                     return res.json({
                         status: false,
                         message: "this friend doesn't exist"
                     });
                 } else {
-                    let indexFriend = friend.notifs.friends.map(function (u) { return u.id }).indexOf(friendId)
-                    if (indexFriend != -1) {
-                        user.notifs.friends.splice(indexFriend, 1);
-                        user.save();
+                    let notifIndex = user.notifs.friends.map(function (u) { console.log(u); return u.id; }).indexOf(friendId);
+                    if (notifIndex != -1) {
+                        user.notifs.friends.splice(notifIndex, 1);
+                        finalUser = new User(user);
+                        finalUser.save();
                         return res.json({
                             status: true,
-                            message: "invitation was delete"
+                            message: "invitation delete"
                         });
                     } else {
                         return res.json({
                             status: false,
-                            message: "No invitation"
+                            message: "you dont have invitation by this user"
                         });
                     }
                 }
