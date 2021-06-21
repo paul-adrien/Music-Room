@@ -29,12 +29,12 @@ module.exports = function (app) {
 
         return res.redirect(
           "http://localhost:8081/login?data=" +
-          encodeURI(
-            JSON.stringify({
-              user: userDb,
-              token: token,
-            })
-          )
+            encodeURI(
+              JSON.stringify({
+                user: userDb,
+                token: token,
+              })
+            )
         );
       }
     )(req, res, next);
@@ -60,45 +60,45 @@ module.exports = function (app) {
 
         return res.redirect(
           "http://localhost:8081/login?data=" +
-          encodeURI(
-            JSON.stringify({
-              user: userDb,
-              token: token,
-            })
-          )
+            encodeURI(
+              JSON.stringify({
+                user: userDb,
+                token: token,
+              })
+            )
         );
       }
     )(req, res, next);
   });
 
-  app.get(
-    "/user/authenticate/github",
-    passport.authenticate("github", { scope: ["user:email"] })
-  );
-  app.get("/user/authenticate/github/callback", (req, res, next) => {
-    passport.authenticate(
-      "github",
-      {
-        failureRedirect: "http://localhost:8081/login",
-      },
-      async (err, userId) => {
-        // Successful authentication, redirect home.
-        const userDb = await getUser({ id: userId });
+  // app.get(
+  //   "/user/authenticate/github",
+  //   passport.authenticate("github", { scope: ["user:email"] })
+  // );
+  // app.get("/user/authenticate/github/callback", (req, res, next) => {
+  //   passport.authenticate(
+  //     "github",
+  //     {
+  //       failureRedirect: "http://localhost:8081/login",
+  //     },
+  //     async (err, userId) => {
+  //       // Successful authentication, redirect home.
+  //       const userDb = await getUser({ id: userId });
 
-        const token = jwt.sign({ id: userDb._id }, config.secret, {
-          expiresIn: 86400, // 24 hours
-        });
+  //       const token = jwt.sign({ id: userDb._id }, config.secret, {
+  //         expiresIn: 86400, // 24 hours
+  //       });
 
-        return res.redirect(
-          "http://localhost:8081/login?data=" +
-          encodeURI(
-            JSON.stringify({
-              user: userDb,
-              token: token,
-            })
-          )
-        );
-      }
-    )(req, res, next);
-  });
+  //       return res.redirect(
+  //         "http://localhost:8081/login?data=" +
+  //         encodeURI(
+  //           JSON.stringify({
+  //             user: userDb,
+  //             token: token,
+  //           })
+  //         )
+  //       );
+  //     }
+  //   )(req, res, next);
+  // });
 };
