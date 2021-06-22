@@ -148,4 +148,17 @@ export class SpotifyService {
       .getMyDevices()
       .then((res) => console.log(res));
   }
+
+  getPlayerInfo() {
+    if (
+      this.spotifyApi.player.getPlaybackInfo().then((res) => {
+        console.log(res);
+        return res;
+      })
+    )
+      return this.spotifyApi.player.getCurrentlyPlayingTrack().then((res) => {
+        console.log(res);
+        return res;
+      });
+  }
 }

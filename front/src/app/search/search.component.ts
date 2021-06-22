@@ -5,6 +5,10 @@ import {
   OnInit,
   ChangeDetectorRef,
 } from '@angular/core';
+import {
+  CurrentlyPlaying,
+  Track,
+} from 'spotify-web-api-ts/types/types/SpotifyObjects';
 
 @Component({
   selector: 'app-search',
@@ -35,20 +39,33 @@ import {
       test auth
     </div>
 
-    <div class="primary-button" (click)="this.testDevices()">devices</div>
+    <mat-progress-bar mode="determinate" [value]="((this.playerInfo?.progress_ms * 100)/this.playerInfo?.item.duration_ms)" [color]="'warn'"></mat-progress-bar>
+    <div class="control-bar">
+      <img class="logo" [src]="this.playerInfo?.item?.album.images[0].url" />
+      <div class="item-info">
+        <div class="info-top">{{ this.playerInfo?.item?.name }}</div>
+        <div class="info-bottom">
+          {{ this.playerInfo?.item?.artists[0].name }}
+        </div>
+      </div>
+    </div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./search.component.scss'],
 })
-export class SearchComponent implements OnInit {
+export class SearchComponent {
   public searchRes: any;
+  public progressTime = 0;
+  public playerInfo: { is_playing: boolean; item: Track; progress_ms: number };
 
   constructor(
     private spotifyService: SpotifyService,
     private cd: ChangeDetectorRef
   ) {}
 
-  ngOnInit(): void {}
+  ngAfterContentInit() {
+    setInterval(() => this.getPlayerInfo(), 500);
+  }
 
   play(uri: string) {
     this.spotifyService.play(uri);
@@ -71,7 +88,17 @@ export class SearchComponent implements OnInit {
     this.spotifyService.requestAuthorization();
   }
 
-  testDevices() {
-    this.spotifyService.getDevices();
+  getPlayerInfo() {
+    this.spotifyService.getPlayerInfo().then((res) => {
+      if (typeof res !== 'string') {
+        this.progressTime = (res as CurrentlyPlaying).progress_ms;
+        this.playerInfo = {
+          is_playing: res.is_playing,
+          item: res.item as Track,
+          progress_ms: res.progress_ms,
+        };
+      }
+      this.cd.detectChanges();
+    });
   }
 }
