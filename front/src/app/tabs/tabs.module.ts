@@ -6,14 +6,18 @@ import { FormsModule } from '@angular/forms';
 import { TabsPageRoutingModule } from './tabs-routing.module';
 
 import { TabsPage } from './tabs.page';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { PlayerComponent } from '../player/player.component';
 
 @NgModule({
   imports: [
     IonicModule,
     CommonModule,
     FormsModule,
-    TabsPageRoutingModule
+    TabsPageRoutingModule,
+    MatProgressBarModule,
   ],
-  declarations: [TabsPage]
+  entryComponents: [PlayerComponent],
+  declarations: [TabsPage],
 })
 export class TabsPageModule {}

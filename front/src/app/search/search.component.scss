@@ -19,24 +19,14 @@
     overflow: scroll;
   }
 
-  .result-item,
-  .control-bar {
+  .result-item {
     width: 100%;
     height: 3rem;
     display: flex;
     align-items: center;
     padding: 0.5rem 0;
     box-sizing: content-box;
-  }
-
-  .control-bar {
-    padding: 0;
-    background: var(--ion-color-dark);
-    border-bottom: 1px solid black;
-
-    .logo {
-      margin-left: 0;
-    }
+    cursor: pointer;
   }
 
   .item-info {
@@ -63,16 +53,4 @@
     object-fit: contain;
     margin: 0 1rem;
   }
-
-}
-mat-progress-bar {
-  height: 3px !important;
-}
-
-::ng-deep .mat-progress-bar-buffer {
-  background-color: grey;
-}
-
-::ng-deep .mat-progress-bar-fill::after {
-  background-color: white;
 }

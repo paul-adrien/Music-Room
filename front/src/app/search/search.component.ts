@@ -20,7 +20,7 @@ import {
       </div>
     </div>
     <div class="result">
-      <div *ngIf="this.searchRes?.items.length > 0">
+      <div *ngIf="this.searchRes?.items?.length > 0">
         <div
           class="result-item"
           (click)="this.play(item?.uri)"
@@ -39,16 +39,7 @@ import {
       test auth
     </div>
 
-    <mat-progress-bar mode="determinate" [value]="((this.playerInfo?.progress_ms * 100)/this.playerInfo?.item.duration_ms)" [color]="'warn'"></mat-progress-bar>
-    <div class="control-bar">
-      <img class="logo" [src]="this.playerInfo?.item?.album.images[0].url" />
-      <div class="item-info">
-        <div class="info-top">{{ this.playerInfo?.item?.name }}</div>
-        <div class="info-bottom">
-          {{ this.playerInfo?.item?.artists[0].name }}
-        </div>
-      </div>
-    </div>
+
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./search.component.scss'],
@@ -63,19 +54,16 @@ export class SearchComponent {
     private cd: ChangeDetectorRef
   ) {}
 
-  ngAfterContentInit() {
-    setInterval(() => this.getPlayerInfo(), 500);
-  }
 
   play(uri: string) {
-    this.spotifyService.play(uri);
+    this.spotifyService.playTrack(uri).subscribe();
   }
 
   search(event: any) {
     console.log(event);
-    this.spotifyService.searchMusic(event.target.value).then((data) => {
+    this.spotifyService.searchMusic(event.target.value).subscribe((data) => {
       console.log(data);
-      this.searchRes = data;
+      this.searchRes = data.tracks;
       this.cd.detectChanges();
     });
   }
@@ -88,17 +76,5 @@ export class SearchComponent {
     this.spotifyService.requestAuthorization();
   }
 
-  getPlayerInfo() {
-    this.spotifyService.getPlayerInfo().then((res) => {
-      if (typeof res !== 'string') {
-        this.progressTime = (res as CurrentlyPlaying).progress_ms;
-        this.playerInfo = {
-          is_playing: res.is_playing,
-          item: res.item as Track,
-          progress_ms: res.progress_ms,
-        };
-      }
-      this.cd.detectChanges();
-    });
-  }
+
 }

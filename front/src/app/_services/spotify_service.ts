@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import * as querystring from 'querystring';
-import { map, tap } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { SpotifyWebApi } from 'spotify-web-api-ts';
 
 const httpOptions = {
@@ -33,19 +33,44 @@ export class SpotifyService {
     }
   }
 
-  searchMusic(search: string): Promise<any> {
-    // return this.http.get(
-    //   'http://localhost:8080/' + 'spotify/:search',
-    //   httpOptions
-    // );
-    return this.spotifyApi.search.searchTracks(search).then((data) => {
-      console.log(data);
-      return data;
-    });
+  searchMusic(search: string) {
+    return this.http
+      .get<any>(
+        `https://api.spotify.com/v1/search?q=${encodeURI(search)}&type=track`,
+        httpApiSpotifyOptions
+      )
+      .pipe(
+        catchError((err) => {
+          if (err?.status === 401) {
+            return this.getRefreshToken();
+          } else {
+            return;
+          }
+        })
+      );
+    // return this.spotifyApi.search.searchTracks(search).then((data) => {
+    //   console.log(data);
+    //   return data;
+    // });
   }
 
-  play(uri: string) {
-    this.spotifyApi.player.play({ uris: [uri] });
+  playTrack(uri: string) {
+    return this.http
+      .put<any>(
+        `https://api.spotify.com/v1/me/player/play`,
+        { uris: [uri] },
+        httpApiSpotifyOptions
+      )
+      .pipe(
+        catchError((err) => {
+          if (err?.status === 401) {
+            return this.getRefreshToken();
+          } else {
+            return;
+          }
+        })
+      );
+    // this.spotifyApi.player.play({ uris: [uri] });
   }
 
   getCode() {
@@ -140,25 +165,76 @@ export class SpotifyService {
   }
 
   getDevices() {
-    // return this.http.get(
-    //   'https://api.spotify.com/v1/me/player/devices',
-    //   httpApiSpotifyOptions
-    // );
-    return this.spotifyApi.player
-      .getMyDevices()
-      .then((res) => console.log(res));
+    return this.http
+      .get(
+        'https://api.spotify.com/v1/me/player/devices',
+        httpApiSpotifyOptions
+      )
+      .pipe(
+        catchError((err) => {
+          if (err?.status === 401) {
+            return this.getRefreshToken();
+          } else {
+            return;
+          }
+        })
+      );
+    // return this.spotifyApi.player
+    //   .getMyDevices()
+    //   .then((res) => console.log(res));
   }
 
   getPlayerInfo() {
-    if (
-      this.spotifyApi.player.getPlaybackInfo().then((res) => {
-        console.log(res);
-        return res;
-      })
-    )
-      return this.spotifyApi.player.getCurrentlyPlayingTrack().then((res) => {
-        console.log(res);
-        return res;
-      });
+    return this.http
+      .get<any>(`https://api.spotify.com/v1/me/player`, httpApiSpotifyOptions)
+      .pipe(
+        catchError((err) => {
+          if (err?.status === 401) {
+            return this.getRefreshToken();
+          } else {
+            return;
+          }
+        })
+      );
+    // return this.spotifyApi.player.getCurrentlyPlayingTrack().then((res) => {
+    //   console.log(res);
+    //   return res;
+    // });
+  }
+
+  play() {
+    return this.http
+      .put<any>(
+        `https://api.spotify.com/v1/me/player/play`,
+        {},
+        httpApiSpotifyOptions
+      )
+      .pipe(
+        catchError((err) => {
+          if (err?.status === 401) {
+            return this.getRefreshToken();
+          } else {
+            return;
+          }
+        })
+      );
+  }
+
+  pause() {
+    return this.http
+      .put<any>(
+        `https://api.spotify.com/v1/me/player/pause`,
+        {},
+        httpApiSpotifyOptions
+      )
+      .pipe(
+        catchError((err) => {
+          if (err?.status === 401) {
+            return this.getRefreshToken();
+          } else {
+            return;
+          }
+        })
+      );
   }
 }
