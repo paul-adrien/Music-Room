@@ -86,42 +86,42 @@ passport.use(
   )
 );
 
-passport.use(
-  new GitHubStrategy(
-    {
-      clientID: keys.github.clientID,
-      clientSecret: keys.github.clientSecret,
-      callbackURL: `http://localhost:8080/user/authenticate/github/callback`,
-      scope: ["user:email"],
-    },
-    async function (accessToken, refreshToken, profile, done) {
-      const user = await getUser({ id: `git_${profile.id}` });
-      if (user && user !== null) return done(null, user.id);
-      if (
-        profile &&
-        profile._json &&
-        !(await checkUserExist(`git_${profile.id}`))
-      ) {
-        const user = new User({
-          id: `git_${profile.id}`,
-          userName: profile._json.login,
-          picture: profile._json.avatar_url.replace("?v=4", ""),
-          email: profile.emails[0].value,
-          lang: "en",
-        });
-        user.save((err, user) => {
-          if (err) {
-            return res.json({
-              status: false,
-              message: err,
-            });
-          }
-          return done(null, `git_${profile.id}`);
-        });
-      } else return done(null, false);
-    }
-  )
-);
+// passport.use(
+//   new GitHubStrategy(
+//     {
+//       clientID: keys.github.clientID,
+//       clientSecret: keys.github.clientSecret,
+//       callbackURL: `http://localhost:8080/user/authenticate/github/callback`,
+//       scope: ["user:email"],
+//     },
+//     async function (accessToken, refreshToken, profile, done) {
+//       const user = await getUser({ id: `git_${profile.id}` });
+//       if (user && user !== null) return done(null, user.id);
+//       if (
+//         profile &&
+//         profile._json &&
+//         !(await checkUserExist(`git_${profile.id}`))
+//       ) {
+//         const user = new User({
+//           id: `git_${profile.id}`,
+//           userName: profile._json.login,
+//           picture: profile._json.avatar_url.replace("?v=4", ""),
+//           email: profile.emails[0].value,
+//           lang: "en",
+//         });
+//         user.save((err, user) => {
+//           if (err) {
+//             return res.json({
+//               status: false,
+//               message: err,
+//             });
+//           }
+//           return done(null, `git_${profile.id}`);
+//         });
+//       } else return done(null, false);
+//     }
+//   )
+// );
 
 passport.serializeUser((userID, done) => {
   done(null, userID);
