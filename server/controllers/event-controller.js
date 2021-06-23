@@ -1,48 +1,55 @@
 const db = require("../models");
 const User = db.user;
-const Playlist = db.playlist;
+const Event = db.event;
 
-exports.getAllPlaylist = (req, res) => {
+exports.getAllEvent = (req, res) => {
     const userId = req.params.userId;
 
-    Playlist.find({ $or: [{ created_by: userId }, { users: { $in: [{ id: userId }] } }, { type: true }] })
-        .exec((err, playlists) => {
+    Event.find({ $or: [{ created_by: userId }, { users: { $in: [{ id: userId }] } }, { type: true }] })
+        .exec((err, event) => {
             if (err) {
                 return res.json({
                     status: false,
                     message: err,
-                    playlists: null
+                    event: null
                 });
-            } else if (!playlists) {
+            } else if (!event) {
                 return res.json({
                     status: true,
-                    message: 'no playlist',
-                    playlists: null
+                    message: 'no event',
+                    event: null
                 });
             } else {
                 return res.json({
                     status: true,
-                    message: 'list of playlist',
-                    playlists: playlists
+                    message: 'list of event',
+                    event: event
                 });
             }
         })
 }
 
-exports.CreatePlaylist = async (req, res) => {
+exports.CreateEvent = async (req, res) => {
     const userId = req.params.userId;
-    const { name, type, right, style } = req.body;
+    const { name, type, start, end, lat, lng, vote_right, style } = req.body;
 
-    let playlist = new Playlist({
+    let event = new Event({
         name: name,
         created_by: userId,
+        status: null,
+        start_date: start,
+        start_end: end,
+        location: {
+            lat: lat,
+            lng: lng
+        },
+        vote_right: vote_right,
         users: null,
         musics: null,
         type: type,
-        right: right,
         style: style
     });
-    playlist.save((err, playlist) => {
+    event.save((err, event) => {
         if (err) {
             return res.json({
                 status: false,
@@ -51,56 +58,56 @@ exports.CreatePlaylist = async (req, res) => {
         }
         res.json({
             status: true,
-            message: 'playlist created',
-            playlist: playlist
+            message: 'event created',
+            event: event
         });
     })
 }
 
-exports.getPlaylist = (req, res) => {
-    const { userId, playlistId } = req.params;
+exports.getEvent = (req, res) => {
+    const { userId, eventId } = req.params;
 
-    Playlist.findOne({ _id: playlistId })
-        .exec((err, playlists) => {
+    Event.findOne({ _id: eventId })
+        .exec((err, event) => {
             if (err) {
                 return res.json({
                     status: false,
                     message: err,
-                    playlists: null
+                    event: null
                 });
-            } else if (!playlists) {
+            } else if (!event) {
                 return res.json({
                     status: true,
-                    message: 'no playlist',
-                    playlists: null
+                    message: 'no event',
+                    event: null
                 });
             } else {
                 return res.json({
                     status: true,
-                    message: 'detail of playlist',
-                    playlists: playlists
+                    message: 'detail of event',
+                    event: event
                 });
             }
         })
 }
 
-exports.delPlaylist = async (req, res) => {
-    const { userId, playlistId } = req.params;
+exports.delEvent = async (req, res) => {
+    const { userId, eventId } = req.params;
 
-    Playlist.findOne({ $and: [{ _id: playlistId }, { $or: [{ created_by: userId }, { users: { $in: [{ $and: [{ id: userId }, { right: true }] }] } }] }] })
-        .exec((err, playlist) => {
+    Event.findOne({ $and: [{ _id: eventId }, { $or: [{ created_by: userId }, { users: { $in: [{ $and: [{ id: userId }, { right: true }] }] } }] }] })
+        .exec((err, event) => {
             if (err) {
                 return res.json({
                     status: false,
                     message: err
                 });
-            } else if (!playlist) {
+            } else if (!event) {
                 return res.json({
                     status: true,
-                    message: "this playlist doesn't exist or you dont have the good right"
+                    message: "this event doesn't exist or you dont have the good right"
                 });
             } else {
-                Playlist.deleteOne({ _id: playlistId }).exec((err) => {
+                Event.deleteOne({ _id: eventId }).exec((err) => {
                     if (err) {
                         return res.json({
                             status: false,
@@ -110,67 +117,158 @@ exports.delPlaylist = async (req, res) => {
                 });
                 return res.json({
                     status: true,
-                    message: 'playlist was delete',
+                    message: 'event was delete',
                 });
             }
         })
 }
 
-exports.editPlaylist = async (req, res) => {
-    const { userId, playlistId } = req.params;
-    const { name, type, right, style } = req.body;
+exports.editEvent = async (req, res) => {
+    const { userId, eventId } = req.params;
+    const { name, type, start, end, lat, lng, vote_right, style } = req.body;
 
-    Playlist.findOne({ $and: [{ _id: playlistId }, { created_by: userId }] })
-        .exec(async (err, playlist) => {
+    Event.findOne({ $and: [{ _id: eventId }, { created_by: userId }] })
+        .exec(async (err, event) => {
             if (err) {
                 return res.json({
                     status: false,
                     message: err,
-                    playlist: null
+                    event: null
                 });
-            } else if (!playlist) {
+            } else if (!event) {
                 return res.json({
                     status: true,
-                    message: "this playlist doesn't exist or you dont have the good right",
-                    playlist: null
+                    message: "this event doesn't exist or you dont have the good right",
+                    event: null
                 });
             } else {
-                let editPlaylist = {
+                let editEvent = {
                     name: name,
                     created_by: userId,
-                    users: playlist.users,
-                    musics: playlist.musics,
+                    status: null,
+                    start_date: start,
+                    start_end: end,
+                    location: {
+                        lat: lat,
+                        lng: lng
+                    },
+                    vote_right: vote_right,
+                    users: event.users,
+                    musics: event.musics,
                     type: type,
-                    right: right,
                     style: style
                 };
-                const finalPlaylist = await Playlist.updateOne({ _id: playlist._id }, { $set: editPlaylist }).exec();
+                const finalEvent = await Event.updateOne({ _id: event._id }, { $set: editEvent }).exec();
                 res.json({
                     status: true,
-                    playlist: finalPlaylist,
-                    message: 'playlist was changed'
+                    event: finalEvent,
+                    message: 'event was changed'
                 });
             }
         })
 }
 
-exports.inviteToPlaylist = async (req, res) => {
-    const { userId, playlistId, friendId } = req.params;
+exports.addMusicEvent = async (req, res) => {
+    const { userId, eventId, trackId } = req.params;
+    const duration = req.body.duration;
+
+    Event.findOne({ $and: [{ _id: eventId }, { $or: [{ created_by: userId }, { users: { $in: [{ $and: [{ id: userId }, { right: true }] }] } }] }] })
+        .exec(async (err, event) => {
+            if (err) {
+                return res.json({
+                    status: false,
+                    message: err
+                });
+            } else if (!event) {
+                return res.json({
+                    status: true,
+                    message: "this event doesn't exist or you dont have the good right"
+                });
+            } else {
+                if (event.musics === null) {
+                    event.musics = {
+                        trackId: trackId,
+                        duration: duration,
+                        nb_vote: 0,
+                        vote: []
+                    }
+                } else {
+                    event.musics.push({
+                        trackId: trackId,
+                        duration: duration,
+                        nb_vote: 0,
+                        vote: []
+                    })
+                }
+                let editEvent = new Event(event);
+                editEvent.save((err) => {
+                    if (err) {
+                        return res.json({
+                            status: false,
+                            message: err
+                        });
+                    } else
+                        return res.json({
+                            status: true,
+                            message: "music save"
+                        });
+                })
+            }
+        })
+}
+
+exports.delMusicEvent = async (req, res) => {
+    const { userId, eventId, trackId } = req.params;
+
+    Event.findOne({ $and: [{ _id: eventId }, { $or: [{ created_by: userId }, { users: { $in: [{ $and: [{ id: userId }, { right: true }] }] } }] }] })
+        .exec((err, event) => {
+            if (err) {
+                return res.json({
+                    status: false,
+                    message: err
+                });
+            } else if (!event) {
+                return res.json({
+                    status: true,
+                    message: "this event doesn't exist or you dont have the good right"
+                });
+            } else {
+                let musicIndex = event.musics.map((m) => { return m.trackId }).indexOf(trackId);
+                if (musicIndex != -1) {
+                    event.musics.splice(musicIndex, 1);
+                    const finalEvent = new Event(event);
+                    finalEvent.save();
+                    return res.json({
+                        status: true,
+                        message: "music delete"
+                    });
+                } else {
+                    return res.json({
+                        status: false,
+                        message: "this music is not in this event"
+                    });
+                }
+            }
+        })
+}
+
+exports.inviteToEvent = async (req, res) => {
+    const { userId, eventId, friendId } = req.params;
     const right = req.body.right;
 
-    Playlist.findOne({ $and: [{ _id: playlistId }, { created_by: userId }] })
-        .exec((err, playlist) => {
+    Event.findOne({ $and: [{ _id: eventId }, { created_by: userId }] })
+        .exec((err, event) => {
             if (err) {
                 return res.json({
                     status: false,
                     message: err,
-                    playlist: null
+                    event: null
                 });
-            } else if (!playlist) {
+            } else if (!event) {
                 return res.json({
                     status: true,
-                    message: "this playlist doesn't exist or you dont have the good right",
-                    playlist: null
+                    message: "this event doesn't exist or you dont have the good right",
+                    event: null
                 });
             } else {
                 User.findOne({ id: userId }).exec(async (err, user) => {
@@ -197,25 +295,25 @@ exports.inviteToPlaylist = async (req, res) => {
                                     message: "this friend doesn't exist"
                                 });
                             } else {
-                                if (friend.notifs !== undefined && friend.notifs.playlist !== undefined && friend.notifs.playlist.map((f) => { return f.id }).indexOf(playlistId) != -1)
+                                if (friend.notifs !== undefined && friend.notifs.events !== undefined && friend.notifs.events.map((f) => { return f.id }).indexOf(eventId) != -1)
                                     return res.json({
                                         status: false,
                                         message: "this user already invite you"
                                     });
-                                if (playlist.users.map((e) => { return e.id }).indexOf(friendId) != -1)
+                                if (event.users.map((e) => { return e.id }).indexOf(friendId) != -1)
                                     return res.json({
                                         status: false,
-                                        message: "this useris already in this playlist"
+                                        message: "this useris already in this event"
                                     });
-                                if (friend.notifs.playlist === undefined || friend.notifs.playlist.length == 0) {
-                                    friend.notifs.playlist = {
-                                        id: playlistId,
+                                if (friend.notifs.events === undefined || friend.notifs.events.length == 0) {
+                                    friend.notifs.events = {
+                                        id: eventId,
                                         right: right,
                                         date: Date.now()
                                     };
                                 } else {
-                                    await friend.notifs.playlist.push({
-                                        id: playlistId,
+                                    await friend.notifs.events.push({
+                                        id: eventId,
                                         right: right,
                                         date: Date.now()
                                     });
@@ -243,20 +341,20 @@ exports.inviteToPlaylist = async (req, res) => {
         })
 }
 
-exports.refuseInviteToPlaylist = async (req, res) => {
-    const { userId, playlistId } = req.params;
+exports.refuseInviteToEvent = async (req, res) => {
+    const { userId, eventId } = req.params;
 
-    Playlist.findOne({ _id: playlistId })
-        .exec((err, playlist) => {
+    Event.findOne({ _id: eventId })
+        .exec((err, event) => {
             if (err) {
                 return res.json({
                     status: false,
                     message: err
                 });
-            } else if (!playlist) {
+            } else if (!event) {
                 return res.json({
                     status: true,
-                    message: "this playlist doesn't exist or you dont have the good right"
+                    message: "this event doesn't exist or you dont have the good right"
                 });
             } else {
                 User.findOne({ id: userId }).exec(async (err, user) => {
@@ -271,11 +369,11 @@ exports.refuseInviteToPlaylist = async (req, res) => {
                             message: "this user doesn't exist"
                         });
                     } else {
-                        let notifIndex = user.notifs.playlist.map(function (u) { console.log(u); return u.id; }).indexOf(playlistId);
+                        let notifIndex = user.notifs.events.map(function (u) { console.log(u); return u.id; }).indexOf(eventId);
                         if (notifIndex != -1) {
-                            user.notifs.playlist.splice(notifIndex, 1);
+                            user.notifs.events.splice(notifIndex, 1);
                             let finalUser = new User(user);
-                            finalUser.save((err, playlist) => {
+                            finalUser.save((err, event) => {
                                 if (err) {
                                     return res.json({
                                         status: false,
@@ -299,20 +397,20 @@ exports.refuseInviteToPlaylist = async (req, res) => {
         })
 }
 
-exports.acceptInvitePlaylist = async (req, res) => {
-    const { userId, playlistId } = req.params;
+exports.acceptInviteEvent = async (req, res) => {
+    const { userId, eventId } = req.params;
 
-    Playlist.findOne({ _id: playlistId })
-        .exec((err, playlist) => {
+    Event.findOne({ _id: eventId })
+        .exec((err, event) => {
             if (err) {
                 return res.json({
                     status: false,
                     message: err
                 });
-            } else if (!playlist) {
+            } else if (!event) {
                 return res.json({
                     status: true,
-                    message: "this playlist doesn't exist or you dont have the good right"
+                    message: "this event doesn't exist or you dont have the good right"
                 });
             } else {
                 User.findOne({ id: userId }).exec(async (err, user) => {
@@ -327,29 +425,29 @@ exports.acceptInvitePlaylist = async (req, res) => {
                             message: "this user doesn't exist"
                         });
                     } else {
-                        let notifIndex = user.notifs.playlist.map(function (u) { console.log(u); return u.id; }).indexOf(playlistId);
+                        let notifIndex = user.notifs.events.map(function (u) { console.log(u); return u.id; }).indexOf(eventId);
                         if (notifIndex != -1) {
-                            if (playlist.users != null) {
-                                playlist.users.push({
+                            if (event.users != null) {
+                                event.users.push({
                                     id: userId,
                                     username: user.userName,
-                                    right: user.notifs.playlist.right
+                                    right: user.notifs.events.right
                                 });
                             } else
-                                playlist.users = {
+                                event.users = {
                                     id: userId,
                                     username: user.userName,
-                                    right: user.notifs.playlist.right
+                                    right: user.notifs.events.right
                                 };
-                            let finalPlaylist = new Playlist(playlist);
-                            finalPlaylist.save((err) => {
+                            let finalEvent = new Event(event);
+                            finalEvent.save((err) => {
                                 if (err) {
                                     return res.json({
                                         status: false,
                                         message: err
                                     });
                                 } else
-                                    user.notifs.playlist.splice(notifIndex, 1);
+                                    user.notifs.events.splice(notifIndex, 1);
                                 let finalUser = new User(user);
                                 finalUser.save();
                                 return res.json({
@@ -369,118 +467,37 @@ exports.acceptInvitePlaylist = async (req, res) => {
         })
 }
 
-exports.quitPlaylist = async (req, res) => {
-    const { userId, playlistId } = req.params;
+exports.quitEvent = async (req, res) => {
+    const { userId, eventId } = req.params;
 
-    Playlist.findOne({ _id: playlistId })
-        .exec((err, playlist) => {
+    Event.findOne({ _id: eventId })
+        .exec((err, event) => {
             if (err) {
                 return res.json({
                     status: false,
                     message: err
                 });
-            } else if (!playlist) {
+            } else if (!event) {
                 return res.json({
                     status: true,
-                    message: "this playlist doesn't exist or you dont have the good right"
+                    message: "this event doesn't exist or you dont have the good right"
                 });
             } else {
-                let playlistIndex = playlist.users.map((u) => { return u.id }).indexOf(userId);
-                if (playlistIndex != -1) {
-                    playlist.users.splice(playlistIndex, 1);
-                    const finalPlaylist = new Playlist(playlist);
-                    finalPlaylist.save();
+                let eventIndex = event.users.map((u) => { return u.id }).indexOf(userId);
+                if (eventIndex != -1) {
+                    event.users.splice(eventIndex, 1);
+                    const finalEvent = new Event(event);
+                    finalEvent.save();
                     return res.json({
                         status: true,
-                        message: "you have quit this playlist"
+                        message: "you have quit this event"
                     });
                 } else {
                     return res.json({
                         status: false,
-                        message: "this user is not in this playlist"
+                        message: "this user is not in this event"
                     });
                 }
             }
         })
 }
-
-exports.addMusicPlaylist = async (req, res) => {
-    const { userId, playlistId, trackId } = req.params;
-    const duration = req.body.duration;
-
-    Playlist.findOne({ $and: [{ _id: playlistId }, { $or: [{ created_by: userId }, { users: { $in: [{ $and: [{ id: userId }, { right: true }] }] } }] }] })
-        .exec(async (err, playlist) => {
-            if (err) {
-                return res.json({
-                    status: false,
-                    message: err
-                });
-            } else if (!playlist) {
-                return res.json({
-                    status: true,
-                    message: "this playlist doesn't exist or you dont have the good right"
-                });
-            } else {
-                if (playlist.musics === null) {
-                    playlist.musics = {
-                        trackId: trackId,
-                        duration: duration
-                    }
-                } else {
-                    playlist.musics.push({
-                        trackId: trackId,
-                        duration: duration
-                    })
-                }
-                let editPlaylist = new Playlist(playlist);
-                editPlaylist.save((err) => {
-                    if (err) {
-                        return res.json({
-                            status: false,
-                            message: err
-                        });
-                    } else
-                        return res.json({
-                            status: true,
-                            message: "music save"
-                        });
-                })
-            }
-        })
-}
-
-exports.delMusicPlaylist = async (req, res) => {
-    const { userId, playlistId, trackId } = req.params;
-
-    Playlist.findOne({ $and: [{ _id: playlistId }, { $or: [{ created_by: userId }, { users: { $in: [{ $and: [{ id: userId }, { right: true }] }] } }] }] })
-        .exec((err, playlist) => {
-            if (err) {
-                return res.json({
-                    status: false,
-                    message: err
-                });
-            } else if (!playlist) {
-                return res.json({
-                    status: true,
-                    message: "this playlist doesn't exist or you dont have the good right"
-                });
-            } else {
-                let musicIndex = playlist.musics.map((m) => { return m.trackId }).indexOf(trackId);
-                if (musicIndex != -1) {
-                    playlist.musics.splice(musicIndex, 1);
-                    const finalPlaylist = new Playlist(playlist);
-                    finalPlaylist.save();
-                    return res.json({
-                        status: true,
-                        message: "music delete"
-                    });
-                } else {
-                    return res.json({
-                        status: false,
-                        message: "this music is not in this playlist"
-                    });
-                }
-            }
-        })
-}
-

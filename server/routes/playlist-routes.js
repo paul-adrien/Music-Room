@@ -26,4 +26,6 @@ module.exports = function (app) {
     app.post("/:userId/playlist/:playlistId/acceptInvite", [authJwt.verifyToken], controller.acceptInvitePlaylist);
     app.delete("/:userId/playlist/:playlistId/refuseInvite", [authJwt.verifyToken], controller.refuseInviteToPlaylist);
     app.delete("/:userId/playlist/:playlistId/quitPlaylist", [authJwt.verifyToken], controller.quitPlaylist);
+
+    //app.put("/:userId/playlist/:playlistId/friends/:friendId", [authJwt.verifyToken], controller.editUserPlaylist)
 };

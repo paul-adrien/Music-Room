@@ -39,5 +39,6 @@ require("./routes/music-routes")(app);
 require("./routes/Oauth-routes")(app);
 require("./routes/friends-routes")(app);
 require("./routes/playlist-routes")(app);
+require("./routes/event-routes")(app);
 
 module.exports = app;
