@@ -11,16 +11,15 @@ import { LoginComponent } from './login/login.component';
 import { SearchComponent } from './search/search.component';
 import { ProfileComponent } from './profile/profile.component';
 import { HttpClientModule } from '@angular/common/http';
-import { PlayerComponent } from './player/player.component';
+import { NgxSliderModule } from '@angular-slider/ngx-slider';
 
 @NgModule({
-  declarations: [	
+  declarations: [
     AppComponent,
     LoginComponent,
     SearchComponent,
     ProfileComponent,
-      PlayerComponent
-   ],
+  ],
   entryComponents: [],
   imports: [
     BrowserModule,
@@ -28,6 +27,7 @@ import { PlayerComponent } from './player/player.component';
     AppRoutingModule,
     HttpClientModule,
     MatProgressBarModule,
+    NgxSliderModule,
   ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],

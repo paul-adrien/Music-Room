@@ -12,40 +12,7 @@ import { SpotifyService } from '../_services/spotify_service';
   selector: 'app-tabs',
   template: `
     <ion-tabs>
-      <mat-progress-bar
-        *ngIf="this.playerInfo !== undefined"
-        mode="determinate"
-        [value]="
-          (this.playerInfo?.progress_ms * 100) /
-          this.playerInfo?.item.duration_ms
-        "
-        [color]="'warn'"
-      ></mat-progress-bar>
-      <div *ngIf="this.playerInfo !== undefined" class="control-bar">
-        <img
-          (click)="this.presentModal()"
-          class="logo"
-          [src]="this.playerInfo?.item?.album.images[0].url"
-        />
-        <div (click)="this.presentModal()" class="item-info">
-          <div class="info-top">{{ this.playerInfo?.item?.name }}</div>
-          <div class="info-bottom">
-            {{ this.playerInfo?.item?.artists[0].name }}
-          </div>
-        </div>
-        <img
-          *ngIf="this.playerInfo?.is_playing === false"
-          (click)="this.play()"
-          class="play-pause"
-          src="./assets/play.svg"
-        />
-        <img
-          *ngIf="this.playerInfo?.is_playing"
-          (click)="this.pause()"
-          class="play-pause"
-          src="./assets/pause.svg"
-        />
-      </div>
+      <app-player></app-player>
       <ion-tab-bar color="dark" slot="bottom">
         <ion-tab-button tab="tab1">
           <ion-icon name="triangle"></ion-icon>
@@ -113,6 +80,9 @@ export class TabsPage {
     const modal = await this.modalController.create({
       component: PlayerComponent,
       cssClass: 'my-custom-class',
+      componentProps: {
+        playerInfo: this.spotifyService.getPlayerInfo(),
+      },
     });
     return await modal.present();
   }

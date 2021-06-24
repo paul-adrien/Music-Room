@@ -8,6 +8,7 @@ import { TabsPageRoutingModule } from './tabs-routing.module';
 import { TabsPage } from './tabs.page';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { PlayerComponent } from '../player/player.component';
+import { NgxSliderModule } from '@angular-slider/ngx-slider';
 
 @NgModule({
   imports: [
@@ -16,8 +17,9 @@ import { PlayerComponent } from '../player/player.component';
     FormsModule,
     TabsPageRoutingModule,
     MatProgressBarModule,
+    NgxSliderModule,
   ],
   entryComponents: [PlayerComponent],
-  declarations: [TabsPage],
+  declarations: [TabsPage, PlayerComponent],
 })
 export class TabsPageModule {}

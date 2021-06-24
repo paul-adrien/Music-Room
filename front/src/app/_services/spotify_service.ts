@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import * as querystring from 'querystring';
@@ -117,7 +117,13 @@ export class SpotifyService {
         }),
         httpSpotifyOptions
       )
-      .pipe(tap((res) => this.saveToken(res)));
+      .pipe(
+        tap((res) => {
+          this.saveToken(res);
+          window.location.href =
+            window.location.origin + window.location.pathname;
+        })
+      );
   }
 
   getRefreshToken() {
@@ -138,6 +144,7 @@ export class SpotifyService {
         querystring.stringify({
           grant_type: 'refresh_token',
           refresh_token: localStorage.getItem('refresh_token'),
+          clientId: clientId,
         }),
         httpSpotifyOptions
       )
@@ -152,7 +159,6 @@ export class SpotifyService {
       if (res.access_token != undefined) {
         const access_token = res.access_token;
         localStorage.setItem('access_token', access_token);
-        this.spotifyApi.setAccessToken(access_token);
       }
       if (res.refresh_token != undefined) {
         const refresh_token = res.refresh_token;
@@ -224,6 +230,60 @@ export class SpotifyService {
     return this.http
       .put<any>(
         `https://api.spotify.com/v1/me/player/pause`,
+        {},
+        httpApiSpotifyOptions
+      )
+      .pipe(
+        catchError((err) => {
+          if (err?.status === 401) {
+            return this.getRefreshToken();
+          } else {
+            return;
+          }
+        })
+      );
+  }
+
+  seek(position: number) {
+    return this.http
+      .put<any>(
+        `https://api.spotify.com/v1/me/player/seek?position_ms=${position.toString()}`,
+        {},
+        httpApiSpotifyOptions
+      )
+      .pipe(
+        catchError((err) => {
+          if (err?.status === 401) {
+            return this.getRefreshToken();
+          } else {
+            return;
+          }
+        })
+      );
+  }
+
+  next() {
+    return this.http
+      .post<any>(
+        `https://api.spotify.com/v1/me/player/next`,
+        {},
+        httpApiSpotifyOptions
+      )
+      .pipe(
+        catchError((err) => {
+          if (err?.status === 401) {
+            return this.getRefreshToken();
+          } else {
+            return;
+          }
+        })
+      );
+  }
+
+  previous() {
+    return this.http
+      .post<any>(
+        `https://api.spotify.com/v1/me/player/previous`,
         {},
         httpApiSpotifyOptions
       )

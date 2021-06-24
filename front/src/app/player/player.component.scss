@@ -1,5 +1,139 @@
-:host {
-  width: 100%;
+.player-container {
   height: 100%;
   display: flex;
+  padding: 2rem;
+  flex-direction: column;
+  justify-content: flex-start;
+
+  .top-container {
+    display: flex;
+    margin-bottom: 2rem;
+  }
+
+  .cover {
+    margin-bottom: 1rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+    font-family: "Circular-bold";
+    margin-bottom: 0.5rem;
+  }
+
+  .album {
+    color: var(--light-grey-color);
+    margin-bottom: 0.5rem;
+  }
+}
+.control-bar {
+  width: 100%;
+  height: 3rem;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  box-sizing: content-box;
+  background: var(--ion-color-dark);
+  border-bottom: 1px solid black;
+}
+
+.item-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  height: 100%;
+  width: 50%;
+  flex-grow: 1;
+  padding-right: 3rem;
+
+  .info-top {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .info-bottom {
+    color: var(--light-grey-color);
+  }
+}
+.logo {
+  height: 100%;
+  object-fit: contain;
+  margin-right: 1rem;
+}
+
+.timer-container {
+  display: flex;
+  font-size: 0.8rem;
+  justify-content: space-between;
+}
+
+.control-buttons-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  margin-top: 1rem;
+
+  .play-pause {
+    height: 3rem;
+    margin: 0;
+  }
+
+  .next-previous {
+    height: 1.5rem;
+    object-fit: contain;
+    cursor: pointer;
+  }
+}
+
+.play-pause {
+  height: 1.8rem;
+  margin-right: 1rem;
+  object-fit: contain;
+  cursor: pointer;
+}
+
+mat-progress-bar {
+  height: 3px !important;
+}
+
+::ng-deep .mat-progress-bar-buffer {
+  background-color: grey;
+}
+
+::ng-deep .mat-progress-bar-fill::after {
+  background-color: white;
+}
+
+::ng-deep {
+  .player-container .ngx-slider {
+    margin: 1rem 0;
+  }
+
+  .player-container .ngx-slider .ngx-slider-pointer {
+    cursor: pointer;
+    width: 14px;
+    height: 14px;
+    top: -5px;
+    background-color: white;
+    z-index: 3;
+    border-radius: 16px;
+  }
+
+  .player-container .ngx-slider .ngx-slider-pointer::after {
+    display: none;
+  }
+
+  .player-container .ngx-slider .ngx-slider-selection {
+    background: white !important;
+    visibility: visible;
+  }
+
+  .player-container .ngx-slider .ngx-slider-bar {
+    background: rgba(255, 255, 255, 0.7);
+  }
+
+  .player-container .ngx-slider .ngx-slider-bubble.ngx-slider-limit,
+  .player-container .ngx-slider .ngx-slider-bubble {
+    color: var(--color-text);
+  }
 }
