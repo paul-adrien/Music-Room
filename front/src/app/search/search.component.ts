@@ -34,12 +34,10 @@ import {
         </div>
       </div>
     </div>
-    <div class="primary-button" (click)="this.testMusic()">test</div>
+    <!-- <div class="primary-button" (click)="this.testMusic()">test</div>
     <div class="primary-button" (click)="this.testRequestAutho()">
       test auth
-    </div>
-
-
+    </div> -->
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./search.component.scss'],
@@ -53,7 +51,6 @@ export class SearchComponent {
     private spotifyService: SpotifyService,
     private cd: ChangeDetectorRef
   ) {}
-
 
   play(uri: string) {
     this.spotifyService.playTrack(uri).subscribe();
@@ -75,6 +72,4 @@ export class SearchComponent {
   testRequestAutho() {
     this.spotifyService.requestAuthorization();
   }
-
-
 }

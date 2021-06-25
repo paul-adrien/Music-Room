@@ -87,7 +87,7 @@ export class SpotifyService {
     let url = 'https://accounts.spotify.com/authorize';
     url += '?client_id=' + clientId;
     url += '&response_type=code';
-    url += '&redirect_uri=' + encodeURI('http://localhost:8100/tabs/search');
+    url += '&redirect_uri=' + encodeURI('http://localhost:8100/login');
     url += '&show_dialog=true';
     url +=
       '&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-position user-library-read streaming user-read-playback-state user-read-recently-played playlist-read-private';
@@ -96,34 +96,37 @@ export class SpotifyService {
 
   getAuthorizationToken() {
     const code = this.getCode();
-    let token =
-      'Basic ' +
-      btoa('fe5ad0d35eb34ee3a60234973d3b1346:9bbe1deebd4045ef9b0eb3f7bab09daa');
-    const httpSpotifyOptions = {
-      headers: new HttpHeaders({
-        Authorization: token,
-        'Content-Type': 'application/x-www-form-urlencoded',
-        Accept: 'application/json',
-      }),
-    };
-
-    return this.http
-      .post(
-        `https://accounts.spotify.com/api/token`,
-        querystring.stringify({
-          grant_type: 'authorization_code',
-          code: code,
-          redirect_uri: 'http://localhost:8100/tabs/search',
+    if (code !== null) {
+      let token =
+        'Basic ' +
+        btoa(
+          'fe5ad0d35eb34ee3a60234973d3b1346:9bbe1deebd4045ef9b0eb3f7bab09daa'
+        );
+      const httpSpotifyOptions = {
+        headers: new HttpHeaders({
+          Authorization: token,
+          'Content-Type': 'application/x-www-form-urlencoded',
+          Accept: 'application/json',
         }),
-        httpSpotifyOptions
-      )
-      .pipe(
-        tap((res) => {
-          this.saveToken(res);
-          window.location.href =
-            window.location.origin + window.location.pathname;
-        })
-      );
+      };
+
+      return this.http
+        .post(
+          `https://accounts.spotify.com/api/token`,
+          querystring.stringify({
+            grant_type: 'authorization_code',
+            code: code,
+            redirect_uri: 'http://localhost:8100/login',
+          }),
+          httpSpotifyOptions
+        )
+        .pipe(
+          tap((res) => {
+            this.saveToken(res);
+            window.location.href = 'http://localhost:8100/tabs/search';
+          })
+        );
+    } else return;
   }
 
   getRefreshToken() {
@@ -148,7 +151,12 @@ export class SpotifyService {
         }),
         httpSpotifyOptions
       )
-      .pipe(tap((res) => this.saveToken(res)));
+      .pipe(
+        tap((res) => {
+          this.saveToken(res);
+          window.location.href = window.location.href;
+        })
+      );
   }
 
   saveToken(res: any) {

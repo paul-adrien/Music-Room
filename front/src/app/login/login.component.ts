@@ -1,6 +1,9 @@
+import { SpotifyService } from './../_services/spotify_service';
+import { AuthService } from './../_services/auth_service';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { User } from 'libs/user';
 
 function ValidatorUserNameLength(control: FormControl) {
   const test = /^(?=.{3,20}$)[a-zA-Z0-9]+(?:[-' ][a-zA-Z0-9]+)*$/;
@@ -52,9 +55,12 @@ function ValidatorPass(control: FormControl) {
       {{ this.loginMode ? 'signUp' : 'signIn' }}
     </div>
     <form
+      [formGroup]="this.registerForm"
       class="form-container"
       *ngIf="!isLoggedIn && !this.loginMode"
       name="form"
+      (ngSubmit)="f.form.valid && onSubmit()"
+      #f="ngForm"
       novalidate
     >
       <div class="inputs">
@@ -173,9 +179,12 @@ function ValidatorPass(control: FormControl) {
       </button>
     </form>
     <form
+      [formGroup]="this.loginForm"
       class="form-container"
       *ngIf="!isLoggedIn && this.loginMode"
       name="form"
+      (ngSubmit)="f.form.valid && onSubmit()"
+      #f="ngForm"
       novalidate
     >
       <div class="inputs">
@@ -273,6 +282,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private route: Router,
     private router: ActivatedRoute,
+    private authService: AuthService,
+    private spotifyService: SpotifyService,
     private cd: ChangeDetectorRef //public translate: TranslateService
   ) {}
 
@@ -281,10 +292,17 @@ export class LoginComponent implements OnInit {
       if (params.data) {
         const data = JSON.parse(decodeURI(params.data));
 
-        // this.authService.saveToken(data.token);
-        // this.authService.saveUser(data.user);
+        if (data.token && data.user) {
+          this.authService.saveToken(data.token);
+          this.authService.saveUser(data.user);
+        }
         // this.translate.setDefaultLang(data.user?.lang);
-        this.route.navigate(['home']);
+      } else if (params.code) {
+        this.spotifyService.getAuthorizationToken().subscribe(() => {
+          if (localStorage.getItem('access_token')) {
+            this.route.navigate(['/tabs/search']);
+          }
+        });
       }
     });
   }
@@ -297,46 +315,50 @@ export class LoginComponent implements OnInit {
     this.isSuccessful = false;
   }
 
-  // onSubmit() {
-  //   if (this.loginMode === false) {
-  //     const form: Partial<User> = this.registerForm.getRawValue();
-  //     this.authService.register(form).subscribe(
-  //       (data) => {
-  //         if (data) {
-  //           this.authService.saveToken(data.token);
-  //           this.authService.saveUser(data.user);
-
-  //           this.route.navigate(['/home']);
-  //           this.isSuccessful = true;
-  //           this.isSignUpFailed = false;
-  //           this.cd.detectChanges();
-  //         } else {
-  //           this.errorMessageReg = data.message;
-  //           this.cd.detectChanges();
-  //         }
-  //       },
-  //       (err) => {
-  //         this.isSignUpFailed = true;
-  //       }
-  //     );
-  //   } else {
-  //     const form: Partial<User> = this.loginForm.getRawValue();
-  //     this.authService.login(form).subscribe(
-  //       (data) => {
-  //         this.authService.saveToken(data.token);
-  //         this.authService.saveUser(data.user);
-
-  //         this.route.navigate(['/home']);
-  //         this.isSuccessful = true;
-  //         this.isSignUpFailed = false;
-  //         this.cd.detectChanges();
-  //       },
-  //       (err) => {
-  //         this.isLoginFailed = true;
-  //       }
-  //     );
-  //   }
-  // }
+  onSubmit() {
+    if (this.loginMode === false) {
+      const form: Partial<User> = this.registerForm.getRawValue();
+      this.authService.register(form).subscribe(
+        (data) => {
+          if (data) {
+            this.authService.saveToken(data.token);
+            this.authService.saveUser(data.user);
+            this.spotifyService.requestAuthorization();
+            if (localStorage.getItem('access_token')) {
+              this.route.navigate(['/tabs/search']);
+              this.isSuccessful = true;
+              this.isSignUpFailed = false;
+            }
+            this.cd.detectChanges();
+          } else {
+            this.errorMessageReg = data.message;
+            this.cd.detectChanges();
+          }
+        },
+        (err) => {
+          this.isSignUpFailed = true;
+        }
+      );
+    } else {
+      const form: Partial<User> = this.loginForm.getRawValue();
+      this.authService.login(form).subscribe(
+        (data) => {
+          this.authService.saveToken(data.token);
+          this.authService.saveUser(data.user);
+          this.spotifyService.requestAuthorization();
+          if (localStorage.getItem('access_token')) {
+            this.route.navigate(['/tabs/search']);
+            this.isSuccessful = true;
+            this.isSignUpFailed = false;
+          }
+          this.cd.detectChanges();
+        },
+        (err) => {
+          this.isLoginFailed = true;
+        }
+      );
+    }
+  }
 
   public Oauth42() {
     location.href = 'http://localhost:8080/user/authenticate/42';

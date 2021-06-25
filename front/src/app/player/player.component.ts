@@ -126,16 +126,19 @@ export class PlayerComponent {
   }
 
   getPlayerInfo() {
-    this.spotifyService.getPlayerInfo().subscribe((res) => {
-      if (typeof res !== 'string' && res !== null) {
-        this.playerInfo = {
-          is_playing: res.is_playing,
-          item: res.item as Track,
-          progress_ms: res.progress_ms,
-        };
-      }
-      this.cd.detectChanges();
-    });
+    this.spotifyService
+      .getPlayerInfo()
+      .toPromise()
+      .then((res) => {
+        if (typeof res !== 'string' && res !== null) {
+          this.playerInfo = {
+            is_playing: res.is_playing,
+            item: res.item as Track,
+            progress_ms: res.progress_ms,
+          };
+        }
+        this.cd.detectChanges();
+      });
   }
 
   play() {
@@ -180,5 +183,10 @@ export class PlayerComponent {
 
   previousTrack() {
     this.spotifyService.previous().subscribe();
+  }
+  ngOnDestroy() {
+    if (!this.isModal) {
+      this.pause();
+    }
   }
 }
