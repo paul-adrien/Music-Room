@@ -2,6 +2,7 @@ import { SearchComponent } from './search/search.component';
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { LoginComponent } from './login/login.component';
+import { RoomComponent } from './room/room.component';
 
 const routes: Routes = [
   {

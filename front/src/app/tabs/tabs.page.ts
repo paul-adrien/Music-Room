@@ -14,7 +14,7 @@ import { SpotifyService } from '../_services/spotify_service';
     <ion-tabs>
       <app-player></app-player>
       <ion-tab-bar color="dark" slot="bottom">
-        <ion-tab-button tab="tab1">
+        <ion-tab-button tab="home">
           <ion-icon name="triangle"></ion-icon>
           <ion-label>Accueil</ion-label>
         </ion-tab-button>
@@ -46,7 +46,7 @@ export class TabsPage {
   ) {}
 
   ngAfterContentInit() {
-    setInterval(() => this.getPlayerInfo(), 500);
+    //setInterval(() => this.getPlayerInfo(), 500);
   }
 
   getPlayerInfo() {

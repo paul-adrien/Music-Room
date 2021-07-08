@@ -1,3 +1,4 @@
+import { SpotifyService } from './../_services/spotify_service';
 import { AuthService } from './../_services/auth_service';
 import { Component, OnInit } from '@angular/core';
 import { User } from 'libs/user';
@@ -16,13 +17,22 @@ import { User } from 'libs/user';
 export class ProfileComponent implements OnInit {
   public user: Partial<User>;
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private spotifyService: SpotifyService
+  ) {}
 
   ngOnInit(): void {
     this.user = this.authService.getUser();
   }
 
   logOut() {
-    this.authService.logOut();
+    this.spotifyService.pause().subscribe(
+      (res) => {
+        this.authService.logOut();
+      },
+      () => this.authService.logOut(),
+      () => this.authService.logOut()
+    );
   }
 }

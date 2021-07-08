@@ -122,7 +122,7 @@ export class PlayerComponent {
   ) {}
 
   ngAfterContentInit() {
-    setInterval(() => this.getPlayerInfo(), 500);
+    //setInterval(() => this.getPlayerInfo(), 1500);
   }
 
   getPlayerInfo() {

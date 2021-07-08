@@ -1,3 +1,4 @@
+import { authInterceptorProviders } from './_helpers/auth-interceptor';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
@@ -13,6 +14,8 @@ import { ProfileComponent } from './profile/profile.component';
 import { HttpClientModule } from '@angular/common/http';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { ReactiveFormsModule } from '@angular/forms';
+import { HomeComponent } from './home/home.component';
+import { RoomComponent } from './room/room.component';
 
 @NgModule({
   declarations: [
@@ -20,6 +23,8 @@ import { ReactiveFormsModule } from '@angular/forms';
     LoginComponent,
     SearchComponent,
     ProfileComponent,
+    HomeComponent,
+    RoomComponent,
   ],
   entryComponents: [],
   imports: [
@@ -31,7 +36,10 @@ import { ReactiveFormsModule } from '@angular/forms';
     NgxSliderModule,
     ReactiveFormsModule,
   ],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+  providers: [
+    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    authInterceptorProviders,
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

@@ -19,7 +19,7 @@ module.exports = function (app) {
     passport.authenticate(
       "42",
       {
-        failureRedirect: "http://localhost:8081/login",
+        failureRedirect: "http://localhost:8100/login",
       },
       async (err, userId) => {
         const userDb = await getUser({ id: userId });
@@ -28,7 +28,7 @@ module.exports = function (app) {
         });
 
         return res.redirect(
-          "http://localhost:8081/login?data=" +
+          "http://localhost:8100/login?data=" +
             encodeURI(
               JSON.stringify({
                 user: userDb,
@@ -48,7 +48,7 @@ module.exports = function (app) {
     passport.authenticate(
       "google",
       {
-        failureRedirect: "http://localhost:8081/login",
+        failureRedirect: "http://localhost:8100/login",
       },
       async (err, userId) => {
         // Successful authentication, redirect home.
@@ -59,7 +59,7 @@ module.exports = function (app) {
         });
 
         return res.redirect(
-          "http://localhost:8081/login?data=" +
+          "http://localhost:8100/login?data=" +
             encodeURI(
               JSON.stringify({
                 user: userDb,
@@ -79,7 +79,7 @@ module.exports = function (app) {
   //   passport.authenticate(
   //     "github",
   //     {
-  //       failureRedirect: "http://localhost:8081/login",
+  //       failureRedirect: "http://localhost:8100/login",
   //     },
   //     async (err, userId) => {
   //       // Successful authentication, redirect home.
@@ -90,7 +90,7 @@ module.exports = function (app) {
   //       });
 
   //       return res.redirect(
-  //         "http://localhost:8081/login?data=" +
+  //         "http://localhost:8100/login?data=" +
   //         encodeURI(
   //           JSON.stringify({
   //             user: userDb,

@@ -54,6 +54,25 @@ export class SpotifyService {
     // });
   }
 
+  getTracksInfo(trackIds: string[]) {
+    return this.http
+      .get<any>(
+        `https://api.spotify.com/v1/tracks?ids=${encodeURI(
+          trackIds.join(',')
+        )}`,
+        httpApiSpotifyOptions
+      )
+      .pipe(
+        catchError((err) => {
+          if (err?.status === 401) {
+            return this.getRefreshToken();
+          } else {
+            return;
+          }
+        })
+      );
+  }
+
   playTrack(uri: string) {
     return this.http
       .put<any>(
@@ -141,22 +160,24 @@ export class SpotifyService {
       }),
     };
 
-    return this.http
-      .post(
-        `https://accounts.spotify.com/api/token`,
-        querystring.stringify({
-          grant_type: 'refresh_token',
-          refresh_token: localStorage.getItem('refresh_token'),
-          clientId: clientId,
-        }),
-        httpSpotifyOptions
-      )
-      .pipe(
-        tap((res) => {
-          this.saveToken(res);
-          window.location.href = window.location.href;
-        })
-      );
+    if (localStorage.getItem('refresh_token')) {
+      return this.http
+        .post(
+          `https://accounts.spotify.com/api/token`,
+          querystring.stringify({
+            grant_type: 'refresh_token',
+            refresh_token: localStorage.getItem('refresh_token'),
+            clientId: clientId,
+          }),
+          httpSpotifyOptions
+        )
+        .pipe(
+          tap((res) => {
+            this.saveToken(res);
+            window.location.href = window.location.href;
+          })
+        );
+    }
   }
 
   saveToken(res: any) {

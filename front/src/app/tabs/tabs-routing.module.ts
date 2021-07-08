@@ -1,8 +1,10 @@
+import { HomeComponent } from './../home/home.component';
 import { ProfileComponent } from './../profile/profile.component';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { SearchComponent } from '../search/search.component';
 import { TabsPage } from './tabs.page';
+import { RoomComponent } from '../room/room.component';
 
 const routes: Routes = [
   {
@@ -26,6 +28,11 @@ const routes: Routes = [
       },
       { path: 'search', component: SearchComponent },
       { path: 'profile', component: ProfileComponent },
+      { path: 'home', component: HomeComponent },
+      {
+        path: 'room/:id',
+        component: RoomComponent,
+      },
 
       {
         path: '',
