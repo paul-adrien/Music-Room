@@ -27,9 +27,7 @@ module.exports = function (app) {
     app.delete("/:userId/event/:eventId/refuseInvite", [authJwt.verifyToken], controller.refuseInviteToEvent);
     app.delete("/:userId/event/:eventId/quitEvent", [authJwt.verifyToken], controller.quitEvent);
     // app.put("/:userId/playlist/:playlistId/friends/:friendId", [authJwt.verifyToken], controller.editUserEvent)
-
-    // app.post("/:userId/event/:eventId/join", [authJwt.verifyToken], controller.joinEvent);
-    // app.post("/:userId/event/:eventId/leave", [authJwt.verifyToken], controller.leaveEvent);
+    app.post("/:userId/event/:eventId/join", [authJwt.verifyToken], controller.joinEvent);
 
     // router.post('/:userId/event/:eventId/musics/:trackId/vote', [authJwt.verifyToken], controller.voteMusicEvent);
     // router.delete('/:userId/event/:eventId/musics/:trackId/unvote', [authJwt.verifyToken], controller.unvoteMusicEvent);

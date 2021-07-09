@@ -12,7 +12,7 @@ const Event = mongoose.model(
             lat: Number,
             lng: Number
         },
-        type: String,
+        type: Boolean,
         vote_right: String,
         style: String,
         users: [{

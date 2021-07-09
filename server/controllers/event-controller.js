@@ -5,28 +5,34 @@ const Event = db.event;
 exports.getAllEvent = (req, res) => {
     const userId = req.params.userId;
 
-    Event.find({ $or: [{ created_by: userId }, { users: { $in: [{ id: userId }] } }, { type: true }] })
-        .exec((err, event) => {
-            if (err) {
-                return res.json({
-                    status: false,
-                    message: err,
-                    event: null
-                });
-            } else if (!event) {
-                return res.json({
-                    status: true,
-                    message: 'no event',
-                    event: null
-                });
-            } else {
-                return res.json({
-                    status: true,
-                    message: 'list of event',
-                    event: event
-                });
-            }
-        })
+    Event.find({
+        $or:
+            [
+                { created_by: userId },
+                { users: { $in: [{ id: userId }] } },
+                { type: true }
+            ]
+    }).exec((err, event) => {
+        if (err) {
+            return res.json({
+                status: false,
+                message: err,
+                event: null
+            });
+        } else if (!event) {
+            return res.json({
+                status: true,
+                message: 'no event',
+                event: null
+            });
+        } else {
+            return res.json({
+                status: true,
+                message: 'list of event',
+                event: event
+            });
+        }
+    })
 }
 
 exports.CreateEvent = async (req, res) => {
@@ -94,7 +100,7 @@ exports.getEvent = (req, res) => {
 exports.delEvent = async (req, res) => {
     const { userId, eventId } = req.params;
 
-    Event.findOne({ $and: [{ _id: eventId }, { $or: [{ created_by: userId }, { users: { $in: [{ $and: [{ id: userId }, { right: true }] }] } }] }] })
+    Event.findOne({ $and: [{ _id: eventId }, { created_by: userId }] })
         .exec((err, event) => {
             if (err) {
                 return res.json({
@@ -172,84 +178,94 @@ exports.addMusicEvent = async (req, res) => {
     const { userId, eventId, trackId } = req.params;
     const duration = req.body.duration;
 
-    Event.findOne({ $and: [{ _id: eventId }, { $or: [{ created_by: userId }, { users: { $in: [{ $and: [{ id: userId }, { right: true }] }] } }] }] })
-        .exec(async (err, event) => {
-            if (err) {
-                return res.json({
-                    status: false,
-                    message: err
-                });
-            } else if (!event) {
-                return res.json({
-                    status: true,
-                    message: "this event doesn't exist or you dont have the good right"
-                });
-            } else {
-                if (event.musics === null) {
-                    event.musics = {
-                        trackId: trackId,
-                        duration: duration,
-                        nb_vote: 0,
-                        vote: []
-                    }
-                } else {
-                    event.musics.push({
-                        trackId: trackId,
-                        duration: duration,
-                        nb_vote: 0,
-                        vote: []
-                    })
+    Event.findOne({
+        $and:
+            [
+                { _id: eventId },
+                { created_by: userId }
+            ]
+    }).exec(async (err, event) => {
+        if (err) {
+            return res.json({
+                status: false,
+                message: err
+            });
+        } else if (!event) {
+            return res.json({
+                status: true,
+                message: "this event doesn't exist or you dont have the good right"
+            });
+        } else {
+            if (event.musics === null) {
+                event.musics = {
+                    trackId: trackId,
+                    duration: duration,
+                    nb_vote: 0,
+                    vote: []
                 }
-                let editEvent = new Event(event);
-                editEvent.save((err) => {
-                    if (err) {
-                        return res.json({
-                            status: false,
-                            message: err
-                        });
-                    } else
-                        return res.json({
-                            status: true,
-                            message: "music save"
-                        });
+            } else {
+                event.musics.push({
+                    trackId: trackId,
+                    duration: duration,
+                    nb_vote: 0,
+                    vote: []
                 })
             }
-        })
+            let editEvent = new Event(event);
+            editEvent.save((err) => {
+                if (err) {
+                    return res.json({
+                        status: false,
+                        message: err
+                    });
+                } else
+                    return res.json({
+                        status: true,
+                        message: "music save"
+                    });
+            })
+        }
+    })
 }
 
 exports.delMusicEvent = async (req, res) => {
     const { userId, eventId, trackId } = req.params;
 
-    Event.findOne({ $and: [{ _id: eventId }, { $or: [{ created_by: userId }, { users: { $in: [{ $and: [{ id: userId }, { right: true }] }] } }] }] })
-        .exec((err, event) => {
-            if (err) {
-                return res.json({
-                    status: false,
-                    message: err
-                });
-            } else if (!event) {
+    Event.findOne({
+        $and:
+            [
+                { _id: eventId },
+                { created_by: userId }
+            ]
+    }).exec((err, event) => {
+        if (err) {
+            return res.json({
+                status: false,
+                message: err
+            });
+        } else if (!event) {
+            return res.json({
+                status: true,
+                message: "this event doesn't exist or you dont have the good right"
+            });
+        } else {
+            let musicIndex = event.musics.map((m) => { return m.trackId }).indexOf(trackId);
+            if (musicIndex != -1) {
+                event.musics.splice(musicIndex, 1);
+                const finalEvent = new Event(event);
+                finalEvent.save();
                 return res.json({
                     status: true,
-                    message: "this event doesn't exist or you dont have the good right"
+                    message: "music delete"
                 });
             } else {
-                let musicIndex = event.musics.map((m) => { return m.trackId }).indexOf(trackId);
-                if (musicIndex != -1) {
-                    event.musics.splice(musicIndex, 1);
-                    const finalEvent = new Event(event);
-                    finalEvent.save();
-                    return res.json({
-                        status: true,
-                        message: "music delete"
-                    });
-                } else {
-                    return res.json({
-                        status: false,
-                        message: "this music is not in this event"
-                    });
-                }
+                return res.json({
+                    status: false,
+                    message: "this music is not in this event"
+                });
             }
-        })
+        }
+    })
 }
 
 exports.inviteToEvent = async (req, res) => {
@@ -500,4 +516,183 @@ exports.quitEvent = async (req, res) => {
                 }
             }
         })
+}
+
+exports.joinEvent = async (req, res) => {
+    const { userId, eventId } = req.params;
+
+    Event.findOne({ _id: eventId })
+        .exec((err, event) => {
+            if (err) {
+                return res.json({
+                    status: false,
+                    message: err
+                });
+            } else if (!event) {
+                return res.json({
+                    status: true,
+                    message: "this event doesn't exist or you dont have the good right"
+                });
+            } else {
+                User.findOne({ id: userId }).exec(async (err, user) => {
+                    if (err) {
+                        return res.json({
+                            status: false,
+                            message: err
+                        });
+                    } else if (!user) {
+                        return res.json({
+                            status: false,
+                            message: "this user doesn't exist"
+                        });
+                    } else {
+                        if (event.right === true) {
+                            if (event.users != null) {
+                                event.users.push({
+                                    id: userId,
+                                    username: user.userName
+                                });
+                            } else
+                                event.users = {
+                                    id: userId,
+                                    username: user.userName
+                                };
+                            let finalEvent = new Event(event);
+                            finalEvent.save((err) => {
+                                if (err) {
+                                    return res.json({
+                                        status: false,
+                                        message: err
+                                    });
+                                } else
+                                    return res.json({
+                                        status: true,
+                                        message: "invitation was accepted"
+                                    });
+                            })
+                        } else {
+                            return res.json({
+                                status: false,
+                                message: "this event is private"
+                            });
+                        }
+                    }
+                })
+            }
+        })
+}
+
+exports.voteMusicEvent = async (req, res) => {
+    const { userId, eventId, trackId } = req.params;
+
+    Event.findOne({
+        $and:
+            [
+                { _id: eventId },
+                {
+                    $or:
+                        [
+                            { type: true },
+                            { created_by: userId },
+                            { users: { $in: [{ $and: [{ id: userId }, { right: true }] }] } },
+                        ]
+                }
+            ]
+    }).exec(async (err, event) => {
+        if (err) {
+            return res.json({
+                status: false,
+                message: err
+            });
+        } else if (!event) {
+            return res.json({
+                status: true,
+                message: "this event doesn't exist or you dont have the good right"
+            });
+        } else {
+            let musicIndex = event.musics.map(function (m) { console.log(m); return m.trackId; }).indexOf(trackId);
+            if (musicIndex != -1) {
+                event.musics[musicIndex].nb_vote += 1;
+                event.musics[musicIndex].vote.push({ user_id: userId });
+            } else
+                return res.json({
+                    status: false,
+                    message: 'this music does not exist in this event'
+                })
+            let editEvent = new Event(event);
+            editEvent.save((err) => {
+                if (err) {
+                    return res.json({
+                        status: false,
+                        message: err
+                    });
+                } else
+                    return res.json({
+                        status: true,
+                        message: "your vote was register"
+                    });
+            })
+        }
+    })
+}
+
+exports.unvoteMusicEvent = async (req, res) => {
+    const { userId, eventId, trackId } = req.params;
+
+    Event.findOne({
+        $and:
+            [
+                { _id: eventId },
+                {
+                    $or:
+                        [
+                            { type: true },
+                            { created_by: userId },
+                            { users: { $in: [{ $and: [{ id: userId }, { right: true }] }] } },
+                        ]
+                }
+            ]
+    }).exec(async (err, event) => {
+        if (err) {
+            return res.json({
+                status: false,
+                message: err
+            });
+        } else if (!event) {
+            return res.json({
+                status: true,
+                message: "this event doesn't exist or you dont have the good right"
+            });
+        } else {
+            let musicIndex = event.musics.map(function (m) { console.log(m); return m.trackId; }).indexOf(trackId);
+            if (musicIndex != -1) {
+                event.musics[musicIndex].nb_vote -= 1;
+                let userIndex = event.musics.vote.map(function (u) { console.log(u); return u.user_id; }).indexOf(userId);
+                if (userIndex != -1) {
+                    event.musics[musicIndex].vote.splice(musicIndex, 1);
+                } else
+                    return res.json({
+                        status: false,
+                        message: 'you never vote this music'
+                    })
+            } else
+                return res.json({
+                    status: false,
+                    message: 'this music does not exist in this event'
+                })
+            let editEvent = new Event(event);
+            editEvent.save((err) => {
+                if (err) {
+                    return res.json({
+                        status: false,
+                        message: err
+                    });
+                } else
+                    return res.json({
+                        status: true,
+                        message: "your vote was register"
+                    });
+            })
+        }
+    })
 }
