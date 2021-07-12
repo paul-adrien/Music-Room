@@ -10,28 +10,34 @@ exports.userBoard = (req, res) => {
   });
 };
 
-exports.userUpdate = async (req, res) => {
+exports.userUpdate = async (req, res, next) => {
   if (await updateUser(req.params.id, req.body)) {
     const user = await getUser({ id: req.params.id });
-    res.json(user);
+    res.message = 'user was update';
+    res.status(200).json(user);
   } else {
-    res.json({
+    res.message = "user update error";
+    res.status(400).json({
       status: false,
       message: "user update error",
     });
-  }
+  };
+  next();
 };
 
-exports.getProfile = async (req, res) => {
+exports.getProfile = async (req, res, next) => {
   const user = await getUser({ id: req.params.id });
   if (user) {
-    res.json(user);
+    res.message = 'send user';
+    res.status(200).json(user);
   } else {
-    res.json({
+    res.message = "user doesn't exist";
+    res.status(400).json({
       status: false,
       message: "user doesn't exist",
     });
   }
+  next();
 };
 
 exports.forgotPass_send = async (req, res) => {

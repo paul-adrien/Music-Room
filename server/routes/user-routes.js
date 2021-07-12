@@ -1,5 +1,6 @@
 const { authJwt } = require("../middlewares");
 const controller = require("../controllers/user-controller");
+const logs = require("../middlewares/logs");
 
 module.exports = function (app) {
     app.use(function (req, res, next) {
@@ -11,6 +12,6 @@ module.exports = function (app) {
     });
 
     app.get("/token", [authJwt.verifyToken], controller.userBoard);
-    app.get("/user/:id", [authJwt.verifyToken], controller.getProfile);
-    app.put("/user/:id", [authJwt.verifyToken], controller.userUpdate);
+    app.get("/user/:id", [authJwt.verifyToken], controller.getProfile, logs);
+    app.put("/user/:id", [authJwt.verifyToken], controller.userUpdate, logs);
 };

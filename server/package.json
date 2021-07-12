@@ -10,9 +10,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "fs": "0.0.1-security",
     "http": "0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.12",
@@ -23,5 +25,8 @@
     "passport-google-oauth20": "^2.0.0",
     "spotify-web-api-node": "^5.0.2",
     "swagger-ui-express": "^4.1.6"
+  },
+  "devDependencies": {
+    "jasmine": "^3.8.0"
   }
 }

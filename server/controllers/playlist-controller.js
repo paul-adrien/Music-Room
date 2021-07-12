@@ -2,34 +2,38 @@ const db = require("../models");
 const User = db.user;
 const Playlist = db.playlist;
 
-exports.getAllPlaylist = (req, res) => {
+exports.getAllPlaylist = (req, res, next) => {
     const userId = req.params.userId;
 
     Playlist.find({ $or: [{ created_by: userId }, { users: { $in: [{ id: userId }] } }, { type: true }] })
         .exec((err, playlists) => {
             if (err) {
-                return res.json({
+                res.message = err;
+                res.status(400).json({
                     status: false,
                     message: err,
                     playlists: null
                 });
             } else if (!playlists) {
-                return res.json({
+                res.message = 'no playlist';
+                res.status(201).json({
                     status: true,
                     message: 'no playlist',
                     playlists: null
                 });
             } else {
-                return res.json({
+                res.message = 'list of playlist';
+                res.status(200).json({
                     status: true,
                     message: 'list of playlist',
                     playlists: playlists
                 });
             }
+            next();
         })
 }
 
-exports.CreatePlaylist = async (req, res) => {
+exports.CreatePlaylist = async (req, res, next) => {
     const userId = req.params.userId;
     const { name, type, right, style } = req.body;
 
@@ -44,92 +48,106 @@ exports.CreatePlaylist = async (req, res) => {
     });
     playlist.save((err, playlist) => {
         if (err) {
-            return res.json({
+            res.message = err;
+            res.status(400).json({
                 status: false,
                 message: err,
             });
         }
-        res.json({
+        res.message = 'playlist created';
+        res.status(200).json({
             status: true,
             message: 'playlist created',
             playlist: playlist
         });
+        next();
     })
 }
 
-exports.getPlaylist = (req, res) => {
+exports.getPlaylist = (req, res, next) => {
     const { userId, playlistId } = req.params;
 
     Playlist.findOne({ _id: playlistId })
         .exec((err, playlists) => {
             if (err) {
-                return res.json({
+                res.message = err;
+                res.status(400).json({
                     status: false,
                     message: err,
                     playlists: null
                 });
             } else if (!playlists) {
-                return res.json({
+                res.message = 'no playlist';
+                res.status(201).json({
                     status: true,
                     message: 'no playlist',
                     playlists: null
                 });
             } else {
-                return res.json({
+                res.message = 'detail of playlist';
+                res.status(200).json({
                     status: true,
                     message: 'detail of playlist',
                     playlists: playlists
                 });
             }
+            next();
         })
 }
 
-exports.delPlaylist = async (req, res) => {
+exports.delPlaylist = async (req, res, next) => {
     const { userId, playlistId } = req.params;
 
     Playlist.findOne({ $and: [{ _id: playlistId }, { $or: [{ created_by: userId }, { users: { $in: [{ $and: [{ id: userId }, { right: true }] }] } }] }] })
         .exec((err, playlist) => {
             if (err) {
-                return res.json({
+                res.message = err;
+                res.status(400).json({
                     status: false,
                     message: err
                 });
             } else if (!playlist) {
-                return res.json({
+                res.message = "this playlist doesn't exist or you dont have the good right";
+                res.status(201).json({
                     status: true,
                     message: "this playlist doesn't exist or you dont have the good right"
                 });
             } else {
                 Playlist.deleteOne({ _id: playlistId }).exec((err) => {
                     if (err) {
-                        return res.json({
+                        res.message = err;
+                        res.status(401).json({
                             status: false,
                             message: err
                         });
                     }
                 });
-                return res.json({
+                res.message = 'playlist was delete';
+                res.status(200).json({
                     status: true,
                     message: 'playlist was delete',
                 });
             }
+            next();
         })
 }
 
-exports.editPlaylist = async (req, res) => {
+exports.editPlaylist = async (req, res, next) => {
     const { userId, playlistId } = req.params;
     const { name, type, right, style } = req.body;
 
     Playlist.findOne({ $and: [{ _id: playlistId }, { created_by: userId }] })
         .exec(async (err, playlist) => {
             if (err) {
-                return res.json({
+                res.message = err;
+                res.status(400).json({
                     status: false,
                     message: err,
                     playlist: null
                 });
             } else if (!playlist) {
-                return res.json({
+                res.message = "this playlist doesn't exist or you dont have the good right";
+                res.status(201).json({
                     status: true,
                     message: "this playlist doesn't exist or you dont have the good right",
                     playlist: null
@@ -145,29 +163,33 @@ exports.editPlaylist = async (req, res) => {
                     style: style
                 };
                 const finalPlaylist = await Playlist.updateOne({ _id: playlist._id }, { $set: editPlaylist }).exec();
-                res.json({
+                res.message = 'playlist was changed';
+                res.status(200).json({
                     status: true,
                     playlist: finalPlaylist,
                     message: 'playlist was changed'
                 });
             }
+            next();
         })
 }
 
-exports.inviteToPlaylist = async (req, res) => {
+exports.inviteToPlaylist = async (req, res, next) => {
     const { userId, playlistId, friendId } = req.params;
     const right = req.body.right;
 
     Playlist.findOne({ $and: [{ _id: playlistId }, { created_by: userId }] })
         .exec((err, playlist) => {
             if (err) {
-                return res.json({
+                res.message = err;
+                res.status(400).json({
                     status: false,
                     message: err,
                     playlist: null
                 });
             } else if (!playlist) {
-                return res.json({
+                res.message = "this playlist doesn't exist or you dont have the good right";
+                res.status(201).json({
                     status: true,
                     message: "this playlist doesn't exist or you dont have the good right",
                     playlist: null
@@ -175,38 +197,46 @@ exports.inviteToPlaylist = async (req, res) => {
             } else {
                 User.findOne({ id: userId }).exec(async (err, user) => {
                     if (err) {
-                        return res.json({
+                        res.message = err;
+                        res.status(401).json({
                             status: false,
                             message: err
                         });
                     } else if (!user) {
-                        return res.json({
+                        res.message = "this user doesn't exist";
+                        res.status(402).json({
                             status: false,
                             message: "this user doesn't exist"
                         });
                     } else {
                         User.findOne({ id: friendId }).exec(async (err, friend) => {
                             if (err) {
-                                return res.json({
+                                res.message = err;
+                                res.status(403).json({
                                     status: false,
                                     message: err
                                 });
                             } else if (!friend) {
-                                return res.json({
+                                res.message = "this friend doesn't exist";
+                                res.status(404).json({
                                     status: false,
                                     message: "this friend doesn't exist"
                                 });
                             } else {
-                                if (friend.notifs !== undefined && friend.notifs.playlist !== undefined && friend.notifs.playlist.map((f) => { return f.id }).indexOf(playlistId) != -1)
-                                    return res.json({
+                                if (friend.notifs !== undefined && friend.notifs.playlist !== undefined && friend.notifs.playlist.map((f) => { return f.id }).indexOf(playlistId) != -1) {
+                                    res.message = "this user already invite you";
+                                    res.status(405).json({
                                         status: false,
                                         message: "this user already invite you"
                                     });
-                                if (playlist.users.map((e) => { return e.id }).indexOf(friendId) != -1)
-                                    return res.json({
+                                }
+                                if (playlist.users.map((e) => { return e.id }).indexOf(friendId) != -1) {
+                                    res.message = "this useris already in this playlist";
+                                    res.status(406).json({
                                         status: false,
                                         message: "this useris already in this playlist"
                                     });
+                                }
                                 if (friend.notifs.playlist === undefined || friend.notifs.playlist.length == 0) {
                                     friend.notifs.playlist = {
                                         id: playlistId,
@@ -224,12 +254,14 @@ exports.inviteToPlaylist = async (req, res) => {
                                 const finalFriend = new User(friend);
                                 finalFriend.save((err, friend) => {
                                     if (err) {
-                                        return res.json({
+                                        res.message = err;
+                                        res.status(407).json({
                                             status: false,
                                             message: err,
                                         });
                                     } else {
-                                        return res.json({
+                                        res.message = "invitation was send";
+                                        res.status(200).json({
                                             status: true,
                                             message: "invitation was send"
                                         });
@@ -240,33 +272,38 @@ exports.inviteToPlaylist = async (req, res) => {
                     }
                 })
             }
+            next();
         })
 }
 
-exports.refuseInviteToPlaylist = async (req, res) => {
+exports.refuseInviteToPlaylist = async (req, res, next) => {
     const { userId, playlistId } = req.params;
 
     Playlist.findOne({ _id: playlistId })
         .exec((err, playlist) => {
             if (err) {
-                return res.json({
+                res.message = err;
+                res.status(400).json({
                     status: false,
                     message: err
                 });
             } else if (!playlist) {
-                return res.json({
+                res.message = "this playlist doesn't exist or you dont have the good right";
+                res.status(401).json({
                     status: true,
                     message: "this playlist doesn't exist or you dont have the good right"
                 });
             } else {
                 User.findOne({ id: userId }).exec(async (err, user) => {
                     if (err) {
-                        return res.json({
+                        res.message = err;
+                        res.status(402).json({
                             status: false,
                             message: err
                         });
                     } else if (!user) {
-                        return res.json({
+                        res.message = "this user doesn't exist";
+                        res.status(403).json({
                             status: false,
                             message: "this user doesn't exist"
                         });
@@ -277,18 +314,22 @@ exports.refuseInviteToPlaylist = async (req, res) => {
                             let finalUser = new User(user);
                             finalUser.save((err, playlist) => {
                                 if (err) {
-                                    return res.json({
+                                    res.message = err;
+                                    res.status(404).json({
                                         status: false,
                                         message: err
                                     });
-                                } else
-                                    return res.json({
+                                } else {
+                                    res.message = "invitation delete";
+                                    res.status(200).json({
                                         status: true,
                                         message: "invitation delete"
                                     });
+                                }
                             });
                         } else {
-                            return res.json({
+                            res.message = "you dont have invitation by this user";
+                            res.status(405).json({
                                 status: false,
                                 message: "you dont have invitation by this user"
                             });
@@ -296,33 +337,38 @@ exports.refuseInviteToPlaylist = async (req, res) => {
                     }
                 })
             }
+            next();
         })
 }
 
-exports.acceptInvitePlaylist = async (req, res) => {
+exports.acceptInvitePlaylist = async (req, res, next) => {
     const { userId, playlistId } = req.params;
 
     Playlist.findOne({ _id: playlistId })
         .exec((err, playlist) => {
             if (err) {
-                return res.json({
+                res.message = err;
+                res.status(400).json({
                     status: false,
                     message: err
                 });
             } else if (!playlist) {
-                return res.json({
+                res.message = "this playlist doesn't exist or you dont have the good right";
+                res.status(401).json({
                     status: true,
                     message: "this playlist doesn't exist or you dont have the good right"
                 });
             } else {
                 User.findOne({ id: userId }).exec(async (err, user) => {
                     if (err) {
-                        return res.json({
+                        res.message = err;
+                        res.status(403).json({
                             status: false,
                             message: err
                         });
                     } else if (!user) {
-                        return res.json({
+                        res.message = "this user doesn't exist";
+                        res.status(404).json({
                             status: false,
                             message: "this user doesn't exist"
                         });
@@ -344,7 +390,8 @@ exports.acceptInvitePlaylist = async (req, res) => {
                             let finalPlaylist = new Playlist(playlist);
                             finalPlaylist.save((err) => {
                                 if (err) {
-                                    return res.json({
+                                    res.message = err;
+                                    res.status(405).json({
                                         status: false,
                                         message: err
                                     });
@@ -352,13 +399,15 @@ exports.acceptInvitePlaylist = async (req, res) => {
                                     user.notifs.playlist.splice(notifIndex, 1);
                                 let finalUser = new User(user);
                                 finalUser.save();
-                                return res.json({
+                                res.message = "invitation was accepted";
+                                res.status(200).json({
                                     status: true,
                                     message: "invitation was accepted"
                                 });
                             })
                         } else {
-                            return res.json({
+                            res.message = "you dont have invitation by this user";
+                            res.status(406).json({
                                 status: false,
                                 message: "you dont have invitation by this user"
                             });
@@ -366,21 +415,24 @@ exports.acceptInvitePlaylist = async (req, res) => {
                     }
                 })
             }
+            next();
         })
 }
 
-exports.quitPlaylist = async (req, res) => {
+exports.quitPlaylist = async (req, res, next) => {
     const { userId, playlistId } = req.params;
 
     Playlist.findOne({ _id: playlistId })
         .exec((err, playlist) => {
             if (err) {
-                return res.json({
+                res.message = err;
+                res.status(400).json({
                     status: false,
                     message: err
                 });
             } else if (!playlist) {
-                return res.json({
+                res.message = "this playlist doesn't exist or you dont have the good right";
+                res.status(401).json({
                     status: true,
                     message: "this playlist doesn't exist or you dont have the good right"
                 });
@@ -390,33 +442,38 @@ exports.quitPlaylist = async (req, res) => {
                     playlist.users.splice(playlistIndex, 1);
                     const finalPlaylist = new Playlist(playlist);
                     finalPlaylist.save();
-                    return res.json({
+                    res.message = "you have quit this playlist";
+                    res.status(200).json({
                         status: true,
                         message: "you have quit this playlist"
                     });
                 } else {
-                    return res.json({
+                    res.message = "this user is not in this playlist";
+                    res.status(402).json({
                         status: false,
                         message: "this user is not in this playlist"
                     });
                 }
             }
+            next();
         })
 }
 
-exports.addMusicPlaylist = async (req, res) => {
+exports.addMusicPlaylist = async (req, res, next) => {
     const { userId, playlistId, trackId } = req.params;
     const duration = req.body.duration;
 
     Playlist.findOne({ $and: [{ _id: playlistId }, { $or: [{ created_by: userId }, { users: { $in: [{ $and: [{ id: userId }, { right: true }] }] } }] }] })
         .exec(async (err, playlist) => {
             if (err) {
-                return res.json({
+                res.message = err;
+                res.status(400).json({
                     status: false,
                     message: err
                 });
             } else if (!playlist) {
-                return res.json({
+                res.message = "this playlist doesn't exist or you dont have the good right";
+                res.status(401).json({
                     status: true,
                     message: "this playlist doesn't exist or you dont have the good right"
                 });
@@ -435,32 +492,37 @@ exports.addMusicPlaylist = async (req, res) => {
                 let editPlaylist = new Playlist(playlist);
                 editPlaylist.save((err) => {
                     if (err) {
-                        return res.json({
+                        res.message = err;
+                        res.status(403).json({
                             status: false,
                             message: err
                         });
                     } else
-                        return res.json({
-                            status: true,
-                            message: "music save"
-                        });
+                        res.message = "music save";
+                    res.status(200).json({
+                        status: true,
+                        message: "music save"
+                    });
                 })
             }
+            next();
         })
 }
 
-exports.delMusicPlaylist = async (req, res) => {
+exports.delMusicPlaylist = async (req, res, next) => {
     const { userId, playlistId, trackId } = req.params;
 
     Playlist.findOne({ $and: [{ _id: playlistId }, { $or: [{ created_by: userId }, { users: { $in: [{ $and: [{ id: userId }, { right: true }] }] } }] }] })
         .exec((err, playlist) => {
             if (err) {
-                return res.json({
+                res.message = err;
+                res.status(400).json({
                     status: false,
                     message: err
                 });
             } else if (!playlist) {
-                return res.json({
+                res.message = "this playlist doesn't exist or you dont have the good right";
+                res.status(401).json({
                     status: true,
                     message: "this playlist doesn't exist or you dont have the good right"
                 });
@@ -470,17 +532,20 @@ exports.delMusicPlaylist = async (req, res) => {
                     playlist.musics.splice(musicIndex, 1);
                     const finalPlaylist = new Playlist(playlist);
                     finalPlaylist.save();
-                    return res.json({
+                    res.message = "music delete";
+                    res.status(200).json({
                         status: true,
                         message: "music delete"
                     });
                 } else {
-                    return res.json({
+                    res.message = "this music is not in this playlist";
+                    res.status(402).json({
                         status: false,
                         message: "this music is not in this playlist"
                     });
                 }
             }
+            next();
         })
 }
 
