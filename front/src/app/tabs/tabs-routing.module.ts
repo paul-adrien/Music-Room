@@ -1,3 +1,4 @@
+import { Tab1Page } from '../tab-home/tab-home.page';
 import { HomeComponent } from './../home/home.component';
 import { ProfileComponent } from './../profile/profile.component';
 import { NgModule } from '@angular/core';
@@ -12,9 +13,10 @@ const routes: Routes = [
     component: TabsPage,
     children: [
       {
-        path: 'tab1',
+        path: 'tab-home',
+        component: Tab1Page,
         loadChildren: () =>
-          import('../tab1/tab1.module').then((m) => m.Tab1PageModule),
+          import('../tab-home/tab-home.module').then((m) => m.Tab1PageModule),
       },
       {
         path: 'tab2',
@@ -28,12 +30,6 @@ const routes: Routes = [
       },
       { path: 'search', component: SearchComponent },
       { path: 'profile', component: ProfileComponent },
-      { path: 'home', component: HomeComponent },
-      {
-        path: 'room/:id',
-        component: RoomComponent,
-      },
-
       {
         path: '',
         redirectTo: '/tabs/search',

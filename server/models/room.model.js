@@ -10,6 +10,7 @@ const Room = mongoose.model(
         id: String,
         username: String,
         right: Boolean,
+        deviceId: String,
       },
     ],
     musics: [

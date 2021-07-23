@@ -5,7 +5,10 @@ import { AuthService } from './../_services/auth_service';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { User } from 'libs/user';
 import { Route, Router } from '@angular/router';
-import { NavController } from '@ionic/angular';
+import { AlertController, NavController } from '@ionic/angular';
+import { SpotifyService } from '../_services/spotify_service';
+import { Device } from '@ionic-native/device/ngx';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-home',
@@ -32,7 +35,9 @@ export class HomeComponent implements OnInit {
     private authService: AuthService,
     private roomService: RoomService,
     private router: Router,
-    private navCtrl: NavController
+    private spotifyService: SpotifyService,
+    private device: Device,
+    private alertController: AlertController
   ) {}
 
   ngOnInit(): void {
@@ -47,6 +52,34 @@ export class HomeComponent implements OnInit {
   }
 
   openRoom(roomId: string) {
-    this.router.navigate([`tabs/room/${roomId}`]);
+    this.spotifyService.getPlayerInfo().subscribe(async (res) => {
+      console.log(this.device.platform, res);
+      if (this.device.platform === null && res?.device?.id) {
+        this.roomService
+          .enterRoom(this.user.id, roomId, res?.device?.id)
+          .subscribe((res) => {
+            if (res?.status) {
+              this.router.navigate([`tabs/tab-home/room/${roomId}`]);
+            }
+          });
+      } else if (this.device.platform === null && !res?.device?.id) {
+        await this.presentAlert();
+      }
+    });
+    // this.roomService.enterRoom(this.user.id, roomId);
+    //com.spotify.music
+  }
+
+  async presentAlert() {
+    const alert = await this.alertController.create({
+      header: 'Attention',
+      message: 'Ouvre spotify avant, fdp.',
+      buttons: ['OK'],
+    });
+
+    await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+    console.log('onDidDismiss resolved with role', role);
   }
 }

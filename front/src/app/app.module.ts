@@ -1,3 +1,4 @@
+import { Device } from '@ionic-native/device/ngx';
 import { authInterceptorProviders } from './_helpers/auth-interceptor';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { NgModule } from '@angular/core';
@@ -39,6 +40,7 @@ import { RoomComponent } from './room/room.component';
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     authInterceptorProviders,
+    Device,
   ],
   bootstrap: [AppComponent],
 })

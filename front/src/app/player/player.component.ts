@@ -8,7 +8,6 @@ import {
   OnInit,
 } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { Track } from 'spotify-web-api-ts/types/types/SpotifyObjects';
 import { Options } from '@angular-slider/ngx-slider';
 import { SpotifyService } from '../_services/spotify_service';
 
@@ -112,7 +111,7 @@ import { SpotifyService } from '../_services/spotify_service';
 })
 export class PlayerComponent {
   @Input() public isModal = false;
-  public playerInfo: { is_playing: boolean; item: Track; progress_ms: number } =
+  public playerInfo: { is_playing: boolean; item: any; progress_ms: number } =
     undefined;
 
   constructor(
@@ -133,7 +132,7 @@ export class PlayerComponent {
         if (typeof res !== 'string' && res !== null) {
           this.playerInfo = {
             is_playing: res.is_playing,
-            item: res.item as Track,
+            item: res.item as any,
             progress_ms: res.progress_ms,
           };
         }

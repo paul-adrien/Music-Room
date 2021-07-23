@@ -4,7 +4,6 @@ import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
 import * as querystring from 'querystring';
 import { catchError, map, tap } from 'rxjs/operators';
-import { SpotifyWebApi } from 'spotify-web-api-ts';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
@@ -24,14 +23,7 @@ const clientSecret = '9bbe1deebd4045ef9b0eb3f7bab09daa';
   providedIn: 'root',
 })
 export class SpotifyService {
-  public spotifyApi: SpotifyWebApi;
-
-  constructor(private http: HttpClient, private route: Router) {
-    this.spotifyApi = new SpotifyWebApi();
-    if (localStorage.getItem('access_token')) {
-      this.spotifyApi.setAccessToken(localStorage.getItem('access_token'));
-    }
-  }
+  constructor(private http: HttpClient, private route: Router) {}
 
   searchMusic(search: string) {
     return this.http

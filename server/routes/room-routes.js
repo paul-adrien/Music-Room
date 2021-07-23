@@ -18,14 +18,14 @@ module.exports = function (app) {
   app.put("/room/:roomId", [authJwt.verifyToken], controller.editRoom);
 
   app.post(
-    "/:userId/playlist/:playlistId/music/:trackId",
+    "/room/:roomId/music/:trackId",
     [authJwt.verifyToken],
-    controller.addMusicPlaylist
+    controller.addMusicRoom
   );
   app.delete(
-    "/:userId/playlist/:playlistId/music/:trackId",
+    "/room/:roomId/music/:trackId",
     [authJwt.verifyToken],
-    controller.delMusicPlaylist
+    controller.delMusicRoom
   );
   // app.put("/:userId/playlist/:playlistId/music/:trackId", [authJwt.verifyToken], controller.chageOrderPlaylist);
 
@@ -44,10 +44,16 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.refuseInviteToPlaylist
   );
-  app.delete(
-    "/:userId/playlist/:playlistId/quitPlaylist",
+
+  app.post(
+    "/room/:roomId/enterRoom",
     [authJwt.verifyToken],
-    controller.quitPlaylist
+    controller.enterRoom
+  );
+  app.delete(
+    "/room/:roomId/quitRoom",
+    [authJwt.verifyToken],
+    controller.quitRoom
   );
 
   //app.put("/:userId/playlist/:playlistId/friends/:friendId", [authJwt.verifyToken], controller.editUserPlaylist)

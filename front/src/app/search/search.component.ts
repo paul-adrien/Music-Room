@@ -4,11 +4,9 @@ import {
   Component,
   OnInit,
   ChangeDetectorRef,
+  Input,
 } from '@angular/core';
-import {
-  CurrentlyPlaying,
-  Track,
-} from 'spotify-web-api-ts/types/types/SpotifyObjects';
+import { ModalController } from '@ionic/angular';
 
 @Component({
   selector: 'app-search',
@@ -23,7 +21,7 @@ import {
       <div *ngIf="this.searchRes?.items?.length > 0">
         <div
           class="result-item"
-          (click)="this.play(item?.uri)"
+          (click)="this.isModal ? this.dismiss(item) : this.play(item?.uri)"
           *ngFor="let item of this.searchRes.items"
         >
           <img class="logo" [src]="item.album.images[0].url" />
@@ -43,13 +41,15 @@ import {
   styleUrls: ['./search.component.scss'],
 })
 export class SearchComponent {
+  @Input() public isModal = false;
   public searchRes: any;
   public progressTime = 0;
-  public playerInfo: { is_playing: boolean; item: Track; progress_ms: number };
+  public playerInfo: { is_playing: boolean; item: any; progress_ms: number };
 
   constructor(
     private spotifyService: SpotifyService,
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
+    public modalController: ModalController
   ) {}
 
   play(uri: string) {
@@ -71,5 +71,12 @@ export class SearchComponent {
 
   testRequestAutho() {
     this.spotifyService.requestAuthorization();
+  }
+
+  dismiss(track?: any) {
+    this.modalController.dismiss({
+      dismissed: true,
+      track: track,
+    });
   }
 }

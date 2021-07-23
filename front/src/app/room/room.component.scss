@@ -1,5 +1,14 @@
 :host {
   display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+
+  .back-img {
+    height: 1.8rem;
+    width: 1.8rem;
+    margin-top: 1rem;
+    margin-left: 0.5rem;
+  }
 
   .room-container {
     display: flex;
@@ -11,10 +20,17 @@
       font-size: 3rem;
     }
 
+    .suggestion {
+      font-size: 0.8rem !important;
+      margin: 1rem auto;
+      height: 1rem;
+      width: fit-content;
+    }
+
     .sub-title {
-      font-size: 2rem;
       font-family: Circular-medium;
       margin: 1rem;
+      font-size: 1.8rem;
     }
 
     .tracks-container {

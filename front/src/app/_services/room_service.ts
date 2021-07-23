@@ -31,6 +31,34 @@ export class RoomService {
     );
   }
 
+  enterRoom(userId: string, roomId: string, deviceId: string) {
+    return this.http.post<any>(
+      environment.AUTH_API + `room/${roomId}/enterRoom`,
+      {
+        userId: userId,
+        deviceId: deviceId,
+      },
+      httpOptions
+    );
+  }
+
+  quitRoom(userId: string, roomId: string) {
+    return this.http.delete<any>(
+      environment.AUTH_API + `room/${roomId}/quitRoom?userId=${userId}`,
+      httpOptions
+    );
+  }
+
+  addTrack(trackId: string, roomId: string) {
+    return this.http.post<any>(
+      environment.AUTH_API + `room/${roomId}/music/${trackId}`,
+      {
+        trackId: trackId,
+      },
+      httpOptions
+    );
+  }
+
   getRoom(roomId: string): Observable<any> {
     return this.http.get(environment.AUTH_API + `room/${roomId}`, httpOptions);
   }

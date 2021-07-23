@@ -4,8 +4,6 @@ const User = db.user;
 const Room = db.room;
 
 exports.getAllRoom = (req, res) => {
-  const userId = req.params.userId;
-
   Room.find({}).exec((err, rooms) => {
     if (err) {
       return res.json({
@@ -54,7 +52,7 @@ exports.CreateRoom = async (req, res) => {
 };
 
 exports.getRoom = (req, res) => {
-  const { userId, roomId } = req.params;
+  const { roomId } = req.params;
 
   Room.findOne({ _id: roomId }).exec((err, room) => {
     if (err) {
@@ -402,142 +400,184 @@ exports.acceptInvitePlaylist = async (req, res) => {
   });
 };
 
-exports.quitPlaylist = async (req, res) => {
-  const { userId, playlistId } = req.params;
+exports.enterRoom = async (req, res) => {
+  const { roomId } = req.params;
+  const { userId, deviceId } = req.body;
 
-  Playlist.findOne({ _id: playlistId }).exec((err, playlist) => {
+  const user = await getUser({ _id: userId });
+
+  Room.findOne({ _id: roomId }).exec((err, room) => {
     if (err) {
       return res.json({
         status: false,
         message: err,
       });
-    } else if (!playlist) {
+    } else if (!room) {
       return res.json({
         status: true,
-        message: "this playlist doesn't exist or you dont have the good right",
+        message: "this room doesn't exist or you dont have the good right",
       });
     } else {
-      let playlistIndex = playlist.users
-        .map((u) => {
-          return u.id;
-        })
-        .indexOf(userId);
-      if (playlistIndex != -1) {
-        playlist.users.splice(playlistIndex, 1);
-        const finalPlaylist = new Playlist(playlist);
-        finalPlaylist.save();
-        return res.json({
-          status: true,
-          message: "you have quit this playlist",
-        });
-      } else {
-        return res.json({
-          status: false,
-          message: "this user is not in this playlist",
-        });
-      }
-    }
-  });
-};
-
-exports.addMusicPlaylist = async (req, res) => {
-  const { userId, playlistId, trackId } = req.params;
-  const duration = req.body.duration;
-
-  Playlist.findOne({
-    $and: [
-      { _id: playlistId },
-      {
-        $or: [
-          { created_by: userId },
-          { users: { $in: [{ $and: [{ id: userId }, { right: true }] }] } },
-        ],
-      },
-    ],
-  }).exec(async (err, playlist) => {
-    if (err) {
-      return res.json({
-        status: false,
-        message: err,
-      });
-    } else if (!playlist) {
-      return res.json({
-        status: true,
-        message: "this playlist doesn't exist or you dont have the good right",
-      });
-    } else {
-      if (playlist.musics === null) {
-        playlist.musics = {
-          trackId: trackId,
-          duration: duration,
-        };
-      } else {
-        playlist.musics.push({
-          trackId: trackId,
-          duration: duration,
-        });
-      }
-      let editPlaylist = new Playlist(playlist);
-      editPlaylist.save((err) => {
+      Room.updateOne(
+        { _id: roomId },
+        {
+          $push: {
+            users: {
+              id: userId,
+              deviceId: deviceId,
+              username: user.userName,
+              right: room.created_by === userId ? true : false,
+            },
+          },
+        }
+      ).exec((err, room) => {
         if (err) {
           return res.json({
             status: false,
             message: err,
           });
-        } else
+        } else {
           return res.json({
             status: true,
-            message: "music save",
+            message: "you have enter this room",
           });
+        }
       });
     }
   });
 };
 
-exports.delMusicPlaylist = async (req, res) => {
-  const { userId, playlistId, trackId } = req.params;
+exports.quitRoom = async (req, res) => {
+  const { roomId } = req.params;
+  const { userId } = req.query;
 
-  Playlist.findOne({
-    $and: [
-      { _id: playlistId },
-      {
-        $or: [
-          { created_by: userId },
-          { users: { $in: [{ $and: [{ id: userId }, { right: true }] }] } },
-        ],
-      },
-    ],
-  }).exec((err, playlist) => {
+  Room.findOne({ _id: roomId }).exec((err, room) => {
     if (err) {
       return res.json({
         status: false,
         message: err,
       });
-    } else if (!playlist) {
+    } else if (!room) {
       return res.json({
         status: true,
-        message: "this playlist doesn't exist or you dont have the good right",
+        message: "this room doesn't exist or you dont have the good right",
       });
     } else {
-      let musicIndex = playlist.musics
-        .map((m) => {
-          return m.trackId;
+      let roomIndex = room.users
+        .map((u) => {
+          return u.id;
         })
-        .indexOf(trackId);
-      if (musicIndex != -1) {
-        playlist.musics.splice(musicIndex, 1);
-        const finalPlaylist = new Playlist(playlist);
-        finalPlaylist.save();
-        return res.json({
-          status: true,
-          message: "music delete",
+        .indexOf(userId);
+      if (roomIndex != -1) {
+        Room.updateOne(
+          { _id: roomId },
+          { $pull: { users: { id: userId } } }
+        ).exec((err, room) => {
+          if (err) {
+            return res.json({
+              status: false,
+              message: err,
+            });
+          } else {
+            return res.json({
+              status: true,
+              message: "you have quit this room",
+            });
+          }
         });
       } else {
         return res.json({
           status: false,
-          message: "this music is not in this playlist",
+          message: "this user is not in this room",
         });
       }
+    }
+  });
+};
+
+exports.addMusicRoom = async (req, res) => {
+  const { roomId } = req.params;
+  const { trackId } = req.body;
+  const duration = req.body.duration;
+
+  Room.findOne({ _id: roomId }).exec((err, room) => {
+    if (err) {
+      return res.json({
+        status: false,
+        message: err,
+      });
+    } else if (!room) {
+      return res.json({
+        status: true,
+        message: "this room doesn't exist or you dont have the good right",
+      });
+    } else {
+      Room.updateOne(
+        { _id: roomId },
+        {
+          $addToSet: {
+            musics: {
+              trackId: trackId,
+              duration: null,
+            },
+          },
+        }
+      ).exec((err, room) => {
+        if (err) {
+          return res.json({
+            status: false,
+            message: err,
+          });
+        } else {
+          return res.json({
+            status: true,
+            message: "music add to the list",
+          });
+        }
+      });
+    }
+  });
+};
+
+exports.delMusicRoom = async (req, res) => {
+  const { roomId } = req.params;
+  const { trackId } = req.query;
+  const duration = req.body.duration;
+
+  Room.findOne({ _id: roomId }).exec((err, room) => {
+    if (err) {
+      return res.json({
+        status: false,
+        message: err,
+      });
+    } else if (!room) {
+      return res.json({
+        status: true,
+        message: "this room doesn't exist or you dont have the good right",
+      });
+    } else {
+      Room.updateOne(
+        { _id: roomId },
+        {
+          $pull: {
+            musics: {
+              trackId: trackId,
+            },
+          },
+        }
+      ).exec((err, room) => {
+        if (err) {
+          return res.json({
+            status: false,
+            message: err,
+          });
+        } else {
+          return res.json({
+            status: true,
+            message: "music remove to the list",
+          });
+        }
+      });
     }
   });
 };

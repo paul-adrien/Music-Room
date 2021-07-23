@@ -4,7 +4,6 @@ import {
   Component,
 } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { Track } from 'spotify-web-api-ts/types/types/SpotifyObjects';
 import { PlayerComponent } from '../player/player.component';
 import { SpotifyService } from '../_services/spotify_service';
 
@@ -14,7 +13,7 @@ import { SpotifyService } from '../_services/spotify_service';
     <ion-tabs>
       <app-player></app-player>
       <ion-tab-bar color="dark" slot="bottom">
-        <ion-tab-button tab="home">
+        <ion-tab-button tab="tab-home">
           <ion-icon name="triangle"></ion-icon>
           <ion-label>Accueil</ion-label>
         </ion-tab-button>
@@ -36,7 +35,7 @@ import { SpotifyService } from '../_services/spotify_service';
   styleUrls: ['tabs.page.scss'],
 })
 export class TabsPage {
-  public playerInfo: { is_playing: boolean; item: Track; progress_ms: number } =
+  public playerInfo: { is_playing: boolean; item: any; progress_ms: number } =
     undefined;
 
   constructor(
@@ -54,7 +53,7 @@ export class TabsPage {
       if (typeof res !== 'string' && res !== null) {
         this.playerInfo = {
           is_playing: res.is_playing,
-          item: res.item as Track,
+          item: res.item as any,
           progress_ms: res.progress_ms,
         };
       }
@@ -80,6 +79,7 @@ export class TabsPage {
     const modal = await this.modalController.create({
       component: PlayerComponent,
       cssClass: 'my-custom-class',
+      swipeToClose: true,
       componentProps: {
         playerInfo: this.spotifyService.getPlayerInfo(),
       },
