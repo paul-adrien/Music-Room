@@ -6,19 +6,23 @@ const Room = db.room;
 exports.getAllRoom = (req, res) => {
   Room.find({}).exec((err, rooms) => {
     if (err) {
-      return res.json({
+      return res.status(400).json({
         status: false,
         message: err,
         rooms: null,
       });
     } else if (!rooms) {
-      return res.json({
+      return res.status(201).json({
         status: true,
         message: "no room",
         rooms: null,
       });
     } else {
-      return res.json(rooms);
+      return res.status(200).json({
+        status: true,
+        message: "rooms success",
+        rooms: rooms,
+      });
     }
   });
 };
@@ -540,13 +544,12 @@ exports.addMusicRoom = async (req, res) => {
 };
 
 exports.delMusicRoom = async (req, res) => {
-  const { roomId } = req.params;
-  const { trackId } = req.query;
+  const { roomId, trackId } = req.params;
   const duration = req.body.duration;
 
   Room.findOne({ _id: roomId }).exec((err, room) => {
     if (err) {
-      return res.json({
+      return res.status(400).json({
         status: false,
         message: err,
       });
@@ -567,13 +570,14 @@ exports.delMusicRoom = async (req, res) => {
         }
       ).exec((err, room) => {
         if (err) {
-          return res.json({
+          return res.status(400).json({
             status: false,
             message: err,
           });
         } else {
-          return res.json({
+          return res.status(200).json({
             status: true,
+            room: room,
             message: "music remove to the list",
           });
         }

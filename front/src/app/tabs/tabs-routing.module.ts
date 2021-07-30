@@ -6,6 +6,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { SearchComponent } from '../search/search.component';
 import { TabsPage } from './tabs.page';
 import { RoomComponent } from '../room/room.component';
+import { AuthGuard } from '../_services/auth-guard';
 
 const routes: Routes = [
   {
@@ -28,18 +29,25 @@ const routes: Routes = [
         loadChildren: () =>
           import('../tab3/tab3.module').then((m) => m.Tab3PageModule),
       },
-      { path: 'search', component: SearchComponent },
-      { path: 'profile', component: ProfileComponent },
+      { path: 'search', canActivate: [AuthGuard], component: SearchComponent },
+      {
+        path: 'profile',
+        canActivate: [AuthGuard],
+        component: ProfileComponent,
+      },
       {
         path: '',
         redirectTo: '/tabs/search',
+        canActivate: [AuthGuard],
+
         pathMatch: 'full',
       },
     ],
   },
   {
     path: '',
-    redirectTo: '/tabs/tab1',
+    redirectTo: '/tabs/search',
+    canActivate: [AuthGuard],
     pathMatch: 'full',
   },
 ];

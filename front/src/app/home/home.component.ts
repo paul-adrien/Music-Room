@@ -1,3 +1,4 @@
+import { map } from 'rxjs/operators';
 import { async } from '@angular/core/testing';
 import { Observable } from 'rxjs';
 import { RoomService } from './../_services/room_service';

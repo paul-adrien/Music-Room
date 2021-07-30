@@ -20,6 +20,45 @@
       font-size: 3rem;
     }
 
+    .player-container {
+      margin: 0 1rem;
+      display: flex;
+      flex-direction: column;
+
+      .player-info {
+        display: flex;
+        width: 100%;
+        font-size: 1.1rem;
+
+        .player-text {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .player-name {
+          font-family: Circular-medium;
+          margin-top: 0.5rem;
+        }
+
+        .player-artist {
+          color: var(--light-grey-color);
+          margin-top: 0.5rem;
+        }
+
+        .img-track {
+          height: 8rem;
+          object-fit: contain;
+          margin-right: 1rem;
+        }
+      }
+
+      .timer-container {
+        display: flex;
+        font-size: 0.8rem;
+        justify-content: space-between;
+      }
+    }
+
     .suggestion {
       font-size: 0.8rem !important;
       margin: 1rem auto;
@@ -66,5 +105,19 @@
       object-fit: contain;
       margin: 0 1rem;
     }
+  }
+
+  mat-progress-bar {
+    height: 3px !important;
+    margin: 1rem 0;
+    border-radius: 10px;
+  }
+
+  ::ng-deep .mat-progress-bar-buffer {
+    background-color: grey;
+  }
+
+  ::ng-deep .mat-progress-bar-fill::after {
+    background-color: white;
   }
 }

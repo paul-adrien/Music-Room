@@ -59,11 +59,25 @@ export class RoomService {
     );
   }
 
+  delTrack(trackId: string, roomId: string) {
+    return this.http.delete<any>(
+      environment.AUTH_API + `room/${roomId}/music/${trackId}`,
+
+      httpOptions
+    );
+  }
+
   getRoom(roomId: string): Observable<any> {
     return this.http.get(environment.AUTH_API + `room/${roomId}`, httpOptions);
   }
 
   getAllRoom(): Observable<any> {
-    return this.http.get(environment.AUTH_API + `room`, httpOptions);
+    return this.http.get<any>(environment.AUTH_API + `room`, httpOptions).pipe(
+      map((res) => {
+        if (res.status) {
+          return res.rooms;
+        } else return undefined;
+      })
+    );
   }
 }
