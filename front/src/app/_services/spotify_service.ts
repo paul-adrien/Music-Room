@@ -65,10 +65,14 @@ export class SpotifyService {
       );
   }
 
-  playTrack(uri: string) {
+  playTrack(uri: string, deviceId?: string) {
     return this.http
       .put<any>(
-        `https://api.spotify.com/v1/me/player/play`,
+        deviceId
+          ? `https://api.spotify.com/v1/me/player/play?device_id=${encodeURI(
+              deviceId
+            )}`
+          : `https://api.spotify.com/v1/me/player/play`,
         { uris: [uri] },
         httpApiSpotifyOptions
       )
@@ -229,10 +233,14 @@ export class SpotifyService {
     // });
   }
 
-  play() {
+  play(deviceId?: string) {
     return this.http
       .put<any>(
-        `https://api.spotify.com/v1/me/player/play`,
+        deviceId
+          ? `https://api.spotify.com/v1/me/player/play?device_id=${encodeURI(
+              deviceId
+            )}`
+          : `https://api.spotify.com/v1/me/player/play`,
         {},
         httpApiSpotifyOptions
       )
@@ -247,15 +255,18 @@ export class SpotifyService {
       );
   }
 
-  pause() {
+  pause(deviceId?: string) {
     return this.http
       .put<any>(
-        `https://api.spotify.com/v1/me/player/pause`,
+        `https://api.spotify.com/v1/me/player/pause?device_id=${encodeURI(
+          deviceId
+        )}`,
         {},
         httpApiSpotifyOptions
       )
       .pipe(
         catchError((err) => {
+          console.log('ici petit cul');
           if (err?.status === 401) {
             return this.getRefreshToken();
           } else {

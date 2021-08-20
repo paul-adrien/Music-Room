@@ -17,6 +17,8 @@ const Room = mongoose.model(
       {
         trackId: String,
         duration: String,
+        nb_vote: Number,
+        vote: [String],
       },
     ],
     type: Boolean,

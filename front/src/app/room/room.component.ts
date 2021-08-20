@@ -21,11 +21,11 @@ import { forkJoin } from 'rxjs';
 @Component({
   selector: 'app-room',
   template: `
-    <ion-icon
-      (click)="this.quitRoom()"
+    <img
       class="back-img"
-      name="chevron-back-outline"
-    ></ion-icon>
+      (click)="this.quitRoom()"
+      src="./assets/chevron-back-outline.svg"
+    />
     <div class="room-container" *ngIf="this.room">
       <div class="title">
         {{ this.room.name }}
@@ -42,6 +42,28 @@ import { forkJoin } from 'rxjs';
               {{ this.tracks[0].artists[0].name }}
             </div>
           </div>
+        </div>
+        <div class="buttons-controller">
+          <div class="circle">
+            <img
+              *ngIf="this.playerInfo?.is_playing === false"
+              (click)="!this.wait && this.play()"
+              class="play"
+              src="./assets/play-black.svg"
+            />
+
+            <img
+              *ngIf="this.playerInfo?.is_playing"
+              (click)="!this.wait && this.pause()"
+              class="pause"
+              src="./assets/pause-black.svg"
+            />
+          </div>
+          <img
+            (click)="this.nextTrack()"
+            class="next-previous"
+            src="./assets/next-green.svg"
+          />
         </div>
         <mat-progress-bar
           *ngIf="this.playerInfo !== undefined"
@@ -62,8 +84,18 @@ import { forkJoin } from 'rxjs';
           </div>
         </div>
       </div>
-      <div class="primary-button suggestion" (click)="this.presentModal()">
-        Suggérer un titre
+      <div class="buttons-middle">
+        <div
+          class="primary-button suggestion"
+          (click)="this.presentModalSuggestion()"
+        >
+          Suggérer un titre
+        </div>
+        <img
+          class="add"
+          (click)="this.presentModalInvite()"
+          src="./assets/person-add-outline.svg"
+        />
       </div>
       <div></div>
       <div class="sub-title">Prochains titres</div>
@@ -73,6 +105,26 @@ import { forkJoin } from 'rxjs';
           <div class="track-info">
             <div class="info-top">{{ track.name }}</div>
             <div class="info-bottom">{{ track.artists[0].name }}</div>
+          </div>
+          <div class="buttons-vote">
+            <!-- <img
+              class="down"
+              [src]="
+                this.isVoteTrack(track.id)
+                  ? './assets/thumbs-down-green.svg'
+                  : './assets/thumbs-down.svg'
+              "
+            /> -->
+            <div>{{ this.getNbVoteTrack(track.id) }}</div>
+            <img
+              class="up"
+              (click)="this.voteTrack(track.id)"
+              [src]="
+                this.isVoteTrack(track.id)
+                  ? './assets/thumbs-up-green.svg'
+                  : './assets/thumbs-up.svg'
+              "
+            />
           </div>
         </div>
       </div>
@@ -100,6 +152,10 @@ export class RoomComponent implements OnInit, OnDestroy {
   public playerInfo: { is_playing: boolean; item: any; progress_ms: number } =
     undefined;
 
+  public interval;
+
+  public wait = false;
+
   ngOnInit(): void {
     this.user = this.authService.getUser();
 
@@ -125,7 +181,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   ngAfterContentInit() {
-    setInterval(() => this.getPlayerInfo(), 1500);
+    this.interval = setInterval(() => this.getPlayerInfo(), 1500);
   }
 
   getPlayerInfo() {
@@ -142,9 +198,15 @@ export class RoomComponent implements OnInit, OnDestroy {
             if (this.tracks[1]) {
               this.spotifyService.playTrack(this.tracks[1]?.uri).subscribe();
             }
-            this.roomService
-              .delTrack(this.tracks[0].id, this.roomId)
-              .subscribe();
+            if (
+              this.room.users.find(
+                (user) => user.id === this.user.id && user.right
+              )
+            ) {
+              this.roomService
+                .delTrack(this.tracks[0].id, this.roomId)
+                .subscribe();
+            }
           }
           this.playerInfo = {
             is_playing: res.is_playing,
@@ -183,7 +245,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     });
   }
 
-  async presentModal() {
+  async presentModalSuggestion() {
     const modal = await this.modalController.create({
       component: SearchComponent,
       cssClass: 'my-custom-class',
@@ -196,22 +258,144 @@ export class RoomComponent implements OnInit, OnDestroy {
       if (res?.data?.track) {
         const track = res.data.track;
         console.log(track);
-        this.roomService.addTrack(track.id, this.roomId).subscribe((res) => {
-          this.roomService.getRoom(this.roomId).subscribe((res) => {
-            this.room = res.room;
+        if (!this.tracks.find((res) => res.id === track.id)) {
+          this.roomService
+            .addTrack(track.id, this.roomId, this.user.id)
+            .subscribe((res) => {
+              this.roomService.getRoom(this.roomId).subscribe((res) => {
+                this.room = res.room;
 
-            if (this.tracks.length === 0) {
-              this.spotifyService.playTrack(track.uri).subscribe();
-            }
-          });
-          this.cd.detectChanges();
-        });
+                if (this.tracks.length === 0) {
+                  this.spotifyService.playTrack(track.uri).subscribe();
+                }
+              });
+              this.cd.detectChanges();
+            });
+        } else {
+          this.voteTrack(track.id);
+        }
       }
     });
     return await modal.present();
   }
 
+  async presentModalInvite() {
+    const modal = await this.modalController.create({
+      component: SearchComponent,
+      cssClass: 'my-custom-class',
+      swipeToClose: true,
+      componentProps: {
+        isModal: true,
+        isUser: true,
+      },
+    });
+    modal.onWillDismiss().then((res) => {
+      if (res?.data?.user) {
+        const user = res.data.user;
+        console.log(user);
+      }
+    });
+    return await modal.present();
+  }
+
+  play() {
+    console.log(this.wait);
+
+    if (
+      !this.wait &&
+      !this.playerInfo.is_playing &&
+      this.room.users.find((user) => user.id === this.user.id && user.right)
+    ) {
+      console.log(this.wait);
+      this.wait = true;
+      this.cd.detectChanges();
+
+      forkJoin(
+        this.room.users.map((user) => this.spotifyService.play(user.deviceId))
+      )
+        .toPromise()
+        .then((data) => {
+          this.playerInfo.is_playing = true;
+          this.wait = false;
+          this.cd.detectChanges();
+        })
+        .catch((err) => (this.wait = false));
+    }
+  }
+
+  pause() {
+    console.log(this.wait);
+
+    if (
+      !this.wait &&
+      this.playerInfo.is_playing &&
+      this.room.users.find((user) => user.id === this.user.id && user.right)
+    ) {
+      console.log(this.wait);
+      this.wait = true;
+
+      this.cd.detectChanges();
+      forkJoin(
+        this.room.users.map((user) => this.spotifyService.pause(user.deviceId))
+      )
+        .toPromise()
+        .then((data) => {
+          this.playerInfo.is_playing = false;
+          this.wait = false;
+          this.cd.detectChanges();
+        })
+        .catch((err) => (this.wait = false));
+    }
+  }
+
+  nextTrack() {
+    if (this.tracks[1]) {
+      forkJoin(
+        this.room.users.map((user) =>
+          this.spotifyService.playTrack(this.tracks[1]?.uri, user.deviceId)
+        )
+      ).subscribe((data) => {
+        this.playerInfo.is_playing = true;
+        this.cd.detectChanges();
+      });
+    } else {
+      this.pause();
+    }
+    if (
+      this.room.users.find((user) => user.id === this.user.id && user.right) &&
+      this.tracks[0]
+    ) {
+      this.roomService.delTrack(this.tracks[0].id, this.roomId).subscribe();
+    }
+  }
+
+  voteTrack(trackId: string) {
+    if (
+      this.room.musics.find(
+        (music) =>
+          music.trackId === trackId &&
+          music.vote.find((user) => user === this.user.id) === undefined
+      )
+    )
+      this.roomService
+        .voteTrack(trackId, this.roomId, this.user.id)
+        .subscribe((res) => {});
+  }
+
+  isVoteTrack(trackId: string) {
+    return !this.room.musics.find(
+      (music) =>
+        music.trackId === trackId &&
+        music.vote.find((user) => user === this.user.id) === undefined
+    );
+  }
+
+  getNbVoteTrack(trackId: string) {
+    return this.room.musics.find((music) => music.trackId === trackId)?.nb_vote;
+  }
+
   ngOnDestroy() {
+    clearInterval(this.interval);
     this.quitRoom();
   }
 }

@@ -1,3 +1,4 @@
+import { UserService } from './../_services/user_service';
 import { SpotifyService } from './../_services/spotify_service';
 import {
   ChangeDetectionStrategy,
@@ -18,7 +19,7 @@ import { ModalController } from '@ionic/angular';
       </div>
     </div>
     <div class="result">
-      <div *ngIf="this.searchRes?.items?.length > 0">
+      <div *ngIf="!this.isUser && this.searchRes?.items?.length > 0; else user">
         <div
           class="result-item"
           (click)="this.isModal ? this.dismiss(item) : this.play(item?.uri)"
@@ -31,17 +32,32 @@ import { ModalController } from '@ionic/angular';
           </div>
         </div>
       </div>
+      <ng-template #user>
+        <div
+          class="result-item"
+          (click)="this.dismiss(item)"
+          *ngFor="let item of this.searchRes"
+        >
+          <img
+            class="logo"
+            [src]="item.picture || './assets/test-profile.jpg'"
+          />
+          <div class="item-info">
+            <div class="info-top">{{ item.userName }}</div>
+            <div class="info-bottom">
+              {{ item.firstName }} {{ item.lastName }}
+            </div>
+          </div>
+        </div>
+      </ng-template>
     </div>
-    <!-- <div class="primary-button" (click)="this.testMusic()">test</div>
-    <div class="primary-button" (click)="this.testRequestAutho()">
-      test auth
-    </div> -->
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./search.component.scss'],
 })
 export class SearchComponent {
   @Input() public isModal = false;
+  @Input() public isUser = false;
   public searchRes: any;
   public progressTime = 0;
   public playerInfo: { is_playing: boolean; item: any; progress_ms: number };
@@ -49,7 +65,8 @@ export class SearchComponent {
   constructor(
     private spotifyService: SpotifyService,
     private cd: ChangeDetectorRef,
-    public modalController: ModalController
+    public modalController: ModalController,
+    private userService: UserService
   ) {}
 
   play(uri: string) {
@@ -58,11 +75,19 @@ export class SearchComponent {
 
   search(event: any) {
     console.log(event);
-    this.spotifyService.searchMusic(event.target.value).subscribe((data) => {
-      console.log(data);
-      this.searchRes = data.tracks;
-      this.cd.detectChanges();
-    });
+    if (!this.isUser) {
+      this.spotifyService.searchMusic(event.target.value).subscribe((data) => {
+        console.log(data);
+        this.searchRes = data.tracks;
+        this.cd.detectChanges();
+      });
+    } else if (this.isUser) {
+      this.userService.searchUser(event.target.value).subscribe((data) => {
+        console.log(data);
+        this.searchRes = data;
+        this.cd.detectChanges();
+      });
+    }
   }
 
   testMusic() {
@@ -73,10 +98,17 @@ export class SearchComponent {
     this.spotifyService.requestAuthorization();
   }
 
-  dismiss(track?: any) {
-    this.modalController.dismiss({
-      dismissed: true,
-      track: track,
-    });
+  dismiss(res?: any) {
+    if (!this.isUser) {
+      this.modalController.dismiss({
+        dismissed: true,
+        track: res,
+      });
+    } else if (this.isUser) {
+      this.modalController.dismiss({
+        dismissed: true,
+        user: res,
+      });
+    }
   }
 }

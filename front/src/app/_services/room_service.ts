@@ -49,11 +49,12 @@ export class RoomService {
     );
   }
 
-  addTrack(trackId: string, roomId: string) {
+  addTrack(trackId: string, roomId: string, userId: string) {
     return this.http.post<any>(
       environment.AUTH_API + `room/${roomId}/music/${trackId}`,
       {
         trackId: trackId,
+        userId: userId,
       },
       httpOptions
     );
@@ -63,6 +64,17 @@ export class RoomService {
     return this.http.delete<any>(
       environment.AUTH_API + `room/${roomId}/music/${trackId}`,
 
+      httpOptions
+    );
+  }
+
+  voteTrack(trackId: string, roomId: string, userId: string) {
+    return this.http.post<any>(
+      environment.AUTH_API + `room/${roomId}/music/${trackId}/vote`,
+      {
+        trackId: trackId,
+        userId: userId,
+      },
       httpOptions
     );
   }

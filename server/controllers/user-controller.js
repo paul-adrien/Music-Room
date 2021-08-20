@@ -1,4 +1,4 @@
-const { updateUser, getUser } = require("../models/lib-user.model");
+const { updateUser, getUser, getUsers } = require("../models/lib-user.model");
 var nodemailer = require("nodemailer");
 const User = require("../models/users.model");
 var bcrypt = require("bcryptjs");
@@ -13,7 +13,7 @@ exports.userBoard = (req, res) => {
 exports.userUpdate = async (req, res, next) => {
   if (await updateUser(req.params.id, req.body)) {
     const user = await getUser({ id: req.params.id });
-    res.message = 'user was update';
+    res.message = "user was update";
     res.status(200).json(user);
   } else {
     res.message = "user update error";
@@ -21,15 +21,37 @@ exports.userUpdate = async (req, res, next) => {
       status: false,
       message: "user update error",
     });
-  };
+  }
   next();
 };
 
 exports.getProfile = async (req, res, next) => {
   const user = await getUser({ id: req.params.id });
   if (user) {
-    res.message = 'send user';
+    res.message = "send user";
     res.status(200).json(user);
+  } else {
+    res.message = "user doesn't exist";
+    res.status(400).json({
+      status: false,
+      message: "user doesn't exist",
+    });
+  }
+  next();
+};
+
+exports.getSearchProfile = async (req, res, next) => {
+  const { search } = req.query;
+  const users = await getUsers({
+    $or: [
+      { userName: { $regex: search.toString() } },
+      { lastName: { $regex: search.toString() } },
+      { firstName: { $regex: search.toString() } },
+    ],
+  });
+  if (users) {
+    res.message = "get users search";
+    res.status(200).json(users);
   } else {
     res.message = "user doesn't exist";
     res.status(400).json({
@@ -42,7 +64,7 @@ exports.getProfile = async (req, res, next) => {
 
 exports.forgotPass_send = async (req, res) => {
   const email = req.body.email;
-  var user = new User;
+  var user = new User();
 
   if ((user = await getUser({ email: email }))) {
     var rand = Math.floor(Math.random() * 100 + 54);
@@ -120,4 +142,3 @@ exports.forgotPass_change = async (req, res) => {
     });
   }
 };
-

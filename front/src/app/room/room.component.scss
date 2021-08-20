@@ -59,9 +59,20 @@
       }
     }
 
+    .buttons-middle {
+      display: flex;
+      justify-content: space-evenly;
+      align-items: center;
+
+      .add {
+        height: 1.5rem;
+        object-fit: contain;
+      }
+    }
+
     .suggestion {
       font-size: 0.8rem !important;
-      margin: 1rem auto;
+      margin: 1rem 0;
       height: 1rem;
       width: fit-content;
     }
@@ -103,6 +114,60 @@
     .logo {
       height: 100%;
       object-fit: contain;
+      margin: 0 1rem;
+    }
+
+    .buttons-controller {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+    }
+
+    .buttons-vote {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      flex-grow: 1;
+      height: 100%;
+      margin-right: 1rem;
+
+      .up,
+      .down {
+        height: 1.5rem;
+        object-fit: contain;
+        margin-bottom: 0.5rem;
+        margin-left: 1rem;
+      }
+
+      .down {
+        margin-right: 1rem;
+      }
+    }
+
+    .circle {
+      height: 3rem;
+      width: 3rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 100px;
+      background-color: var(--green-color);
+    }
+
+    .play,
+    .pause,
+    .next-previous {
+      height: 1.8rem;
+      object-fit: contain;
+      cursor: pointer;
+    }
+
+    .play {
+      margin-left: 0.3rem;
+    }
+
+    .next-previous {
+      height: 1.4rem;
       margin: 0 1rem;
     }
   }

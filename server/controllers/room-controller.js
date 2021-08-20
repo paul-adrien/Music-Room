@@ -501,7 +501,7 @@ exports.quitRoom = async (req, res) => {
 
 exports.addMusicRoom = async (req, res) => {
   const { roomId } = req.params;
-  const { trackId } = req.body;
+  const { trackId, userId } = req.body;
   const duration = req.body.duration;
 
   Room.findOne({ _id: roomId }).exec((err, room) => {
@@ -523,6 +523,8 @@ exports.addMusicRoom = async (req, res) => {
             musics: {
               trackId: trackId,
               duration: null,
+              nb_vote: 1,
+              vote: [userId],
             },
           },
         }
@@ -582,6 +584,64 @@ exports.delMusicRoom = async (req, res) => {
           });
         }
       });
+    }
+  });
+};
+
+exports.voteMusicRoom = async (req, res) => {
+  const { roomId, trackId } = req.params;
+  const { userId } = req.body;
+
+  Room.findOne({
+    $and: [
+      { _id: roomId },
+      {
+        $or: [
+          { type: true },
+          { created_by: userId },
+          { users: { $in: [{ $and: [{ id: userId }, { right: true }] }] } },
+        ],
+      },
+    ],
+  }).exec(async (err, room) => {
+    if (err) {
+      return res.json({
+        status: false,
+        message: err,
+      });
+    } else if (!room) {
+      return res.json({
+        status: true,
+        message: "this room doesn't exist or you dont have the good right",
+      });
+    } else {
+      if (
+        room.musics.find(
+          (music) =>
+            music.trackId === trackId &&
+            music.vote.find((user) => user === userId) === undefined
+        )
+      ) {
+        Room.updateOne(
+          { _id: roomId, musics: { $elemMatch: { trackId: trackId } } },
+          {
+            $inc: { "musics.$.nb_vote": 1 },
+          }
+        );
+        return res.json({
+          status: true,
+          message: "this music is vote",
+        });
+      } else if (room.musics.find((music) => music.trackId === trackId)) {
+        return res.json({
+          status: false,
+          message: "this music already vote by you",
+        });
+      } else
+        return res.json({
+          status: false,
+          message: "this music does not exist in this event",
+        });
     }
   });
 };

@@ -7,6 +7,13 @@ const getUser = async function (query) {
   } else return null;
 };
 
+const getUsers = async function (query) {
+  if (query !== null) {
+    const users = await User.find(query).exec();
+    return users;
+  } else return null;
+};
+
 const checkUserExist = async function (userId) {
   if (userId === null) {
     return false;
@@ -22,12 +29,4 @@ const updateUser = async function (userId, user) {
   return res;
 };
 
-const checkUserSeeMovie = async function (userId, imdb_code) {
-  const see = await User.findOne(
-    { id: userId, moviesWatched: imdb_code },
-    "state"
-  ).exec();
-  return !!see;
-};
-
-module.exports = { checkUserExist, getUser, updateUser, checkUserSeeMovie };
+module.exports = { checkUserExist, getUser, updateUser, getUsers };

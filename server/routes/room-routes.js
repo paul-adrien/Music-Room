@@ -56,5 +56,11 @@ module.exports = function (app) {
     controller.quitRoom
   );
 
+  app.post(
+    "/room/:roomId/music/:trackId/vote",
+    [authJwt.verifyToken],
+    controller.voteMusicRoom
+  );
+
   //app.put("/:userId/playlist/:playlistId/friends/:friendId", [authJwt.verifyToken], controller.editUserPlaylist)
 };
