@@ -9,5 +9,6 @@ db.user = require("./users.model");
 db.playlist = require("./playlist.model");
 db.event = require("./event.model");
 db.room = require("./room.model");
+db.conversation = require("./messaging.model");
 
 module.exports = db;

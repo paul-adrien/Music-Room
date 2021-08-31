@@ -41,5 +41,6 @@ require("./routes/friends-routes")(app);
 require("./routes/playlist-routes")(app);
 require("./routes/room-routes")(app);
 require("./routes/event-routes")(app);
+require("./routes/messaging-routes")(app);
 
 module.exports = app;

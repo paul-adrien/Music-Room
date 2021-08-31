@@ -46,8 +46,7 @@ const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: '/tabs/search',
-    canActivate: [AuthGuard],
+    redirectTo: '/tabs/tab-home',
     pathMatch: 'full',
   },
 ];
@@ -55,4 +54,4 @@ const routes: Routes = [
 @NgModule({
   imports: [RouterModule.forChild(routes)],
 })
-export class TabsPageRoutingModule {}
+export class TabsPageRoutingModule { }

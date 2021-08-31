@@ -17,6 +17,9 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HomeComponent } from './home/home.component';
 import { RoomComponent } from './room/room.component';
+import { WebsocketService } from './_services/websocketService';
+import { MessagesComponent } from './messages/messages.component';
+import { ConversationComponent } from './conversation/conversation.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +29,8 @@ import { RoomComponent } from './room/room.component';
     ProfileComponent,
     HomeComponent,
     RoomComponent,
+    MessagesComponent,
+    ConversationComponent
   ],
   entryComponents: [],
   imports: [
@@ -35,13 +40,14 @@ import { RoomComponent } from './room/room.component';
     HttpClientModule,
     MatProgressBarModule,
     NgxSliderModule,
-    ReactiveFormsModule,
+    ReactiveFormsModule
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     authInterceptorProviders,
     Device,
+    WebsocketService
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

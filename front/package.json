@@ -36,8 +36,10 @@
     "@ionic-native/device": "^5.34.0",
     "@ionic/angular": "^5.5.2",
     "@ionic/pwa-elements": "^3.0.2",
+    "@types/socket.io-client": "^3.0.0",
     "query-string": "^7.0.0",
     "rxjs": "~6.6.0",
+    "socket.io-client": "^4.1.3",
     "tslib": "^2.0.0",
     "zone.js": "~0.11.4"
   },
