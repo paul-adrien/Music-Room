@@ -39,7 +39,7 @@ import { ModalController } from '@ionic/angular';
           *ngFor="let item of this.searchRes"
         >
           <img
-            class="logo"
+            class="logo round"
             [src]="item.picture || './assets/test-profile.jpg'"
           />
           <div class="item-info">

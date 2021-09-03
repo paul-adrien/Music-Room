@@ -16,6 +16,10 @@ const httpOptions = {
 export class UserService {
   constructor(private http: HttpClient, private route: Router) {}
 
+  getUser(userId: string): Observable<any> {
+    return this.http.get(environment.AUTH_API + `user/${userId}`, httpOptions);
+  }
+
   searchUser(name: string): Observable<any> {
     return this.http.get(
       environment.AUTH_API + `user?search=${name}`,

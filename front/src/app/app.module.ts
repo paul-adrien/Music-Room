@@ -20,6 +20,8 @@ import { RoomComponent } from './room/room.component';
 import { WebsocketService } from './_services/websocketService';
 import { MessagesComponent } from './messages/messages.component';
 import { ConversationComponent } from './conversation/conversation.component';
+import { CreateModalComponent } from './create-modal/create-modal.component';
+import { NotificationsComponent } from './notifications/notifications.component';
 
 @NgModule({
   declarations: [
@@ -30,7 +32,9 @@ import { ConversationComponent } from './conversation/conversation.component';
     HomeComponent,
     RoomComponent,
     MessagesComponent,
-    ConversationComponent
+    ConversationComponent,
+    CreateModalComponent,
+    NotificationsComponent,
   ],
   entryComponents: [],
   imports: [
@@ -40,14 +44,14 @@ import { ConversationComponent } from './conversation/conversation.component';
     HttpClientModule,
     MatProgressBarModule,
     NgxSliderModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     authInterceptorProviders,
     Device,
-    WebsocketService
+    WebsocketService,
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

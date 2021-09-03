@@ -25,6 +25,7 @@ export class RoomService {
     return this.http.post(
       environment.AUTH_API + `room`,
       {
+        userId: user.id,
         name: name,
       },
       httpOptions
@@ -45,6 +46,13 @@ export class RoomService {
   quitRoom(userId: string, roomId: string) {
     return this.http.delete<any>(
       environment.AUTH_API + `room/${roomId}/quitRoom?userId=${userId}`,
+      httpOptions
+    );
+  }
+
+  checkNameRoom(name: string) {
+    return this.http.get<any>(
+      environment.AUTH_API + `room/${name}/check-name`,
       httpOptions
     );
   }
@@ -90,6 +98,17 @@ export class RoomService {
           return res.rooms;
         } else return undefined;
       })
+    );
+  }
+
+  inviteUserToRoom(roomId: string, userId: string, friendId: string) {
+    return this.http.post<any>(
+      environment.AUTH_API + `room/${roomId}/invite/${friendId}`,
+      {
+        userId: userId,
+        right: true,
+      },
+      httpOptions
     );
   }
 }

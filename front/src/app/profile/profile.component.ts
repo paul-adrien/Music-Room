@@ -28,9 +28,7 @@ export class ProfileComponent implements OnInit {
 
   logOut() {
     this.spotifyService.pause().subscribe(
-      (res) => {
-        this.authService.logOut();
-      },
+      (res) => {},
       () => this.authService.logOut(),
       () => this.authService.logOut()
     );

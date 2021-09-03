@@ -154,6 +154,22 @@ input::placeholder {
   }
 }
 
+.font-bold {
+  font-family: Circular-bold;
+}
+
+.font-medium {
+  font-family: Circular-medium;
+}
+
+.font-light {
+  font-family: Circular-light;
+}
+
+.font-normal {
+  font-family: Circular;
+}
+
 .mat-dialog-container {
   background-color: var(--background-color-grey);
   color: white;
@@ -161,4 +177,9 @@ input::placeholder {
 
 .my-custom-class {
   --background: #222;
+}
+
+.my-custom-modal {
+  margin-top: 4rem;
+  border-radius: 1rem;
 }

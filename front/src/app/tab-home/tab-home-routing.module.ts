@@ -1,8 +1,9 @@
+import { NotificationsComponent } from './../notifications/notifications.component';
 import { RoomComponent } from '../room/room.component';
 import { HomeComponent } from '../home/home.component';
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { Tab1Page } from './tab-home.page';
+import { TabHomePage } from './tab-home.page';
 import { AuthGuard } from '../_services/auth-guard';
 
 const routes: Routes = [
@@ -14,6 +15,11 @@ const routes: Routes = [
   {
     path: 'room/:id',
     component: RoomComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'notifications',
+    component: NotificationsComponent,
     canActivate: [AuthGuard],
   },
 ];

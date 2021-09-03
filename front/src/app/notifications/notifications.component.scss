@@ -1,0 +1,43 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+
+  .back-img {
+    height: 1.8rem;
+    width: 1.8rem;
+    margin-top: 1rem;
+    margin-left: 0.5rem;
+  }
+
+  .title {
+    font-family: "Circular-bold";
+    font-size: 1.6rem;
+    margin: 1rem 1rem;
+  }
+
+  .notif-container {
+    display: flex;
+    padding: 1rem 0;
+    margin: 0 1rem;
+    justify-content: space-between;
+    border-bottom: 1px solid grey;
+
+    .buttons {
+      display: flex;
+      align-items: center;
+    }
+
+    .img {
+      height: 1.7rem;
+      object-fit: contain;
+      margin-left: 0.5rem;
+    }
+
+    .text {
+      margin-right: 2rem;
+      width: 50%;
+      flex-grow: 1;
+    }
+  }
+}

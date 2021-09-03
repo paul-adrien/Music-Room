@@ -14,21 +14,27 @@ const User = mongoose.model(
     validEmail: Boolean,
     friends: [{ id: String }],
     notifs: {
-      playlist: [{
-        id: String,
-        right: Boolean,
-        date: String
-      }],
-      friends: [{
-        id: String,
-        date: String,
-      }],
-      events: [{
-        id: String,
-        right: Boolean,
-        date: String
-      }]
-    }
+      playlist: [
+        {
+          id: String,
+          right: Boolean,
+          date: String,
+        },
+      ],
+      friends: [
+        {
+          id: String,
+          date: String,
+        },
+      ],
+      rooms: [
+        {
+          id: String,
+          right: Boolean,
+          date: String,
+        },
+      ],
+    },
   })
 );
 

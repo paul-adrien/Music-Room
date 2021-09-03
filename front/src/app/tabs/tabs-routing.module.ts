@@ -1,4 +1,4 @@
-import { Tab1Page } from '../tab-home/tab-home.page';
+import { TabHomePage } from '../tab-home/tab-home.page';
 import { HomeComponent } from './../home/home.component';
 import { ProfileComponent } from './../profile/profile.component';
 import { NgModule } from '@angular/core';
@@ -15,7 +15,7 @@ const routes: Routes = [
     children: [
       {
         path: 'tab-home',
-        component: Tab1Page,
+        component: TabHomePage,
         loadChildren: () =>
           import('../tab-home/tab-home.module').then((m) => m.Tab1PageModule),
       },

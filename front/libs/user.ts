@@ -11,15 +11,18 @@ export interface User {
   friends: { id: string }[];
   notifs: {
     playlist: {
+      name: string;
       id: string;
       right: boolean;
       date: string;
     }[];
     friends: {
+      name: string;
       id: string;
       date: string;
     }[];
-    events: {
+    rooms: {
+      name: string;
       id: string;
       right: boolean;
       date: string;

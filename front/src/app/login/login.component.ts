@@ -295,6 +295,12 @@ export class LoginComponent implements OnInit {
         if (data.token && data.user) {
           this.authService.saveToken(data.token);
           this.authService.saveUser(data.user);
+          this.spotifyService.requestAuthorization();
+          if (localStorage.getItem('access_token')) {
+            this.route.navigate(['/tabs/search']);
+            this.isSuccessful = true;
+            this.isSignUpFailed = false;
+          }
         }
         // this.translate.setDefaultLang(data.user?.lang);
       } else if (params.code) {

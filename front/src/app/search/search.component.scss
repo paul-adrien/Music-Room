@@ -52,5 +52,12 @@
     height: 100%;
     object-fit: contain;
     margin: 0 1rem;
+
+    &.round {
+      width: 3rem;
+      height: 3rem;
+      border-radius: 5rem;
+      background: white;
+    }
   }
 }

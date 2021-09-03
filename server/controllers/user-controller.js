@@ -50,7 +50,7 @@ exports.getSearchProfile = async (req, res, next) => {
     ],
   });
   if (users) {
-    res.message = "get users search";
+    ///res.message = "get users search";
     res.status(200).json(users);
   } else {
     res.message = "user doesn't exist";

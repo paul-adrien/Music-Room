@@ -28,11 +28,8 @@ exports.getAllRoom = (req, res) => {
 };
 
 exports.CreateRoom = async (req, res) => {
-  const userId = req.params.userId;
-
+  const { name, userId } = req.body;
   const user = await getUser({ id: userId });
-
-  const { name } = req.body;
 
   let room = new Room({
     name: name,
@@ -52,6 +49,32 @@ exports.CreateRoom = async (req, res) => {
       message: "room created",
       room: room,
     });
+  });
+};
+
+exports.checkName = (req, res) => {
+  const { roomName } = req.params;
+
+  Room.findOne({ name: roomName }).exec((err, room) => {
+    if (err) {
+      return res.json({
+        status: false,
+        message: err,
+        room: null,
+      });
+    } else if (!room) {
+      return res.json({
+        status: true,
+        message: "no room",
+        room: null,
+      });
+    } else {
+      return res.json({
+        status: true,
+        message: "room name exist",
+        room: room,
+      });
+    }
   });
 };
 
@@ -164,24 +187,25 @@ exports.editRoom = async (req, res) => {
   });
 };
 
-exports.inviteToPlaylist = async (req, res) => {
-  const { userId, playlistId, friendId } = req.params;
-  const right = req.body.right;
+exports.inviteToRoom = async (req, res) => {
+  const { roomId, friendId } = req.params;
+  const { userId, right } = req.body;
+  console.log(friendId);
 
-  Playlist.findOne({
-    $and: [{ _id: playlistId }, { created_by: userId }],
-  }).exec((err, playlist) => {
+  Room.findOne({
+    $and: [{ _id: roomId }, { created_by: userId }],
+  }).exec((err, room) => {
     if (err) {
       return res.json({
         status: false,
         message: err,
-        playlist: null,
+        room: null,
       });
-    } else if (!playlist) {
+    } else if (!room) {
       return res.json({
         status: true,
-        message: "this playlist doesn't exist or you dont have the good right",
-        playlist: null,
+        message: "this room doesn't exist or you dont have the good right",
+        room: null,
       });
     } else {
       User.findOne({ id: userId }).exec(async (err, user) => {
@@ -210,59 +234,80 @@ exports.inviteToPlaylist = async (req, res) => {
             } else {
               if (
                 friend.notifs !== undefined &&
-                friend.notifs.playlist !== undefined &&
-                friend.notifs.playlist
-                  .map((f) => {
-                    return f.id;
-                  })
-                  .indexOf(playlistId) != -1
-              )
+                friend.notifs.room !== undefined &&
+                friend.notifs.room.find((room) => room.id === roomId)
+              ) {
                 return res.json({
                   status: false,
                   message: "this user already invite you",
                 });
+              }
               if (
-                playlist.users
-                  .map((e) => {
-                    return e.id;
-                  })
-                  .indexOf(friendId) != -1
-              )
+                room.users?.length > 0 &&
+                room.users.find((el) => el.id === friendId)
+              ) {
+                console.log(room.users.find((el) => el.id === friendId));
                 return res.json({
                   status: false,
-                  message: "this useris already in this playlist",
-                });
-              if (
-                friend.notifs.playlist === undefined ||
-                friend.notifs.playlist.length == 0
-              ) {
-                friend.notifs.playlist = {
-                  id: playlistId,
-                  right: right,
-                  date: Date.now(),
-                };
-              } else {
-                await friend.notifs.playlist.push({
-                  id: playlistId,
-                  right: right,
-                  date: Date.now(),
+                  message: "this user is already in this room",
                 });
               }
-              console.log(friend);
-              const finalFriend = new User(friend);
-              finalFriend.save((err, friend) => {
-                if (err) {
-                  return res.json({
-                    status: false,
-                    message: err,
-                  });
-                } else {
-                  return res.json({
-                    status: true,
-                    message: "invitation was send",
-                  });
-                }
-              });
+              if (
+                friend.notifs.room === undefined ||
+                friend.notifs.room.length === 0
+              ) {
+                User.updateOne(
+                  { id: friendId },
+                  {
+                    $push: {
+                      "notifs.rooms": {
+                        id: roomId,
+                        name: room.name,
+                        right: right,
+                        date: Date.now(),
+                      },
+                    },
+                  }
+                ).exec((err, user) => {
+                  if (err) {
+                    return res.json({
+                      status: false,
+                      message: err,
+                    });
+                  } else {
+                    return res.json({
+                      status: true,
+                      message: "invite send",
+                    });
+                  }
+                });
+              } else {
+                User.updateOne(
+                  { id: friendId },
+                  {
+                    $push: {
+                      "notifs.rooms": {
+                        id: roomId,
+                        name: room.name,
+                        right: right,
+                        date: Date.now(),
+                      },
+                    },
+                  }
+                ).exec((err, user) => {
+                  if (err) {
+                    return res.json({
+                      status: false,
+                      message: err,
+                    });
+                  } else {
+                    return res.json({
+                      status: true,
+                      message: "invite send",
+                    });
+                  }
+                });
+              }
             }
           });
         }

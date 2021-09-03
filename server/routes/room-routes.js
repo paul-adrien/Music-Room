@@ -11,6 +11,11 @@ module.exports = function (app) {
   });
 
   app.get("/room", [authJwt.verifyToken], controller.getAllRoom);
+  app.get(
+    "/room/:roomName/check-name",
+    [authJwt.verifyToken],
+    controller.checkName
+  );
   app.post("/room", [authJwt.verifyToken], controller.CreateRoom);
 
   app.get("/room/:roomId", [authJwt.verifyToken], controller.getRoom);
@@ -30,9 +35,9 @@ module.exports = function (app) {
   // app.put("/:userId/playlist/:playlistId/music/:trackId", [authJwt.verifyToken], controller.chageOrderPlaylist);
 
   app.post(
-    "/:userId/playlist/:playlistId/invite/:friendId",
+    "/room/:roomId/invite/:friendId",
     [authJwt.verifyToken],
-    controller.inviteToPlaylist
+    controller.inviteToRoom
   );
   app.post(
     "/:userId/playlist/:playlistId/acceptInvite",

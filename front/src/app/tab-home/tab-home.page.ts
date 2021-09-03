@@ -5,6 +5,6 @@ import { Component } from '@angular/core';
   template: `<ion-router-outlet></ion-router-outlet>`,
   styleUrls: ['tab-home.page.scss'],
 })
-export class Tab1Page {
+export class TabHomePage {
   constructor() {}
 }
