@@ -34,7 +34,7 @@ exports.CreateRoom = async (req, res) => {
   let room = new Room({
     name: name,
     created_by: userId,
-    users: [{ id: userId, username: user.userName, right: true }],
+    users: [{ id: userId, username: user.userName }],
     musics: [],
   });
   room.save((err, room) => {
@@ -111,10 +111,7 @@ exports.delRoom = async (req, res) => {
     $and: [
       { _id: playlistId },
       {
-        $or: [
-          { created_by: userId },
-          { users: { $in: [{ $and: [{ id: userId }, { right: true }] }] } },
-        ],
+        $or: [{ created_by: userId }, { invited: { $in: [{ userId }] } }],
       },
     ],
   }).exec((err, playlist) => {
@@ -145,55 +142,13 @@ exports.delRoom = async (req, res) => {
   });
 };
 
-exports.editRoom = async (req, res) => {
-  const { userId, playlistId } = req.params;
-  const { name, type, right, style } = req.body;
-
-  Playlist.findOne({
-    $and: [{ _id: playlistId }, { created_by: userId }],
-  }).exec(async (err, playlist) => {
-    if (err) {
-      return res.json({
-        status: false,
-        message: err,
-        playlist: null,
-      });
-    } else if (!playlist) {
-      return res.json({
-        status: true,
-        message: "this playlist doesn't exist or you dont have the good right",
-        playlist: null,
-      });
-    } else {
-      let editPlaylist = {
-        name: name,
-        created_by: userId,
-        users: playlist.users,
-        musics: playlist.musics,
-        type: type,
-        right: right,
-        style: style,
-      };
-      const finalPlaylist = await Playlist.updateOne(
-        { _id: playlist._id },
-        { $set: editPlaylist }
-      ).exec();
-      res.json({
-        status: true,
-        playlist: finalPlaylist,
-        message: "playlist was changed",
-      });
-    }
-  });
-};
-
 exports.inviteToRoom = async (req, res) => {
   const { roomId, friendId } = req.params;
-  const { userId, right } = req.body;
+  const { userId } = req.body;
   console.log(friendId);
 
   Room.findOne({
-    $and: [{ _id: roomId }, { created_by: userId }],
+    _id: roomId,
   }).exec((err, room) => {
     if (err) {
       return res.json({
@@ -249,23 +204,18 @@ exports.inviteToRoom = async (req, res) => {
                 console.log(room.users.find((el) => el.id === friendId));
                 return res.json({
                   status: false,
-                  message: "this user is already in this room",
+                  message: "this user is already in this room or invited",
                 });
               }
               if (
                 friend.notifs.room === undefined ||
                 friend.notifs.room.length === 0
               ) {
-                User.updateOne(
-                  { id: friendId },
+                Room.updateOne(
+                  { _id: roomId },
                   {
                     $push: {
-                      "notifs.rooms": {
-                        id: roomId,
-                        name: room.name,
-                        right: right,
-                        date: Date.now(),
-                      },
+                      invited: friendId,
                     },
                   }
                 ).exec((err, user) => {
@@ -275,23 +225,38 @@ exports.inviteToRoom = async (req, res) => {
                       message: err,
                     });
                   } else {
-                    return res.json({
-                      status: true,
-                      message: "invite send",
+                    User.updateOne(
+                      { id: friendId },
+                      {
+                        $push: {
+                          "notifs.rooms": {
+                            id: roomId,
+                            name: room.name,
+                            date: Date.now(),
+                          },
+                        },
+                      }
+                    ).exec((err, user) => {
+                      if (err) {
+                        return res.json({
+                          status: false,
+                          message: err,
+                        });
+                      } else {
+                        return res.json({
+                          status: true,
+                          message: "invite send",
+                        });
+                      }
                     });
                   }
                 });
               } else {
-                User.updateOne(
-                  { id: friendId },
+                Room.updateOne(
+                  { _id: roomId },
                   {
                     $push: {
-                      "notifs.rooms": {
-                        id: roomId,
-                        name: room.name,
-                        right: right,
-                        date: Date.now(),
-                      },
+                      invited: friendId,
                     },
                   }
                 ).exec((err, user) => {
@@ -301,9 +266,29 @@ exports.inviteToRoom = async (req, res) => {
                       message: err,
                     });
                   } else {
-                    return res.json({
-                      status: true,
-                      message: "invite send",
+                    User.updateOne(
+                      { id: friendId },
+                      {
+                        $push: {
+                          "notifs.rooms": {
+                            id: roomId,
+                            name: room.name,
+                            date: Date.now(),
+                          },
+                        },
+                      }
+                    ).exec((err, user) => {
+                      if (err) {
+                        return res.json({
+                          status: false,
+                          message: err,
+                        });
+                      } else {
+                        return res.json({
+                          status: true,
+                          message: "invite send",
+                        });
+                      }
                     });
                   }
                 });
@@ -376,73 +361,33 @@ exports.refuseInviteToPlaylist = async (req, res) => {
   });
 };
 
-exports.acceptInvitePlaylist = async (req, res) => {
-  const { userId, playlistId } = req.params;
+exports.acceptInviteRoom = async (req, res) => {
+  const { roomId } = req.params;
+  const { userId } = req.body;
 
-  Playlist.findOne({ _id: playlistId }).exec((err, playlist) => {
+  Room.findOne({ _id: roomId }).exec((err, room) => {
     if (err) {
       return res.json({
         status: false,
         message: err,
       });
-    } else if (!playlist) {
+    } else if (!room) {
       return res.json({
         status: true,
-        message: "this playlist doesn't exist or you dont have the good right",
+        message: "this room doesn't exist or you dont have the good right",
       });
     } else {
-      User.findOne({ id: userId }).exec(async (err, user) => {
+      Room.updateOne({ _id: roomId }, { $push: userId }).exec((err, room) => {
         if (err) {
           return res.json({
             status: false,
             message: err,
           });
-        } else if (!user) {
-          return res.json({
-            status: false,
-            message: "this user doesn't exist",
-          });
         } else {
-          let notifIndex = user.notifs.playlist
-            .map(function (u) {
-              console.log(u);
-              return u.id;
-            })
-            .indexOf(playlistId);
-          if (notifIndex != -1) {
-            if (playlist.users != null) {
-              playlist.users.push({
-                id: userId,
-                username: user.userName,
-                right: user.notifs.playlist.right,
-              });
-            } else
-              playlist.users = {
-                id: userId,
-                username: user.userName,
-                right: user.notifs.playlist.right,
-              };
-            let finalPlaylist = new Playlist(playlist);
-            finalPlaylist.save((err) => {
-              if (err) {
-                return res.json({
-                  status: false,
-                  message: err,
-                });
-              } else user.notifs.playlist.splice(notifIndex, 1);
-              let finalUser = new User(user);
-              finalUser.save();
-              return res.json({
-                status: true,
-                message: "invitation was accepted",
-              });
-            });
-          } else {
-            return res.json({
-              status: false,
-              message: "you dont have invitation by this user",
-            });
-          }
+          return res.json({
+            status: true,
+            message: "you accept to enter this room",
+          });
         }
       });
     }
@@ -453,7 +398,7 @@ exports.enterRoom = async (req, res) => {
   const { roomId } = req.params;
   const { userId, deviceId } = req.body;
 
-  const user = await getUser({ _id: userId });
+  const user = await getUser({ id: userId });
 
   Room.findOne({ _id: roomId }).exec((err, room) => {
     if (err) {
@@ -475,7 +420,6 @@ exports.enterRoom = async (req, res) => {
               id: userId,
               deviceId: deviceId,
               username: user.userName,
-              right: room.created_by === userId ? true : false,
             },
           },
         }
@@ -517,7 +461,21 @@ exports.quitRoom = async (req, res) => {
           return u.id;
         })
         .indexOf(userId);
-      if (roomIndex != -1) {
+      if (roomIndex != -1 && room.created_by === userId) {
+        Room.deleteOne({ _id: roomId }).exec((err, room) => {
+          if (err) {
+            return res.json({
+              status: false,
+              message: err,
+            });
+          } else {
+            return res.json({
+              status: true,
+              message: "you have quit this room and delete this room",
+            });
+          }
+        });
+      } else if (roomIndex != -1) {
         Room.updateOne(
           { _id: roomId },
           { $pull: { users: { id: userId } } }
@@ -641,11 +599,7 @@ exports.voteMusicRoom = async (req, res) => {
     $and: [
       { _id: roomId },
       {
-        $or: [
-          { type: true },
-          { created_by: userId },
-          { users: { $in: [{ $and: [{ id: userId }, { right: true }] }] } },
-        ],
+        $or: [{ created_by: userId }, { invited: { $in: [{ userId }] } }],
       },
     ],
   }).exec(async (err, room) => {

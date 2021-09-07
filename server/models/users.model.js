@@ -19,6 +19,7 @@ const User = mongoose.model(
           id: String,
           right: Boolean,
           date: String,
+          name: String,
         },
       ],
       friends: [
@@ -32,6 +33,7 @@ const User = mongoose.model(
           id: String,
           right: Boolean,
           date: String,
+          name: String,
         },
       ],
     },

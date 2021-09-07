@@ -106,7 +106,16 @@ export class RoomService {
       environment.AUTH_API + `room/${roomId}/invite/${friendId}`,
       {
         userId: userId,
-        right: true,
+      },
+      httpOptions
+    );
+  }
+
+  acceptInviteRoom(roomId: string, userId: string) {
+    return this.http.post<any>(
+      environment.AUTH_API + `room/${roomId}/acceptInvite`,
+      {
+        userId: userId,
       },
       httpOptions
     );

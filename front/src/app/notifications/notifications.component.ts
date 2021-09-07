@@ -6,6 +6,10 @@ import { AuthService } from './../_services/auth_service';
 import { Location } from '@angular/common';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { map } from 'rxjs/operators';
+import { SpotifyService } from '../_services/spotify_service';
+import { Device } from '@ionic-native/device/ngx';
+import { Router } from '@angular/router';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-notifications',
@@ -24,8 +28,16 @@ import { map } from 'rxjs/operators';
         </span>
       </div>
       <div class="buttons">
-        <img class="img" src="./assets/close-outline.svg" />
-        <img class="img" src="./assets/checkmark-outline.svg" />
+        <img
+          class="img"
+          (click)="this.removeNotif(notif, 'rooms')"
+          src="./assets/close-outline.svg"
+        />
+        <img
+          class="img"
+          (click)="this.openNotif(notif.id, 'room')"
+          src="./assets/checkmark-outline.svg"
+        />
       </div>
     </div>
     <div *ngFor="let notif of this.user.notifs?.playlist">
@@ -41,7 +53,11 @@ export class NotificationsComponent implements OnInit {
     private authService: AuthService,
     private cd: ChangeDetectorRef,
     private roomService: RoomService,
-    private userService: UserService
+    private userService: UserService,
+    private spotifyService: SpotifyService,
+    private device: Device,
+    private router: Router,
+    private alertController: AlertController
   ) {}
 
   public user: User;
@@ -61,7 +77,62 @@ export class NotificationsComponent implements OnInit {
     this.location.back();
   }
 
+  acceptNotif(id: string, type: string) {
+    if (type === 'room') {
+      this.roomService.acceptInviteRoom(id, this.user.id).subscribe((res) => {
+        if (res.status) {
+          // this.removeNotif()
+        }
+      });
+    }
+  }
+
+  openNotif(id: string, type: string) {
+    this.spotifyService.getPlayerInfo().subscribe(async (res) => {
+      console.log(this.device.platform, res);
+      if (this.device.platform === null && res?.device?.id) {
+        if (type === 'room') {
+          this.roomService
+            .enterRoom(this.user.id, id, res?.device?.id)
+            .subscribe((res) => {
+              if (res?.status) {
+                this.router.navigate([`tabs/tab-home/room/${id}`]);
+              }
+            });
+        } else if (type === 'playlist') {
+          this.router.navigate([`tabs/tab-home/playlist/${id}`]);
+        }
+      } else if (this.device.platform === null && !res?.device?.id) {
+        await this.presentAlert();
+      }
+    });
+    // this.roomService.enterRoom(this.user.id, roomId);
+    //com.spotify.music
+  }
+
+  removeNotif(notif: any, type: string) {
+    let user = this.user;
+    user.notifs[type] = user.notifs[type].filter(
+      (el) => el.id === notif.id && new Date(el.date) === new Date(notif.date)
+    );
+    console.log(user);
+    this.userService.updateUser(user).subscribe((res) => {});
+  }
+
   getRoomName(roomId: string) {
     return this.roomService.getRoom(roomId).pipe(map((room) => room.name));
+  }
+
+  async presentAlert() {
+    const alert = await this.alertController.create({
+      header: 'Attention',
+      message: 'Ouvre spotify avant, fdp.',
+      buttons: ['OK'],
+    });
+
+    await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+    console.log('onDidDismiss resolved with role', role);
   }
 }

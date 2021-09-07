@@ -8,8 +8,12 @@ import { User } from 'libs/user';
   template: `
     <div class="top-container" *ngIf="this.user">
       <img class="log-out" src="./assets/log-out.svg" (click)="this.logOut()" />
-      <img class="picture" src="./assets/test-profile.jpg" />
+      <img
+        class="picture"
+        [src]="this.user?.picture ? this.user.picture : './assets/person.svg'"
+      />
       <div class="name">{{ this.user.firstName }} {{ this.user.lastName }}</div>
+      <div>{{ this.user.userName }}</div>
     </div>
   `,
   styleUrls: ['./profile.component.scss'],

@@ -22,9 +22,10 @@ import { MessagesComponent } from './messages/messages.component';
 import { ConversationComponent } from './conversation/conversation.component';
 import { CreateModalComponent } from './create-modal/create-modal.component';
 import { NotificationsComponent } from './notifications/notifications.component';
+import { PlaylistComponent } from './playlist/playlist.component';
 
 @NgModule({
-  declarations: [
+  declarations: [	
     AppComponent,
     LoginComponent,
     SearchComponent,
@@ -35,7 +36,8 @@ import { NotificationsComponent } from './notifications/notifications.component'
     ConversationComponent,
     CreateModalComponent,
     NotificationsComponent,
-  ],
+      PlaylistComponent
+   ],
   entryComponents: [],
   imports: [
     BrowserModule,

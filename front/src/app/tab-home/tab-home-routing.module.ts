@@ -5,6 +5,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { TabHomePage } from './tab-home.page';
 import { AuthGuard } from '../_services/auth-guard';
+import { PlaylistComponent } from '../playlist/playlist.component';
 
 const routes: Routes = [
   {
@@ -15,6 +16,11 @@ const routes: Routes = [
   {
     path: 'room/:id',
     component: RoomComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'playlist/:id',
+    component: PlaylistComponent,
     canActivate: [AuthGuard],
   },
   {

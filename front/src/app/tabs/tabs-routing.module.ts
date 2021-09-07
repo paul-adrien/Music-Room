@@ -17,7 +17,7 @@ const routes: Routes = [
         path: 'tab-home',
         component: TabHomePage,
         loadChildren: () =>
-          import('../tab-home/tab-home.module').then((m) => m.Tab1PageModule),
+          import('../tab-home/tab-home.module').then((m) => m.TabHomeModule),
       },
       {
         path: 'tab2',
@@ -54,4 +54,4 @@ const routes: Routes = [
 @NgModule({
   imports: [RouterModule.forChild(routes)],
 })
-export class TabsPageRoutingModule { }
+export class TabsPageRoutingModule {}

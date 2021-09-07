@@ -5,11 +5,11 @@ const Room = mongoose.model(
   new mongoose.Schema({
     name: String,
     created_by: String,
+    invited: [String],
     users: [
       {
         id: String,
         username: String,
-        right: Boolean,
         deviceId: String,
       },
     ],
@@ -21,9 +21,7 @@ const Room = mongoose.model(
         vote: [String],
       },
     ],
-    type: Boolean,
-    right: Boolean,
-    style: String,
+    type: "public" | "private",
   })
 );
 

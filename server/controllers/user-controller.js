@@ -11,7 +11,8 @@ exports.userBoard = (req, res) => {
 };
 
 exports.userUpdate = async (req, res, next) => {
-  if (await updateUser(req.params.id, req.body)) {
+  const { user } = req.body;
+  if (await updateUser(req.params.id, user)) {
     const user = await getUser({ id: req.params.id });
     res.message = "user was update";
     res.status(200).json(user);

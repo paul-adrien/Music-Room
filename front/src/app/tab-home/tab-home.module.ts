@@ -20,4 +20,4 @@ import { Tab1PageRoutingModule } from './tab-home-routing.module';
   entryComponents: [SearchComponent, CreateModalComponent],
   declarations: [TabHomePage],
 })
-export class Tab1PageModule {}
+export class TabHomeModule {}

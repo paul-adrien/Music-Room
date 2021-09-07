@@ -1,17 +1,14 @@
-export interface Room {
+export interface Playlist {
   name: string;
   created_by: string;
   invited: string[];
   users: {
     id: string;
     username: string;
-    deviceId: string;
   }[];
   musics: {
     trackId: string;
-    duration: string;
-    nb_vote: number;
-    vote: string[];
+    duration?: string;
   }[];
   type: 'public' | 'private';
 }

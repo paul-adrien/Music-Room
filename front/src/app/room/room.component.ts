@@ -43,7 +43,10 @@ import { forkJoin } from 'rxjs';
             </div>
           </div>
         </div>
-        <div class="buttons-controller">
+        <div
+          *ngIf="this.room.created_by === this.user.id"
+          class="buttons-controller"
+        >
           <div class="circle">
             <img
               *ngIf="this.playerInfo?.is_playing === false"
@@ -198,11 +201,7 @@ export class RoomComponent implements OnInit, OnDestroy {
             if (this.tracks[1]) {
               this.spotifyService.playTrack(this.tracks[1]?.uri).subscribe();
             }
-            if (
-              this.room.users.find(
-                (user) => user.id === this.user.id && user.right
-              )
-            ) {
+            if (this.room.created_by === this.user.id) {
               this.roomService
                 .delTrack(this.tracks[0].id, this.roomId)
                 .subscribe();
@@ -215,7 +214,7 @@ export class RoomComponent implements OnInit, OnDestroy {
           };
           this.roomService.getRoom(this.roomId).subscribe((res) => {
             this.room = res.room;
-            if (res.room.musics.length > 0) {
+            if (res.room?.musics?.length > 0) {
               this.getTracksInfo(res.room.musics);
             } else {
               this.tracks = [];
@@ -304,11 +303,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   play() {
     console.log(this.wait);
 
-    if (
-      !this.wait &&
-      !this.playerInfo.is_playing &&
-      this.room.users.find((user) => user.id === this.user.id && user.right)
-    ) {
+    if (!this.wait && !this.playerInfo.is_playing) {
       console.log(this.wait);
       this.wait = true;
       this.cd.detectChanges();
@@ -329,11 +324,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   pause() {
     console.log(this.wait);
 
-    if (
-      !this.wait &&
-      this.playerInfo.is_playing &&
-      this.room.users.find((user) => user.id === this.user.id && user.right)
-    ) {
+    if (!this.wait && this.playerInfo.is_playing) {
       console.log(this.wait);
       this.wait = true;
 
@@ -364,10 +355,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     } else {
       this.pause();
     }
-    if (
-      this.room.users.find((user) => user.id === this.user.id && user.right) &&
-      this.tracks[0]
-    ) {
+    if (this.tracks[0]) {
       this.roomService.delTrack(this.tracks[0].id, this.roomId).subscribe();
     }
   }

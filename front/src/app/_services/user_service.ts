@@ -26,4 +26,12 @@ export class UserService {
       httpOptions
     );
   }
+
+  updateUser(user: User) {
+    return this.http.put(
+      environment.AUTH_API + `user/${user.id}`,
+      { user },
+      httpOptions
+    );
+  }
 }

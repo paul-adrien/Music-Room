@@ -20,7 +20,6 @@ module.exports = function (app) {
 
   app.get("/room/:roomId", [authJwt.verifyToken], controller.getRoom);
   app.delete("/room/:roomId", [authJwt.verifyToken], controller.delRoom);
-  app.put("/room/:roomId", [authJwt.verifyToken], controller.editRoom);
 
   app.post(
     "/room/:roomId/music/:trackId",
@@ -40,9 +39,9 @@ module.exports = function (app) {
     controller.inviteToRoom
   );
   app.post(
-    "/:userId/playlist/:playlistId/acceptInvite",
+    "/room/:roomId/acceptInvite",
     [authJwt.verifyToken],
-    controller.acceptInvitePlaylist
+    controller.acceptInviteRoom
   );
   app.delete(
     "/:userId/playlist/:playlistId/refuseInvite",
