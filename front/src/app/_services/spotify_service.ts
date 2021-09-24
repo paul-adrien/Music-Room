@@ -1,15 +1,17 @@
-import { ChangeDetectorRef, Injectable } from '@angular/core';
+import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
+import { ChangeDetectorRef, Injectable, NgZone } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import * as querystring from 'querystring';
 import { catchError, map, tap } from 'rxjs/operators';
+import { Device } from '@ionic-native/device/ngx';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
 };
 
-const httpApiSpotifyOptions = {
+let httpApiSpotifyOptions = {
   headers: new HttpHeaders({
     Authorization: 'Bearer ' + localStorage.getItem('access_token'),
     'Content-Type': 'application/json',
@@ -23,7 +25,14 @@ const clientSecret = '9bbe1deebd4045ef9b0eb3f7bab09daa';
   providedIn: 'root',
 })
 export class SpotifyService {
-  constructor(private http: HttpClient, private route: Router) {}
+  constructor(
+    private http: HttpClient,
+    private route: Router,
+    private router: ActivatedRoute,
+    private iab: InAppBrowser,
+    private ngZone: NgZone,
+    private device: Device
+  ) {}
 
   searchMusic(search: string) {
     return this.http
@@ -65,7 +74,7 @@ export class SpotifyService {
       );
   }
 
-  playTrack(uri: string, deviceId?: string) {
+  playTrack(uri: string, deviceId?: string, position_ms?: number) {
     return this.http
       .put<any>(
         deviceId
@@ -73,7 +82,7 @@ export class SpotifyService {
               deviceId
             )}`
           : `https://api.spotify.com/v1/me/player/play`,
-        { uris: [uri] },
+        { uris: [uri], position_ms },
         httpApiSpotifyOptions
       )
       .pipe(
@@ -99,6 +108,7 @@ export class SpotifyService {
   }
 
   requestAuthorization() {
+    let code;
     let url = 'https://accounts.spotify.com/authorize';
     url += '?client_id=' + clientId;
     url += '&response_type=code';
@@ -106,7 +116,27 @@ export class SpotifyService {
     url += '&show_dialog=true';
     url +=
       '&scope=user-read-private user-read-email user-modify-playback-state user-read-playback-position user-library-read streaming user-read-playback-state user-read-recently-played playlist-read-private';
-    window.location.href = url; // Show Spotify's authorization screen
+    if (this.device?.platform === null) {
+      window.location.href = url;
+    } else {
+      const browser = this.iab.create(url, 'defaults');
+      browser.on('loadstart').subscribe((event) => {
+        console.log('start', event);
+        if (
+          event.url.indexOf('localhost') !== -1 &&
+          event.url.indexOf('?code=') !== -1
+        ) {
+          code = event.url.slice(event.url.indexOf('?code=') + '?code='.length);
+          console.log(code);
+          this.ngZone.run(() => {
+            this.route.navigate([`/login`], { queryParams: { code: code } });
+          });
+          browser.close();
+        }
+      });
+    }
+
+    // Show Spotify's authorization screen
   }
 
   getAuthorizationToken() {
@@ -138,7 +168,7 @@ export class SpotifyService {
         .pipe(
           tap((res) => {
             this.saveToken(res);
-            window.location.href = 'http://localhost:8100/tabs/search';
+            this.route.navigate(['/tabs/search']);
           })
         );
     } else return;
@@ -170,28 +200,40 @@ export class SpotifyService {
         .pipe(
           tap((res) => {
             this.saveToken(res);
-            window.location.href = window.location.href;
+            this.route.navigate(['/tabs/search']);
           })
         );
     }
   }
 
   saveToken(res: any) {
-    if (res.access_token != undefined || res.refresh_token != undefined) {
+    if (res.access_token !== undefined || res.refresh_token !== undefined) {
       // var res = JSON.parse(res);
-      console.log(res);
+      console.log('save token', res);
       // var res = JSON.parse(res);
-      if (res.access_token != undefined) {
+      if (res.access_token !== undefined) {
         const access_token = res.access_token;
         localStorage.setItem('access_token', access_token);
+        httpApiSpotifyOptions = {
+          headers: new HttpHeaders({
+            Authorization: 'Bearer ' + localStorage.getItem('access_token'),
+            'Content-Type': 'application/json',
+          }),
+        };
       }
-      if (res.refresh_token != undefined) {
+      if (res.refresh_token !== undefined) {
         const refresh_token = res.refresh_token;
         localStorage.setItem('refresh_token', refresh_token);
         //this.spotifyApi.getRefreshedAccessToken(refresh_token);
       }
     } else {
       console.log(res);
+      httpApiSpotifyOptions = {
+        headers: new HttpHeaders({
+          Authorization: 'Bearer ' + localStorage.getItem('access_token'),
+          'Content-Type': 'application/json',
+        }),
+      };
     }
   }
 

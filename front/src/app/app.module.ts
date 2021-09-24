@@ -1,3 +1,4 @@
+import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 import { Device } from '@ionic-native/device/ngx';
 import { authInterceptorProviders } from './_helpers/auth-interceptor';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -25,7 +26,7 @@ import { NotificationsComponent } from './notifications/notifications.component'
 import { PlaylistComponent } from './playlist/playlist.component';
 
 @NgModule({
-  declarations: [	
+  declarations: [
     AppComponent,
     LoginComponent,
     SearchComponent,
@@ -36,8 +37,8 @@ import { PlaylistComponent } from './playlist/playlist.component';
     ConversationComponent,
     CreateModalComponent,
     NotificationsComponent,
-      PlaylistComponent
-   ],
+    PlaylistComponent,
+  ],
   entryComponents: [],
   imports: [
     BrowserModule,
@@ -53,6 +54,7 @@ import { PlaylistComponent } from './playlist/playlist.component';
     authInterceptorProviders,
     Device,
     WebsocketService,
+    InAppBrowser,
   ],
   bootstrap: [AppComponent],
 })

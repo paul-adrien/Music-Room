@@ -13,5 +13,6 @@ export interface Room {
     nb_vote: number;
     vote: string[];
   }[];
+  progress_ms: number;
   type: 'public' | 'private';
 }

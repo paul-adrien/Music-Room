@@ -5,7 +5,11 @@ const User = db.user;
 const Playlist = db.playlist;
 
 exports.getAllPlaylist = (req, res) => {
-  Playlist.find({}).exec((err, playlists) => {
+  const { userId } = req.query;
+  console.log("negro", userId);
+  Playlist.find(
+    userId !== "undefined" || userId !== undefined ? { created_by: userId } : {}
+  ).exec((err, playlists) => {
     if (err) {
       return res.status(400).json({
         status: false,

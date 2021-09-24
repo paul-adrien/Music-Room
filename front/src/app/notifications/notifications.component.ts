@@ -35,7 +35,7 @@ import { AlertController } from '@ionic/angular';
         />
         <img
           class="img"
-          (click)="this.openNotif(notif.id, 'room')"
+          (click)="this.acceptNotif(notif.id, 'rooms')"
           src="./assets/checkmark-outline.svg"
         />
       </div>
@@ -78,10 +78,10 @@ export class NotificationsComponent implements OnInit {
   }
 
   acceptNotif(id: string, type: string) {
-    if (type === 'room') {
+    if (type === 'rooms') {
       this.roomService.acceptInviteRoom(id, this.user.id).subscribe((res) => {
         if (res.status) {
-          // this.removeNotif()
+          this.openNotif(id, type);
         }
       });
     }
@@ -91,7 +91,7 @@ export class NotificationsComponent implements OnInit {
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
       console.log(this.device.platform, res);
       if (this.device.platform === null && res?.device?.id) {
-        if (type === 'room') {
+        if (type === 'rooms') {
           this.roomService
             .enterRoom(this.user.id, id, res?.device?.id)
             .subscribe((res) => {

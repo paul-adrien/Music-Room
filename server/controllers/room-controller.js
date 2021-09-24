@@ -36,6 +36,7 @@ exports.CreateRoom = async (req, res) => {
     created_by: userId,
     users: [{ id: userId, username: user.userName }],
     musics: [],
+    type: "public",
   });
   room.save((err, room) => {
     if (err) {
@@ -95,6 +96,9 @@ exports.getRoom = (req, res) => {
         room: null,
       });
     } else {
+      if (room.musics.length > 1) {
+        room.musics = room?.musics?.sort((a, b) => b.nb_vote - a.nb_vote);
+      }
       return res.json({
         status: true,
         message: "detail of room",
@@ -377,19 +381,41 @@ exports.acceptInviteRoom = async (req, res) => {
         message: "this room doesn't exist or you dont have the good right",
       });
     } else {
-      Room.updateOne({ _id: roomId }, { $push: userId }).exec((err, room) => {
-        if (err) {
-          return res.json({
-            status: false,
-            message: err,
-          });
-        } else {
-          return res.json({
-            status: true,
-            message: "you accept to enter this room",
-          });
+      Room.updateOne({ _id: roomId }, { $push: { invited: userId } }).exec(
+        (err, room) => {
+          if (err) {
+            return res.json({
+              status: false,
+              message: err,
+            });
+          } else {
+            User.updateOne(
+              { id: userId },
+              {
+                notifs: {
+                  $pull: {
+                    rooms: {
+                      id: roomId,
+                    },
+                  },
+                },
+              }
+            ).exec((err, user) => {
+              if (err) {
+                return res.json({
+                  status: false,
+                  message: err,
+                });
+              } else {
+                return res.json({
+                  status: true,
+                  message: "you accept to enter in the room",
+                });
+              }
+            });
+          }
         }
-      });
+      );
     }
   });
 };
@@ -440,6 +466,46 @@ exports.enterRoom = async (req, res) => {
   });
 };
 
+exports.stockPositionTrack = async (req, res) => {
+  const { roomId } = req.params;
+  const { progress_ms } = req.body;
+
+  Room.findOne({ _id: roomId }).exec((err, room) => {
+    if (err) {
+      return res.json({
+        status: false,
+        message: err,
+      });
+    } else if (!room) {
+      return res.json({
+        status: true,
+        message: "this room doesn't exist or you dont have the good right",
+      });
+    } else {
+      Room.updateOne(
+        { _id: roomId },
+        {
+          $set: {
+            progress_ms: progress_ms,
+          },
+        }
+      ).exec((err, room) => {
+        if (err) {
+          return res.json({
+            status: false,
+            message: err,
+          });
+        } else {
+          return res.json({
+            status: true,
+            message: "you have stock the track's position in this room",
+          });
+        }
+      });
+    }
+  });
+};
+
 exports.quitRoom = async (req, res) => {
   const { roomId } = req.params;
   const { userId } = req.query;
@@ -462,7 +528,22 @@ exports.quitRoom = async (req, res) => {
         })
         .indexOf(userId);
       if (roomIndex != -1 && room.created_by === userId) {
-        Room.deleteOne({ _id: roomId }).exec((err, room) => {
+        // Room.deleteOne({ _id: roomId }).exec((err, room) => {
+        //   if (err) {
+        //     return res.json({
+        //       status: false,
+        //       message: err,
+        //     });
+        //   } else {
+        // return res.json({
+        //   status: true,
+        //   message: "you have quit this room and delete this room",
+        //   }
+        // });
+        Room.updateOne(
+          { _id: roomId },
+          { $pull: { users: { id: userId } } }
+        ).exec((err, room) => {
           if (err) {
             return res.json({
               status: false,
@@ -471,7 +552,7 @@ exports.quitRoom = async (req, res) => {
           } else {
             return res.json({
               status: true,
-              message: "you have quit this room and delete this room",
+              message: "you have quit this room",
             });
           }
         });
@@ -599,7 +680,11 @@ exports.voteMusicRoom = async (req, res) => {
     $and: [
       { _id: roomId },
       {
-        $or: [{ created_by: userId }, { invited: { $in: [{ userId }] } }],
+        $or: [
+          { created_by: userId },
+          { invited: { $in: [userId] } },
+          { type: "public" },
+        ],
       },
     ],
   }).exec(async (err, room) => {
@@ -625,11 +710,20 @@ exports.voteMusicRoom = async (req, res) => {
           { _id: roomId, musics: { $elemMatch: { trackId: trackId } } },
           {
             $inc: { "musics.$.nb_vote": 1 },
+            $push: { "musics.$.vote": userId },
           }
-        );
-        return res.json({
-          status: true,
-          message: "this music is vote",
+        ).exec(async (err, room) => {
+          if (err) {
+            return res.json({
+              status: false,
+              message: err,
+            });
+          } else {
+            return res.json({
+              status: true,
+              message: "this music is vote",
+            });
+          }
         });
       } else if (room.musics.find((music) => music.trackId === trackId)) {
         return res.json({

@@ -1,5 +1,6 @@
 import { Device } from '@ionic-native/device/ngx';
 import { Component, OnInit } from '@angular/core';
+import { StatusBar, Style } from '@capacitor/status-bar';
 
 @Component({
   selector: 'app-root',
@@ -15,6 +16,10 @@ export class AppComponent implements OnInit {
       scheme = 'twitter://';
     } else if (this.device.platform === 'Android') {
       scheme = 'com.twitter.android';
+    }
+
+    if (this.device?.platform !== null) {
+      StatusBar.setStyle({ style: Style.Dark });
     }
     console.log(this.device.platform);
   }

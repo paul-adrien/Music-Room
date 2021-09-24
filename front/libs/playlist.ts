@@ -1,4 +1,5 @@
 export interface Playlist {
+  _id: string;
   name: string;
   created_by: string;
   invited: string[];

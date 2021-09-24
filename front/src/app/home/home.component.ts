@@ -188,7 +188,11 @@ export class HomeComponent implements OnInit {
   openPlaylist(playlistId: string) {
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
       console.log(this.device.platform, res);
-      if (this.device.platform === null && res?.device?.id) {
+      if (
+        (this.device.platform === null ||
+          this.device.platform.toLocaleLowerCase() === 'ios') &&
+        res?.device?.id
+      ) {
         this.router.navigate([`tabs/tab-home/playlist/${playlistId}`]);
       } else if (this.device.platform === null && !res?.device?.id) {
         await this.presentAlert();

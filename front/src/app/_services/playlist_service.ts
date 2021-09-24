@@ -85,9 +85,9 @@ export class PlaylistService {
     );
   }
 
-  getAllPlaylist(): Observable<any> {
+  getAllPlaylist(userId?: string): Observable<any> {
     return this.http
-      .get<any>(environment.AUTH_API + `playlist`, httpOptions)
+      .get<any>(environment.AUTH_API + `playlist?userId=${userId}`, httpOptions)
       .pipe(
         map((res) => {
           if (res.status) {

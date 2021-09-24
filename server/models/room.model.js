@@ -22,6 +22,7 @@ const Room = mongoose.model(
       },
     ],
     type: "public" | "private",
+    progress_ms: Number,
   })
 );
 

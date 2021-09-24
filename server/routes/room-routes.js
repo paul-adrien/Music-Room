@@ -54,6 +54,13 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.enterRoom
   );
+
+  app.post(
+    "/room/:roomId/progress-track",
+    [authJwt.verifyToken],
+    controller.stockPositionTrack
+  );
+
   app.delete(
     "/room/:roomId/quitRoom",
     [authJwt.verifyToken],

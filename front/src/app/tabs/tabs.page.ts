@@ -11,6 +11,7 @@ import { SpotifyService } from '../_services/spotify_service';
   selector: 'app-tabs',
   template: `
     <ion-tabs>
+      <ion-header class="header"> </ion-header>
       <app-player></app-player>
       <ion-tab-bar color="dark" slot="bottom">
         <ion-tab-button tab="tab-home">

@@ -129,7 +129,7 @@ export class PlaylistComponent implements OnInit {
 
   public wait = false;
 
-  public indexTrack = 0;
+  public indexTrack = undefined;
 
   ngOnInit() {
     this.user = this.authService.getUser();
@@ -177,6 +177,9 @@ export class PlaylistComponent implements OnInit {
 
     // After complete is called the items will be in the new order
     console.log('After complete', this.tracks);
+    this.indexTrack = this.tracks.findIndex(
+      (track) => track.id === this.playerInfo.item.id
+    );
   }
 
   ngAfterContentInit() {
@@ -208,6 +211,9 @@ export class PlaylistComponent implements OnInit {
           };
           this.playlistService.getPlaylist(this.playlistId).subscribe((res) => {
             this.playlist = res.playlist;
+            this.indexTrack = this.playlist.musics.findIndex(
+              (music) => music.trackId === this.playerInfo.item.id
+            );
             if (res.playlist.musics?.length > 0) {
               this.getTracksInfo(res.playlist.musics);
             } else {

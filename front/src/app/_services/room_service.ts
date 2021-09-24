@@ -43,6 +43,16 @@ export class RoomService {
     );
   }
 
+  stockPositionTrack(roomId: string, progress_ms: number) {
+    return this.http.post<any>(
+      environment.AUTH_API + `room/${roomId}/progress-track`,
+      {
+        progress_ms,
+      },
+      httpOptions
+    );
+  }
+
   quitRoom(userId: string, roomId: string) {
     return this.http.delete<any>(
       environment.AUTH_API + `room/${roomId}/quitRoom?userId=${userId}`,

@@ -30,16 +30,16 @@ import { forkJoin } from 'rxjs';
       <div class="title">
         {{ this.room.name }}
       </div>
-      <div *ngIf="this.tracks[0]" class="player-container">
+      <div *ngIf="this.trackPlaying" class="player-container">
         <div class="player-info">
           <img
             class="img-track"
-            [src]="this.tracks[0]?.album?.images[0]?.url"
+            [src]="this.trackPlaying?.album?.images[0]?.url"
           />
           <div class="player-text">
-            <div class="player-name">{{ this.tracks[0]?.name }}</div>
+            <div class="player-name">{{ this.trackPlaying?.name }}</div>
             <div class="player-artist">
-              {{ this.tracks[0].artists[0].name }}
+              {{ this.trackPlaying.artists[0].name }}
             </div>
           </div>
         </div>
@@ -103,7 +103,7 @@ import { forkJoin } from 'rxjs';
       <div></div>
       <div class="sub-title">Prochains titres</div>
       <div *ngFor="let track of this.tracks; let isFirst = first">
-        <div class="tracks-container" *ngIf="!this.isFirst">
+        <div class="tracks-container">
           <img class="logo" [src]="track.album.images[0].url" />
           <div class="track-info">
             <div class="info-top">{{ track.name }}</div>
@@ -151,6 +151,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   public user: User;
   public roomId: string = this.route.snapshot.paramMap.get('id');
   public tracks = [];
+  public trackPlaying: any;
 
   public playerInfo: { is_playing: boolean; item: any; progress_ms: number } =
     undefined;
@@ -169,13 +170,21 @@ export class RoomComponent implements OnInit, OnDestroy {
           .getTracksInfo(this.room.musics.map((music) => music.trackId))
           .pipe(map((res: any) => res.tracks))
           .subscribe((res) => {
-            this.tracks = res;
-            if (
-              this.room.users.length === 1 &&
-              this.user.id === this.room.users[0].id
-            ) {
-              //this.spotifyService.playTrack(this.tracks[0].uri).subscribe();
-            }
+            this.trackPlaying = res[0];
+            this.tracks = res?.filter(
+              (music) => music.id !== this.trackPlaying.id
+            );
+            this.room.musics = this.room.musics.filter(
+              (music) => music.trackId !== this.trackPlaying.id
+            );
+            this.spotifyService
+              .playTrack(
+                this.trackPlaying.uri,
+                undefined,
+                this.room?.progress_ms
+              )
+              .subscribe();
+
             this.cd.detectChanges();
           });
       }
@@ -193,18 +202,27 @@ export class RoomComponent implements OnInit, OnDestroy {
       .toPromise()
       .then((res) => {
         if (typeof res !== 'string' && res !== null) {
+          this.roomService
+            .stockPositionTrack(this.roomId, res.progress_ms)
+            .subscribe();
           if (
             res.progress_ms === 0 &&
             !res.is_playing &&
             this.tracks.length > 0
           ) {
-            if (this.tracks[1]) {
-              this.spotifyService.playTrack(this.tracks[1]?.uri).subscribe();
-            }
-            if (this.room.created_by === this.user.id) {
+            if (
+              this.room.created_by === this.user.id ||
+              this.room.users[0].id === this.user.id ||
+              true
+            ) {
               this.roomService
-                .delTrack(this.tracks[0].id, this.roomId)
+                .delTrack(this.trackPlaying.id, this.roomId)
                 .subscribe();
+              this.trackPlaying = undefined;
+            }
+            if (this.tracks[0]) {
+              this.trackPlaying = this.tracks[0];
+              this.spotifyService.playTrack(this.tracks[0]?.uri).subscribe();
             }
           }
           this.playerInfo = {
@@ -214,6 +232,9 @@ export class RoomComponent implements OnInit, OnDestroy {
           };
           this.roomService.getRoom(this.roomId).subscribe((res) => {
             this.room = res.room;
+            this.room.musics = this.room.musics.filter(
+              (music) => music.trackId !== this.trackPlaying.id
+            );
             if (res.room?.musics?.length > 0) {
               this.getTracksInfo(res.room.musics);
             } else {
@@ -225,12 +246,12 @@ export class RoomComponent implements OnInit, OnDestroy {
       });
   }
 
-  getTracksInfo(musics: any) {
+  getTracksInfo(musics: any[]) {
     this.spotifyService
       .getTracksInfo(musics.map((music) => music.trackId))
       .pipe(map((res: any) => res.tracks))
       .subscribe((res) => {
-        this.tracks = res;
+        this.tracks = res?.filter((music) => music.id !== this.trackPlaying.id);
         this.cd.detectChanges();
       });
   }
@@ -264,7 +285,8 @@ export class RoomComponent implements OnInit, OnDestroy {
               this.roomService.getRoom(this.roomId).subscribe((res) => {
                 this.room = res.room;
 
-                if (this.tracks.length === 0) {
+                if (this.trackPlaying === undefined) {
+                  this.trackPlaying = track;
                   this.spotifyService.playTrack(track.uri).subscribe();
                 }
               });
@@ -343,26 +365,31 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   nextTrack() {
-    if (this.tracks[1]) {
+    if (this.trackPlaying) {
+      this.roomService.delTrack(this.trackPlaying.id, this.roomId).subscribe();
+      this.trackPlaying = undefined;
+    }
+    if (this.tracks[0]) {
       forkJoin(
         this.room.users.map((user) =>
-          this.spotifyService.playTrack(this.tracks[1]?.uri, user.deviceId)
+          this.spotifyService.playTrack(this.tracks[0]?.uri, user.deviceId)
         )
       ).subscribe((data) => {
+        this.trackPlaying = this.tracks[0];
+        this.tracks = this.tracks.filter(
+          (track) => track.id !== this.trackPlaying.id
+        );
         this.playerInfo.is_playing = true;
         this.cd.detectChanges();
       });
     } else {
       this.pause();
     }
-    if (this.tracks[0]) {
-      this.roomService.delTrack(this.tracks[0].id, this.roomId).subscribe();
-    }
   }
 
   voteTrack(trackId: string) {
     if (
-      this.room.musics.find(
+      this.room?.musics?.find(
         (music) =>
           music.trackId === trackId &&
           music.vote.find((user) => user === this.user.id) === undefined
@@ -374,15 +401,13 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   isVoteTrack(trackId: string) {
-    return !this.room.musics.find(
-      (music) =>
-        music.trackId === trackId &&
-        music.vote.find((user) => user === this.user.id) === undefined
-    );
+    const music = this.room?.musics?.find((music) => music.trackId === trackId);
+    return !!music?.vote?.find((user) => user === this.user.id);
   }
 
   getNbVoteTrack(trackId: string) {
-    return this.room.musics.find((music) => music.trackId === trackId)?.nb_vote;
+    return this.room?.musics?.find((music) => music.trackId === trackId)
+      ?.nb_vote;
   }
 
   ngOnDestroy() {

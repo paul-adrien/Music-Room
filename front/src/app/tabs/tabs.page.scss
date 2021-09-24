@@ -9,6 +9,10 @@
   border-bottom: 1px solid black;
 }
 
+.header {
+  padding-top: var(--ion-safe-area-top);
+}
+
 .item-info {
   display: flex;
   flex-direction: column;

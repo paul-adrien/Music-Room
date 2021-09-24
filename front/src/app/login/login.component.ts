@@ -4,6 +4,11 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { User } from 'libs/user';
+import {
+  InAppBrowser,
+  InAppBrowserOptions,
+} from '@ionic-native/in-app-browser/ngx';
+import { Device } from '@ionic-native/device/ngx';
 
 function ValidatorUserNameLength(control: FormControl) {
   const test = /^(?=.{3,20}$)[a-zA-Z0-9]+(?:[-' ][a-zA-Z0-9]+)*$/;
@@ -284,6 +289,8 @@ export class LoginComponent implements OnInit {
     private router: ActivatedRoute,
     private authService: AuthService,
     private spotifyService: SpotifyService,
+    private iab: InAppBrowser,
+    private device: Device,
     private cd: ChangeDetectorRef //public translate: TranslateService
   ) {}
 
@@ -367,14 +374,76 @@ export class LoginComponent implements OnInit {
   }
 
   public Oauth42() {
-    location.href = 'http://localhost:8080/user/authenticate/42';
+    const options: InAppBrowserOptions = {
+      zoom: 'no',
+      location: 'no',
+    };
+    if (this.device?.platform === null) {
+      location.href = 'http://localhost:8080/user/authenticate/42';
+    } else {
+      const browser = this.iab.create(
+        'http://localhost:8080/user/authenticate/42',
+        'defaults',
+        options
+      );
+      browser.on('loadstart').subscribe((event) => {
+        console.log('start', event);
+      });
+      browser.on('exit').subscribe((event) => {
+        console.log('end', event);
+
+        browser.close();
+      });
+    }
   }
 
   public OauthGoogle() {
-    location.href = 'http://localhost:8080/user/authenticate/google';
+    //location.href = 'http://localhost:8080/user/authenticate/google';
+    const options: InAppBrowserOptions = {
+      zoom: 'no',
+      location: 'no',
+    };
+    if (this.device?.platform === null) {
+      location.href = 'http://localhost:8080/user/authenticate/google';
+    } else {
+      const browser = this.iab.create(
+        'http://localhost:8080/user/authenticate/google',
+        'defaults',
+        options
+      );
+      browser.on('loadstart').subscribe((event) => {
+        console.log('start', event);
+      });
+      browser.on('exit').subscribe((event) => {
+        console.log('end', event);
+
+        browser.close();
+      });
+    }
   }
 
   public OauthGithub() {
-    location.href = 'http://localhost:8080/user/authenticate/github';
+    //location.href = 'http://localhost:8080/user/authenticate/github';
+    const options: InAppBrowserOptions = {
+      zoom: 'no',
+      location: 'no',
+    };
+    if (this.device?.platform === null) {
+      location.href = 'http://localhost:8080/user/authenticate/github';
+    } else {
+      const browser = this.iab.create(
+        'http://localhost:8080/user/authenticate/github',
+        'defaults',
+        options
+      );
+      browser.on('loadstart').subscribe((event) => {
+        console.log('start', event);
+      });
+      browser.on('exit').subscribe((event) => {
+        console.log('end', event);
+
+        browser.close();
+      });
+    }
   }
 }
