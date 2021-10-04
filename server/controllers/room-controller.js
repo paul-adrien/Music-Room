@@ -4,27 +4,31 @@ const User = db.user;
 const Room = db.room;
 
 exports.getAllRoom = (req, res) => {
-  Room.find({}).exec((err, rooms) => {
-    if (err) {
-      return res.status(400).json({
-        status: false,
-        message: err,
-        rooms: null,
-      });
-    } else if (!rooms) {
-      return res.status(201).json({
-        status: true,
-        message: "no room",
-        rooms: null,
-      });
-    } else {
-      return res.status(200).json({
-        status: true,
-        message: "rooms success",
-        rooms: rooms,
-      });
+  const { userId } = req.query;
+
+  Room.find(userId !== "undefined" ? { created_by: userId } : {}).exec(
+    (err, rooms) => {
+      if (err) {
+        return res.status(400).json({
+          status: false,
+          message: err,
+          rooms: null,
+        });
+      } else if (!rooms) {
+        return res.status(201).json({
+          status: true,
+          message: "no room",
+          rooms: null,
+        });
+      } else {
+        return res.status(200).json({
+          status: true,
+          message: "rooms success",
+          rooms: rooms,
+        });
+      }
     }
-  });
+  );
 };
 
 exports.CreateRoom = async (req, res) => {
@@ -735,6 +739,44 @@ exports.voteMusicRoom = async (req, res) => {
           status: false,
           message: "this music does not exist in this event",
         });
+    }
+  });
+};
+
+exports.changeType = async (req, res) => {
+  const { roomId } = req.params;
+  const { type, userId } = req.body;
+
+  Room.findOne({ _id: roomId, created_by: userId }).exec((err, room) => {
+    if (err) {
+      return res.json({
+        status: false,
+        message: err,
+      });
+    } else if (!room) {
+      return res.json({
+        status: false,
+        message: "this room doesn't exist or you dont have the good right",
+      });
+    } else {
+      Room.updateOne(
+        { _id: roomId },
+        {
+          type: type,
+        }
+      ).exec((err, room) => {
+        if (err) {
+          return res.json({
+            status: false,
+            message: err,
+          });
+        } else {
+          return res.json({
+            status: true,
+            message: "this room change type",
+          });
+        }
+      });
     }
   });
 };

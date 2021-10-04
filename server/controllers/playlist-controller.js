@@ -7,29 +7,29 @@ const Playlist = db.playlist;
 exports.getAllPlaylist = (req, res) => {
   const { userId } = req.query;
   console.log("negro", userId);
-  Playlist.find(
-    userId !== "undefined" || userId !== undefined ? { created_by: userId } : {}
-  ).exec((err, playlists) => {
-    if (err) {
-      return res.status(400).json({
-        status: false,
-        message: err,
-        playlists: null,
-      });
-    } else if (!playlists) {
-      return res.status(201).json({
-        status: true,
-        message: "no playlist",
-        playlists: null,
-      });
-    } else {
-      return res.status(200).json({
-        status: true,
-        message: "playlists success",
-        playlists: playlists,
-      });
+  Playlist.find(userId !== "undefined" ? { created_by: userId } : {}).exec(
+    (err, playlists) => {
+      if (err) {
+        return res.status(400).json({
+          status: false,
+          message: err,
+          playlists: null,
+        });
+      } else if (!playlists) {
+        return res.status(201).json({
+          status: true,
+          message: "no playlist",
+          playlists: null,
+        });
+      } else {
+        return res.status(200).json({
+          status: true,
+          message: "playlists success",
+          playlists: playlists,
+        });
+      }
     }
-  });
+  );
 };
 
 exports.CreatePlaylist = async (req, res) => {
@@ -450,21 +450,22 @@ exports.acceptInvitePlaylist = async (req, res) => {
         message: "this playlist doesn't exist or you dont have the good right",
       });
     } else {
-      Playlist.updateOne({ _id: playlistId }, { $push: userId }).exec(
-        (err, playlist) => {
-          if (err) {
-            return res.json({
-              status: false,
-              message: err,
-            });
-          } else {
-            return res.json({
-              status: true,
-              message: "you accept to enter this playlist",
-            });
-          }
+      Playlist.updateOne(
+        { _id: playlistId },
+        { $push: { invited: userId } }
+      ).exec((err, playlist) => {
+        if (err) {
+          return res.json({
+            status: false,
+            message: err,
+          });
+        } else {
+          return res.json({
+            status: true,
+            message: "you accept to enter this playlist",
+          });
         }
-      );
+      });
     }
   });
 };
@@ -598,4 +599,45 @@ exports.delMusicPlaylist = async (req, res, next) => {
       });
     }
   });
+};
+
+exports.changeType = async (req, res) => {
+  const { playlistId } = req.params;
+  const { type, userId } = req.body;
+
+  Playlist.findOne({ _id: playlistId, created_by: userId }).exec(
+    (err, playlist) => {
+      if (err) {
+        return res.json({
+          status: false,
+          message: err,
+        });
+      } else if (!playlist) {
+        return res.json({
+          status: true,
+          message:
+            "this playlist doesn't exist or you dont have the good right",
+        });
+      } else {
+        Playlist.updateOne(
+          { _id: playlistId },
+          {
+            type: type,
+          }
+        ).exec((err, playlist) => {
+          if (err) {
+            return res.json({
+              status: false,
+              message: err,
+            });
+          } else {
+            return res.json({
+              status: true,
+              message: "this playlist change type",
+            });
+          }
+        });
+      }
+    }
+  );
 };

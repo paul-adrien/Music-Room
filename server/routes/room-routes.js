@@ -73,5 +73,11 @@ module.exports = function (app) {
     controller.voteMusicRoom
   );
 
+  app.post(
+    "/room/:roomId/change-type",
+    [authJwt.verifyToken],
+    controller.changeType
+  );
+
   //app.put("/:userId/playlist/:playlistId/friends/:friendId", [authJwt.verifyToken], controller.editUserPlaylist)
 };

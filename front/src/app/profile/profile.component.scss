@@ -39,6 +39,12 @@
     }
   }
 
+  .title-category {
+    margin: 1rem;
+    font-family: Circular-medium;
+    font-size: 1.5rem;
+  }
+
   .result-item {
     width: 100%;
     height: 3rem;
@@ -74,7 +80,7 @@
     margin: 0 1rem;
 
     &.no-img {
-      padding: 1rem;
+      padding: 0.6rem 1rem;
       margin: 0;
     }
   }

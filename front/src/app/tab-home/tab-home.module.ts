@@ -8,6 +8,7 @@ import { TabHomePage } from './tab-home.page';
 import { ExploreContainerComponentModule } from '../explore-container/explore-container.module';
 
 import { Tab1PageRoutingModule } from './tab-home-routing.module';
+import { SettingsRoomComponent } from '../settings-room/settings-room.component';
 
 @NgModule({
   imports: [
@@ -17,7 +18,11 @@ import { Tab1PageRoutingModule } from './tab-home-routing.module';
     ExploreContainerComponentModule,
     Tab1PageRoutingModule,
   ],
-  entryComponents: [SearchComponent, CreateModalComponent],
+  entryComponents: [
+    SearchComponent,
+    CreateModalComponent,
+    SettingsRoomComponent,
+  ],
   declarations: [TabHomePage],
 })
 export class TabHomeModule {}

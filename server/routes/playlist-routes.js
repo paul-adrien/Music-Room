@@ -72,5 +72,11 @@ module.exports = function (app) {
     logs
   );
 
+  app.post(
+    "/playlist/:playlistId/change-type",
+    [authJwt.verifyToken],
+    controller.changeType
+  );
+
   //app.put("/playlist/:playlistId/friends/:friendId", [authJwt.verifyToken], controller.editUserPlaylist)
 };

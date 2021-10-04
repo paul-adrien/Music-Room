@@ -101,14 +101,16 @@ export class RoomService {
     return this.http.get(environment.AUTH_API + `room/${roomId}`, httpOptions);
   }
 
-  getAllRoom(): Observable<any> {
-    return this.http.get<any>(environment.AUTH_API + `room`, httpOptions).pipe(
-      map((res) => {
-        if (res.status) {
-          return res.rooms;
-        } else return undefined;
-      })
-    );
+  getAllRoom(userId?: string): Observable<any> {
+    return this.http
+      .get<any>(environment.AUTH_API + `room?userId=${userId}`, httpOptions)
+      .pipe(
+        map((res) => {
+          if (res.status) {
+            return res.rooms;
+          } else return undefined;
+        })
+      );
   }
 
   inviteUserToRoom(roomId: string, userId: string, friendId: string) {
@@ -126,6 +128,17 @@ export class RoomService {
       environment.AUTH_API + `room/${roomId}/acceptInvite`,
       {
         userId: userId,
+      },
+      httpOptions
+    );
+  }
+
+  changeType(roomId: string, userId: string, type: 'public' | 'private') {
+    return this.http.post<any>(
+      environment.AUTH_API + `room/${roomId}/change-type`,
+      {
+        userId: userId,
+        type: type,
       },
       httpOptions
     );

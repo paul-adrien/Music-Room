@@ -15,7 +15,7 @@ import { SearchComponent } from './search/search.component';
 import { ProfileComponent } from './profile/profile.component';
 import { HttpClientModule } from '@angular/common/http';
 import { NgxSliderModule } from '@angular-slider/ngx-slider';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HomeComponent } from './home/home.component';
 import { RoomComponent } from './room/room.component';
 import { WebsocketService } from './_services/websocketService';
@@ -24,6 +24,7 @@ import { ConversationComponent } from './conversation/conversation.component';
 import { CreateModalComponent } from './create-modal/create-modal.component';
 import { NotificationsComponent } from './notifications/notifications.component';
 import { PlaylistComponent } from './playlist/playlist.component';
+import { SettingsRoomComponent } from './settings-room/settings-room.component';
 
 @NgModule({
   declarations: [
@@ -38,9 +39,11 @@ import { PlaylistComponent } from './playlist/playlist.component';
     CreateModalComponent,
     NotificationsComponent,
     PlaylistComponent,
+    SettingsRoomComponent,
   ],
   entryComponents: [],
   imports: [
+    FormsModule,
     BrowserModule,
     IonicModule.forRoot(),
     AppRoutingModule,

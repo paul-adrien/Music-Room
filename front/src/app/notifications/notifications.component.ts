@@ -1,3 +1,4 @@
+import { PlaylistService } from './../_services/playlist_service';
 import { async } from '@angular/core/testing';
 import { UserService } from './../_services/user_service';
 import { RoomService } from './../_services/room_service';
@@ -10,6 +11,7 @@ import { SpotifyService } from '../_services/spotify_service';
 import { Device } from '@ionic-native/device/ngx';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
+import { isAfter, isBefore } from 'date-fns';
 
 @Component({
   selector: 'app-notifications',
@@ -20,7 +22,39 @@ import { AlertController } from '@ionic/angular';
       src="./assets/chevron-back-outline.svg"
     />
     <div class="title">Mes notifications</div>
-    <div *ngFor="let notif of this.user.notifs?.rooms" class="notif-container">
+    <div *ngFor="let notif of this.notifs" class="notif-container">
+      <div class="text" *ngIf="notif.type === 'rooms'">
+        Vous avez été invité à rejoindre la room
+        <span class="font-medium">
+          {{ notif?.name }}
+        </span>
+      </div>
+      <div class="text" *ngIf="notif.type === 'playlist'">
+        Vous avez été invité à rejoindre la playlist
+        <span class="font-medium">
+          {{ notif?.name }}
+        </span>
+      </div>
+      <div class="text" *ngIf="notif.type === 'friends'">
+        <span class="font-medium">
+          {{ notif?.name }}
+        </span>
+        s'est abonné(e) à vous
+      </div>
+      <div class="buttons">
+        <img
+          class="img"
+          (click)="this.removeNotif(notif, notif.type)"
+          src="./assets/close-outline.svg"
+        />
+        <img
+          class="img"
+          (click)="this.acceptNotif(notif.id, notif.type)"
+          src="./assets/checkmark-outline.svg"
+        />
+      </div>
+    </div>
+    <!-- <div *ngFor="let notif of this.user.notifs?.rooms" class="notif-container">
       <div class="text">
         Vous avez été invité à rejoindre la room
         <span class="font-medium">
@@ -43,7 +77,7 @@ import { AlertController } from '@ionic/angular';
     <div *ngFor="let notif of this.user.notifs?.playlist">
       {{ notif?.name }}
     </div>
-    <div *ngFor="let notif of this.user.notifs?.friends">{{ notif?.name }}</div>
+    <div *ngFor="let notif of this.user.notifs?.friends">{{ notif?.name }}</div> -->
   `,
   styleUrls: ['./notifications.component.scss'],
 })
@@ -53,6 +87,7 @@ export class NotificationsComponent implements OnInit {
     private authService: AuthService,
     private cd: ChangeDetectorRef,
     private roomService: RoomService,
+    private playlistService: PlaylistService,
     private userService: UserService,
     private spotifyService: SpotifyService,
     private device: Device,
@@ -62,13 +97,33 @@ export class NotificationsComponent implements OnInit {
 
   public user: User;
 
+  public notifs: any[] = [];
+
   ngOnInit() {
     this.user = this.authService.getUser();
-    // this.notifs = this.notifs.concat(
-    //   this.user.notifs.rooms,
-    //   this.user.notifs.playlist,
-    //   this.user.notifs.friends
-    // );
+    const tmpRoom = this.user.notifs.rooms.map((room) => ({
+      ...room,
+      type: 'rooms',
+    }));
+    const tmpPlaylist = this.user.notifs.playlist.map((playlist) => ({
+      ...playlist,
+      type: 'playlist',
+    }));
+    const tmpFriend = this.user.notifs.friends.map((friend) => ({
+      ...friend,
+      type: 'friends',
+    }));
+    this.notifs = this.notifs
+      .concat(tmpRoom, tmpPlaylist, tmpFriend)
+      .sort((a, b) => {
+        if (isBefore(new Date(a.date), new Date(b.date))) {
+          return -1;
+        } else if (isAfter(new Date(a.date), new Date(b.date))) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
     //this.notifs = {playlist: this.user.notifs.playlist, friends: this.user.notifs.friends, rooms: this.user.notifs.rooms.map(room => {...room, this.})}
     this.cd.detectChanges();
   }
@@ -84,6 +139,14 @@ export class NotificationsComponent implements OnInit {
           this.openNotif(id, type);
         }
       });
+    } else if (type === 'playlist') {
+      this.playlistService
+        .acceptInvitePlaylist(id, this.user.id)
+        .subscribe((res) => {
+          if (res.status) {
+            this.openNotif(id, type);
+          }
+        });
     }
   }
 

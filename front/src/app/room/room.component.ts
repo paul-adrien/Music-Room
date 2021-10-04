@@ -13,10 +13,15 @@ import {
 import { RoomService } from '../_services/room_service';
 import { SpotifyService } from '../_services/spotify_service';
 import { User } from 'libs/user';
-import { ModalController, NavController } from '@ionic/angular';
+import {
+  ModalController,
+  NavController,
+  PopoverController,
+} from '@ionic/angular';
 import { AuthService } from '../_services/auth_service';
 import { Location } from '@angular/common';
 import { forkJoin } from 'rxjs';
+import { SettingsRoomComponent } from '../settings-room/settings-room.component';
 
 @Component({
   selector: 'app-room',
@@ -89,18 +94,27 @@ import { forkJoin } from 'rxjs';
       </div>
       <div class="buttons-middle">
         <div
+          *ngIf="this.isInvited || this.room.created_by === this.user.id"
           class="primary-button suggestion"
           (click)="this.presentModalSuggestion()"
         >
           Suggérer un titre
         </div>
-        <img
-          class="add"
-          (click)="this.presentModalInvite()"
-          src="./assets/person-add-outline.svg"
-        />
+        <div class="buttons-right">
+          <img
+            *ngIf="this.isInvited || this.room.created_by === this.user.id"
+            class="add"
+            (click)="this.presentModalInvite()"
+            src="./assets/person-add-outline.svg"
+          />
+          <img
+            *ngIf="this.room.created_by === this.user.id"
+            class="add"
+            (click)="this.presentPopoverSettings($event)"
+            src="./assets/settings-white.svg"
+          />
+        </div>
       </div>
-      <div></div>
       <div class="sub-title">Prochains titres</div>
       <div *ngFor="let track of this.tracks; let isFirst = first">
         <div class="tracks-container">
@@ -120,6 +134,7 @@ import { forkJoin } from 'rxjs';
             /> -->
             <div>{{ this.getNbVoteTrack(track.id) }}</div>
             <img
+              *ngIf="!!this.isInvited || this.room.created_by === this.user.id"
               class="up"
               (click)="this.voteTrack(track.id)"
               [src]="
@@ -144,7 +159,9 @@ export class RoomComponent implements OnInit, OnDestroy {
     private spotifyService: SpotifyService,
     private location: Location,
     private authService: AuthService,
-    public modalController: ModalController
+    public modalController: ModalController,
+    private navCtrl: NavController,
+    private popoverCtrl: PopoverController
   ) {}
 
   public room: Room;
@@ -152,6 +169,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   public roomId: string = this.route.snapshot.paramMap.get('id');
   public tracks = [];
   public trackPlaying: any;
+  public isInvited = false;
 
   public playerInfo: { is_playing: boolean; item: any; progress_ms: number } =
     undefined;
@@ -232,6 +250,8 @@ export class RoomComponent implements OnInit, OnDestroy {
           };
           this.roomService.getRoom(this.roomId).subscribe((res) => {
             this.room = res.room;
+            this.isInvited =
+              this.room.invited.indexOf(this.user.id) >= 0 ? true : false;
             this.room.musics = this.room.musics.filter(
               (music) => music.trackId !== this.trackPlaying.id
             );
@@ -259,7 +279,9 @@ export class RoomComponent implements OnInit, OnDestroy {
   quitRoom() {
     this.roomService.quitRoom(this.user.id, this.roomId).subscribe((res) => {
       if (res.status) {
-        this.location.back();
+        //this.location.back();
+        this.location.historyGo(-1);
+        //this.navCtrl.navigateBack('');
         //this.navCtrl.navigateBack('/tabs/home');
       }
     });
@@ -320,6 +342,21 @@ export class RoomComponent implements OnInit, OnDestroy {
       }
     });
     return await modal.present();
+  }
+
+  async presentPopoverSettings(event) {
+    const popover = await this.popoverCtrl.create({
+      event,
+      component: SettingsRoomComponent,
+      cssClass: 'my-custom-popover',
+      componentProps: {
+        room: this.room,
+        userId: this.user.id,
+        type: 'room',
+      },
+    });
+    popover.onWillDismiss().then((res) => {});
+    return await popover.present();
   }
 
   play() {

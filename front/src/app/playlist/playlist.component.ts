@@ -1,6 +1,6 @@
 import { PlaylistService } from './../_services/playlist_service';
 import { Playlist } from './../../../libs/playlist';
-import { ModalController } from '@ionic/angular';
+import { ModalController, PopoverController } from '@ionic/angular';
 import { AuthService } from './../_services/auth_service';
 import { SpotifyService } from './../_services/spotify_service';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
@@ -11,6 +11,7 @@ import { Location } from '@angular/common';
 import { map } from 'rxjs/operators';
 import { SearchComponent } from '../search/search.component';
 import { ItemReorderEventDetail } from '@ionic/core';
+import { SettingsRoomComponent } from '../settings-room/settings-room.component';
 
 @Component({
   selector: 'app-playlist',
@@ -58,11 +59,19 @@ import { ItemReorderEventDetail } from '@ionic/core';
         >
           Suggérer un titre
         </div>
-        <img
-          class="add"
-          (click)="this.presentModalInvite()"
-          src="./assets/person-add-outline.svg"
-        />
+        <div class="buttons-right">
+          <img
+            class="add"
+            (click)="this.presentModalInvite()"
+            src="./assets/person-add-outline.svg"
+          />
+          <img
+            *ngIf="this.playlist.created_by === this.user.id"
+            class="add"
+            (click)="this.presentPopoverSettings($event)"
+            src="./assets/settings-white.svg"
+          />
+        </div>
       </div>
       <div></div>
       <div class="sub-title">Prochains titres</div>
@@ -112,7 +121,8 @@ export class PlaylistComponent implements OnInit {
     private spotifyService: SpotifyService,
     private location: Location,
     private authService: AuthService,
-    public modalController: ModalController
+    public modalController: ModalController,
+    private popoverCtrl: PopoverController
   ) {}
 
   public playlist: Playlist;
@@ -238,7 +248,7 @@ export class PlaylistComponent implements OnInit {
   }
 
   quitPlaylist() {
-    this.location.back();
+    this.location.historyGo(-1);
     //this.navCtrl.navigateBack('/tabs/home');
   }
 
@@ -298,6 +308,21 @@ export class PlaylistComponent implements OnInit {
     return await modal.present();
   }
 
+  async presentPopoverSettings(event) {
+    const popover = await this.popoverCtrl.create({
+      event,
+      component: SettingsRoomComponent,
+      cssClass: 'my-custom-popover',
+      componentProps: {
+        playlist: this.playlist,
+        userId: this.user.id,
+        type: 'playlist',
+      },
+    });
+    popover.onWillDismiss().then((res) => {});
+    return await popover.present();
+  }
+
   play(index: number) {
     this.indexTrack = index;
     this.spotifyService.playTrack(this.tracks[index]?.uri).subscribe();
@@ -354,7 +379,8 @@ export class PlaylistComponent implements OnInit {
   checkRight() {
     return (
       this.isPublic ||
-      this.playlist.invited.find((userId) => userId === this.user.id)
+      this.playlist.invited.find((userId) => userId === this.user.id) ||
+      this.playlist.created_by === this.user.id
     );
   }
 

@@ -116,4 +116,25 @@ export class PlaylistService {
       httpOptions
     );
   }
+
+  acceptInvitePlaylist(playlistId: string, userId: string) {
+    return this.http.post<any>(
+      environment.AUTH_API + `playlist/${playlistId}/acceptInvite`,
+      {
+        userId: userId,
+      },
+      httpOptions
+    );
+  }
+
+  changeType(playlistId: string, userId: string, type: 'public' | 'private') {
+    return this.http.post<any>(
+      environment.AUTH_API + `playlist/${playlistId}/change-type`,
+      {
+        userId: userId,
+        type: type,
+      },
+      httpOptions
+    );
+  }
 }

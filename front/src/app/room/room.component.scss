@@ -65,9 +65,16 @@
       align-items: center;
       margin: 0 1rem;
 
-      .add {
+      .buttons-right {
+        display: flex;
+        align-items: center;
+      }
+
+      .add,
+      .settings {
         height: 1.5rem;
         object-fit: contain;
+        margin-left: 0.5rem;
       }
     }
 
