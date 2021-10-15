@@ -1,11 +1,13 @@
 import { NotificationsComponent } from './../notifications/notifications.component';
 import { RoomComponent } from '../room/room.component';
 import { HomeComponent } from '../home/home.component';
-import { NgModule } from '@angular/core';
+import { NgModule, Component } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { TabHomePage } from './tab-home.page';
 import { AuthGuard } from '../_services/auth-guard';
 import { PlaylistComponent } from '../playlist/playlist.component';
+import { MessagesComponent } from '../messages/messages.component';
+import { ConversationComponent } from '../conversation/conversation.component';
 
 const routes: Routes = [
   {
@@ -26,6 +28,16 @@ const routes: Routes = [
   {
     path: 'notifications',
     component: NotificationsComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'messages',
+    component: MessagesComponent,
+    canActivate: [AuthGuard],
+  },
+  {
+    path: 'conversation/:id',
+    component: ConversationComponent,
     canActivate: [AuthGuard],
   },
 ];

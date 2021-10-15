@@ -6,6 +6,11 @@ import { WebsocketService } from '../_services/websocketService';
 @Component({
   selector: 'app-messages',
   template: `
+  <img
+      class="back-img"
+      src="./assets/chevron-back-outline.svg"
+  />
+  <div class="title">Mes conversations</div>
   <button (click)="createConv()">Créer une conversation</button>
   <div *ngIf="this.convList">
     <div *ngFor="let conv of this.convList.conversations">

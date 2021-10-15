@@ -54,7 +54,7 @@ io.on("connection", (socket) => {
   socket.on("chat message", (data) => {
     console.log(data);
     messaging_controller.sendMessage(data.userId, data.convId, data.message);
-    io.emit("chat message", data.message);
+    io.emit(`chat message ${data.convId}`, data.message);
   });
 
   //ROOM ///////////////////////////////////////////////////////////////////////////////
