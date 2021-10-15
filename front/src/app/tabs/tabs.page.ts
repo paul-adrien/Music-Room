@@ -79,7 +79,7 @@ export class TabsPage {
   async presentModal() {
     const modal = await this.modalController.create({
       component: PlayerComponent,
-      cssClass: 'my-custom-class',
+      cssClass: ['my-custom-class', 'my-custom-modal'],
       swipeToClose: true,
       componentProps: {
         playerInfo: this.spotifyService.getPlayerInfo(),

@@ -22,6 +22,7 @@ import { AuthService } from '../_services/auth_service';
 import { Location } from '@angular/common';
 import { forkJoin } from 'rxjs';
 import { SettingsRoomComponent } from '../settings-room/settings-room.component';
+import { WebsocketService } from '../_services/websocketService';
 
 @Component({
   selector: 'app-room',
@@ -160,13 +161,41 @@ export class RoomComponent implements OnInit, OnDestroy {
     private location: Location,
     private authService: AuthService,
     public modalController: ModalController,
-    private navCtrl: NavController,
-    private popoverCtrl: PopoverController
-  ) {}
+    private popoverCtrl: PopoverController,
+    private socketService: WebsocketService
+  ) {
+    this.socketService.setupSocketConnection();
+    this.socketService
+      .listenToServer(`room update ${this.roomId}`)
+      .subscribe((data) => {
+        console.log(data);
+        if (JSON.stringify(this.room) !== JSON.stringify(data)) {
+          this.room = data;
+        }
 
+        if (this.trackPlaying === undefined && this.room?.musics?.length > 0) {
+          this.spotifyService
+            .playTrack(this.room.musics[0].trackId)
+            .subscribe();
+        }
+
+        this.isInvited =
+          this.room.invited.indexOf(this.user.id) >= 0 ? true : false;
+        this.room.musics = this.room.musics.filter(
+          (music) => music.trackId !== this.trackPlaying.id
+        );
+        if (data?.musics?.length > 0) {
+          this.getTracksInfo(data.musics);
+        } else {
+          this.tracks = [];
+        }
+        this.cd.detectChanges();
+      });
+  }
+
+  public roomId: string = this.route.snapshot.paramMap.get('id');
   public room: Room;
   public user: User;
-  public roomId: string = this.route.snapshot.paramMap.get('id');
   public tracks = [];
   public trackPlaying: any;
   public isInvited = false;
@@ -183,6 +212,8 @@ export class RoomComponent implements OnInit, OnDestroy {
 
     this.roomService.getRoom(this.roomId).subscribe((res) => {
       this.room = res.room;
+      this.isInvited =
+        this.room.invited.indexOf(this.user.id) >= 0 ? true : false;
       if (res.room.musics.length > 0) {
         this.spotifyService
           .getTracksInfo(this.room.musics.map((music) => music.trackId))
@@ -233,9 +264,10 @@ export class RoomComponent implements OnInit, OnDestroy {
               this.room.users[0].id === this.user.id ||
               true
             ) {
-              this.roomService
-                .delTrack(this.trackPlaying.id, this.roomId)
-                .subscribe();
+              this.socketService.emitToServer('room del music', {
+                roomId: this.roomId,
+                trackId: this.trackPlaying.id,
+              });
               this.trackPlaying = undefined;
             }
             if (this.tracks[0]) {
@@ -248,19 +280,6 @@ export class RoomComponent implements OnInit, OnDestroy {
             item: res.item as any,
             progress_ms: res.progress_ms,
           };
-          this.roomService.getRoom(this.roomId).subscribe((res) => {
-            this.room = res.room;
-            this.isInvited =
-              this.room.invited.indexOf(this.user.id) >= 0 ? true : false;
-            this.room.musics = this.room.musics.filter(
-              (music) => music.trackId !== this.trackPlaying.id
-            );
-            if (res.room?.musics?.length > 0) {
-              this.getTracksInfo(res.room.musics);
-            } else {
-              this.tracks = [];
-            }
-          });
         }
         this.cd.detectChanges();
       });
@@ -290,7 +309,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   async presentModalSuggestion() {
     const modal = await this.modalController.create({
       component: SearchComponent,
-      cssClass: 'my-custom-class',
+      cssClass: ['my-custom-class', 'my-custom-modal'],
       swipeToClose: true,
       componentProps: {
         isModal: true,
@@ -301,19 +320,25 @@ export class RoomComponent implements OnInit, OnDestroy {
         const track = res.data.track;
         console.log(track);
         if (!this.tracks.find((res) => res.id === track.id)) {
-          this.roomService
-            .addTrack(track.id, this.roomId, this.user.id)
-            .subscribe((res) => {
-              this.roomService.getRoom(this.roomId).subscribe((res) => {
-                this.room = res.room;
+          this.socketService.emitToServer('room add music', {
+            userId: this.user.id,
+            roomId: this.roomId,
+            trackId: track.id,
+          });
 
-                if (this.trackPlaying === undefined) {
-                  this.trackPlaying = track;
-                  this.spotifyService.playTrack(track.uri).subscribe();
-                }
-              });
-              this.cd.detectChanges();
-            });
+          // this.roomService
+          //   .addTrack(track.id, this.roomId, this.user.id)
+          //   .subscribe((res) => {
+          //     this.roomService.getRoom(this.roomId).subscribe((res) => {
+          //       this.room = res.room;
+
+          //       if (this.trackPlaying === undefined) {
+          //         this.trackPlaying = track;
+          //         this.spotifyService.playTrack(track.uri).subscribe();
+          //       }
+          //     });
+          //     this.cd.detectChanges();
+          //   });
         } else {
           this.voteTrack(track.id);
         }
@@ -325,7 +350,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   async presentModalInvite() {
     const modal = await this.modalController.create({
       component: SearchComponent,
-      cssClass: 'my-custom-class',
+      cssClass: ['my-custom-class', 'my-custom-modal'],
       swipeToClose: true,
       componentProps: {
         isModal: true,
@@ -403,7 +428,10 @@ export class RoomComponent implements OnInit, OnDestroy {
 
   nextTrack() {
     if (this.trackPlaying) {
-      this.roomService.delTrack(this.trackPlaying.id, this.roomId).subscribe();
+      this.socketService.emitToServer('room del music', {
+        roomId: this.roomId,
+        trackId: this.trackPlaying.id,
+      });
       this.trackPlaying = undefined;
     }
     if (this.tracks[0]) {
@@ -432,9 +460,11 @@ export class RoomComponent implements OnInit, OnDestroy {
           music.vote.find((user) => user === this.user.id) === undefined
       )
     )
-      this.roomService
-        .voteTrack(trackId, this.roomId, this.user.id)
-        .subscribe((res) => {});
+      this.socketService.emitToServer('room vote music', {
+        userId: this.user.id,
+        roomId: this.roomId,
+        trackId: trackId,
+      });
   }
 
   isVoteTrack(trackId: string) {

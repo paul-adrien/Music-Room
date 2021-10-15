@@ -1,9 +1,10 @@
+import { WebsocketService } from './../_services/websocketService';
 import { PlaylistService } from './../_services/playlist_service';
 import { UserService } from './../_services/user_service';
 import { CreateModalComponent } from './../create-modal/create-modal.component';
 import { map } from 'rxjs/operators';
 import { async } from '@angular/core/testing';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { RoomService } from './../_services/room_service';
 import { AuthService } from './../_services/auth_service';
 import {
@@ -22,6 +23,8 @@ import {
 import { SpotifyService } from '../_services/spotify_service';
 import { Device } from '@ionic-native/device/ngx';
 import { Location } from '@angular/common';
+import { Room } from 'libs/room';
+import { Playlist } from 'libs/playlist';
 
 @Component({
   selector: 'app-home',
@@ -41,11 +44,11 @@ import { Location } from '@angular/common';
         />
       </div>
     </div>
-    <div class="rooms" *ngIf="this.rooms | async">
+    <div class="rooms" *ngIf="this.rooms">
       <div
         class="room-container"
         (click)="this.openRoom(room._id)"
-        *ngFor="let room of this.rooms | async"
+        *ngFor="let room of this.rooms"
       >
         <img class="logo-room no-img" src="./assets/radio-outline.svg" />
         <div class="title-room">
@@ -63,11 +66,11 @@ import { Location } from '@angular/common';
         />
       </div>
     </div>
-    <div class="rooms" *ngIf="this.playlists | async">
+    <div class="rooms" *ngIf="this.playlists">
       <div
         class="room-container"
         (click)="this.openPlaylist(playlist._id)"
-        *ngFor="let playlist of this.playlists | async"
+        *ngFor="let playlist of this.playlists"
       >
         <img class="logo-room no-img" src="./assets/radio-outline.svg" />
         <div class="title-room">
@@ -82,8 +85,8 @@ import { Location } from '@angular/common';
 })
 export class HomeComponent implements OnInit {
   public user: Partial<User>;
-  public rooms: Observable<any[]>;
-  public playlists: Observable<any[]>;
+  public rooms: Room[];
+  public playlists: Playlist[];
   constructor(
     private authService: AuthService,
     private roomService: RoomService,
@@ -94,15 +97,31 @@ export class HomeComponent implements OnInit {
     private alertController: AlertController,
     private modalController: ModalController,
     private userService: UserService,
-    private cd: ChangeDetectorRef
-  ) {}
+    private cd: ChangeDetectorRef,
+    private socketService: WebsocketService
+  ) {
+    this.socketService.setupSocketConnection();
+    this.socketService.listenToServer('room create').subscribe((data) => {
+      console.log(data);
+      if (JSON.stringify(this.rooms) !== JSON.stringify(data)) {
+        this.rooms = data;
+      }
+      this.cd.detectChanges();
+    });
+  }
 
   public interval;
 
   ngOnInit(): void {
     this.user = this.authService.getUser();
-    this.rooms = this.roomService.getAllRoom();
-    this.playlists = this.playlistService.getAllPlaylist();
+    forkJoin([
+      this.roomService.getAllRoom(),
+      this.playlistService.getAllPlaylist(),
+    ]).subscribe(([rooms, playlists]) => {
+      this.rooms = rooms;
+      this.playlists = playlists;
+      this.cd.detectChanges();
+    });
   }
 
   ngAfterContentInit() {
@@ -110,8 +129,8 @@ export class HomeComponent implements OnInit {
       this.userService.getUser(this.user.id).subscribe((res) => {
         this.authService.saveUser(res);
         this.user = this.authService.getUser();
-        this.rooms = this.roomService.getAllRoom();
-        this.playlists = this.playlistService.getAllPlaylist();
+        // this.rooms = this.roomService.getAllRoom();
+        // this.playlists = this.playlistService.getAllPlaylist();
 
         this.cd.detectChanges();
       });
@@ -130,13 +149,18 @@ export class HomeComponent implements OnInit {
     });
     modal.onWillDismiss().then((res) => {
       if (res?.data?.name) {
-        this.roomService
-          .createRoom(this.user, res?.data?.name)
-          .subscribe((res) => {
-            console.log(res);
-            this.rooms = this.roomService.getAllRoom();
-            this.cd.detectChanges();
-          });
+        // this.roomService
+        //   .createRoom(this.user, res?.data?.name)
+        //   .subscribe((res) => {
+        //     console.log(res);
+        //     this.rooms = this.roomService.getAllRoom();
+        //     this.cd.detectChanges();
+        //   });
+
+        this.socketService.emitToServer('room create', {
+          userId: this.user.id,
+          name: res?.data?.name,
+        });
       }
     });
     return await modal.present();
@@ -158,7 +182,7 @@ export class HomeComponent implements OnInit {
           .createPlaylist(this.user, res?.data?.name)
           .subscribe((res) => {
             console.log(res);
-            this.playlists = this.playlistService.getAllPlaylist();
+            // this.playlists = this.playlistService.getAllPlaylist();
             this.cd.detectChanges();
           });
       }
@@ -169,7 +193,11 @@ export class HomeComponent implements OnInit {
   openRoom(roomId: string) {
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
       console.log(this.device.platform, res);
-      if (this.device.platform === null && res?.device?.id) {
+      if (
+        (this.device.platform === null ||
+          this.device.platform.toLocaleLowerCase() === 'ios') &&
+        res?.device?.id
+      ) {
         this.roomService
           .enterRoom(this.user.id, roomId, res?.device?.id)
           .subscribe((res) => {

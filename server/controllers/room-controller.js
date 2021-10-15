@@ -31,6 +31,48 @@ exports.getAllRoom = (req, res) => {
   );
 };
 
+exports.getAllRoomSocket = async () => {
+  console.log(
+    "socket",
+    Room.find({}).then((err, rooms) => {
+      if (err) {
+        return {
+          status: false,
+          message: err,
+          rooms: null,
+        };
+      } else if (!rooms) {
+        return {
+          status: true,
+          message: "no room",
+          rooms: null,
+        };
+      } else {
+        return {
+          status: true,
+          message: "rooms success",
+          rooms: rooms,
+        };
+      }
+    })
+  );
+  return Room.find({}).then((rooms) => {
+    if (!rooms) {
+      return {
+        status: true,
+        message: "no room",
+        rooms: null,
+      };
+    } else {
+      return {
+        status: true,
+        message: "rooms success",
+        rooms: rooms,
+      };
+    }
+  });
+};
+
 exports.CreateRoom = async (req, res) => {
   const { name, userId } = req.body;
   const user = await getUser({ id: userId });
@@ -55,6 +97,20 @@ exports.CreateRoom = async (req, res) => {
       room: room,
     });
   });
+};
+
+exports.CreateRoomSocket = async (name, userId) => {
+  const user = await getUser({ id: userId });
+
+  await Room.insertMany([
+    {
+      name: name,
+      created_by: userId,
+      users: [{ id: userId, username: user.userName }],
+      musics: [],
+      type: "public",
+    },
+  ]);
 };
 
 exports.checkName = (req, res) => {
@@ -108,6 +164,27 @@ exports.getRoom = (req, res) => {
         message: "detail of room",
         room: room,
       });
+    }
+  });
+};
+
+exports.getRoomSocket = async (roomId) => {
+  return Room.findOne({ _id: roomId }).then((room) => {
+    if (!room) {
+      return {
+        status: true,
+        message: "no room",
+        room: null,
+      };
+    } else {
+      if (room.musics.length > 1) {
+        room.musics = room?.musics?.sort((a, b) => b.nb_vote - a.nb_vote);
+      }
+      return {
+        status: true,
+        message: "detail of room",
+        room: room,
+      };
     }
   });
 };
@@ -633,6 +710,36 @@ exports.addMusicRoom = async (req, res) => {
   });
 };
 
+exports.addMusicRoomSocket = async (roomId, userId, trackId) => {
+  return Room.findOne({ _id: roomId }).then((room) => {
+    if (!room) {
+      return {
+        status: true,
+        message: "this room doesn't exist or you dont have the good right",
+      };
+    } else {
+      Room.updateOne(
+        { _id: roomId },
+        {
+          $addToSet: {
+            musics: {
+              trackId: trackId,
+              duration: null,
+              nb_vote: 1,
+              vote: [userId],
+            },
+          },
+        }
+      ).then((room) => {
+        return {
+          status: true,
+          message: "music add to the list",
+        };
+      });
+    }
+  });
+};
+
 exports.delMusicRoom = async (req, res) => {
   const { roomId, trackId } = req.params;
   const duration = req.body.duration;
@@ -671,6 +778,34 @@ exports.delMusicRoom = async (req, res) => {
             message: "music remove to the list",
           });
         }
+      });
+    }
+  });
+};
+
+exports.delMusicRoomSocket = async (roomId, trackId) => {
+  return Room.findOne({ _id: roomId }).then((room) => {
+    if (!room) {
+      return {
+        status: true,
+        message: "this room doesn't exist or you dont have the good right",
+      };
+    } else {
+      Room.updateOne(
+        { _id: roomId },
+        {
+          $pull: {
+            musics: {
+              trackId: trackId,
+            },
+          },
+        }
+      ).then((room) => {
+        return {
+          status: true,
+          room: room,
+          message: "music remove to the list",
+        };
       });
     }
   });
@@ -739,6 +874,58 @@ exports.voteMusicRoom = async (req, res) => {
           status: false,
           message: "this music does not exist in this event",
         });
+    }
+  });
+};
+
+exports.voteMusicRoomSocket = async (roomId, userId, trackId) => {
+  return Room.findOne({
+    $and: [
+      { _id: roomId },
+      {
+        $or: [
+          { created_by: userId },
+          { invited: { $in: [userId] } },
+          { type: "public" },
+        ],
+      },
+    ],
+  }).then(async (room) => {
+    if (!room) {
+      return {
+        status: true,
+        message: "this room doesn't exist or you dont have the good right",
+      };
+    } else {
+      if (
+        room.musics.find(
+          (music) =>
+            music.trackId === trackId &&
+            music.vote.find((user) => user === userId) === undefined
+        )
+      ) {
+        Room.updateOne(
+          { _id: roomId, musics: { $elemMatch: { trackId: trackId } } },
+          {
+            $inc: { "musics.$.nb_vote": 1 },
+            $push: { "musics.$.vote": userId },
+          }
+        ).then(async (room) => {
+          return {
+            status: true,
+            message: "this music is vote",
+          };
+        });
+      } else if (room.musics.find((music) => music.trackId === trackId)) {
+        return {
+          status: false,
+          message: "this music already vote by you",
+        };
+      } else
+        return {
+          status: false,
+          message: "this music does not exist in this event",
+        };
     }
   });
 };

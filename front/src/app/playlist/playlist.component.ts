@@ -255,7 +255,7 @@ export class PlaylistComponent implements OnInit {
   async presentModalSuggestion() {
     const modal = await this.modalController.create({
       component: SearchComponent,
-      cssClass: 'my-custom-class',
+      cssClass: ['my-custom-class', 'my-custom-modal'],
       swipeToClose: true,
       componentProps: {
         isModal: true,
@@ -289,7 +289,7 @@ export class PlaylistComponent implements OnInit {
   async presentModalInvite() {
     const modal = await this.modalController.create({
       component: SearchComponent,
-      cssClass: 'my-custom-class',
+      cssClass: ['my-custom-class', 'my-custom-modal'],
       swipeToClose: true,
       componentProps: {
         isModal: true,
