@@ -21,7 +21,7 @@ import { Location } from '@angular/common';
     <div *ngIf="this.conv">
       <p class="title">{{ conv.name }}</p>
       <p (click)="sendMessage()">Send message</p>
-      <div *ngFor="let msg of this.conv.messages">
+      <div class="message-container" *ngFor="let msg of this.conv.messages">
         {{ msg.message }}
       </div>
     </div>

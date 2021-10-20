@@ -15,4 +15,13 @@
     font-size: 1.6rem;
     margin: 1rem 1rem;
   }
+
+  .message-container {
+    display: flex;
+    background-color: var(--background-color-light-grey);
+    border-radius: 4px;
+    box-sizing: content-box;
+    flex-direction: column;
+    overflow-y: auto;
+  }
 }
