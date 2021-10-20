@@ -2,6 +2,7 @@ const http = require("http");
 const app = require("./app");
 const messaging_controller = require("./controllers/messaging-controller");
 const room_controller = require("./controllers/room-controller");
+const playlist_controller = require("./controllers/playlist-controller");
 
 app.set("port", 8080);
 
@@ -48,6 +49,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("room add music", (data) => {
+    console.log(io);
     room_controller
       .addMusicRoomSocket(data.roomId, data.userId, data.trackId)
       .then(() =>
@@ -79,6 +81,53 @@ io.on("connection", (socket) => {
           }
         })
       );
+  });
+
+  socket.on("playlist create", (data) => {
+    playlist_controller.CreatePlaylistSocket(data.name, data.userId).then(() =>
+      playlist_controller.getAllPlaylistSocket().then((res) => {
+        if (res.status) {
+          io.emit("playlist create", res.playlists);
+        }
+      })
+    );
+  });
+
+  socket.on("playlist add music", (data) => {
+    console.log(io);
+    playlist_controller
+      .addMusicPlaylistSocket(data.playlistId, data.userId, data.trackId)
+      .then(() =>
+        playlist_controller.getPlaylistSocket(data.playlistId).then((res) => {
+          if (res.status) {
+            io.emit(`playlist update ${data.playlistId}`, res.playlist);
+          }
+        })
+      );
+  });
+
+  socket.on("playlist del music", (data) => {
+    playlist_controller
+      .delMusicPlaylistSocket(data.playlistId, data.trackId)
+      .then(() =>
+        playlist_controller.getPlaylistSocket(data.playlistId).then((res) => {
+          if (res.status) {
+            io.emit(`playlist update ${data.playlistId}`, res.playlist);
+          }
+        })
+      );
+  });
+
+  socket.on("playlist edit", (data) => {
+    playlist_controller
+      .editPlaylistSocket(data.playlistId, data.playlistBody)
+      .then(() => {
+        playlist_controller.getPlaylistSocket(data.playlistId).then((res) => {
+          if (res.status) {
+            io.emit(`playlist update ${data.playlistId}`, res.playlist);
+          }
+        });
+      });
   });
 });
 

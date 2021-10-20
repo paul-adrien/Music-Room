@@ -718,7 +718,7 @@ exports.addMusicRoomSocket = async (roomId, userId, trackId) => {
         message: "this room doesn't exist or you dont have the good right",
       };
     } else {
-      Room.updateOne(
+      return Room.updateOne(
         { _id: roomId },
         {
           $addToSet: {
@@ -791,7 +791,7 @@ exports.delMusicRoomSocket = async (roomId, trackId) => {
         message: "this room doesn't exist or you dont have the good right",
       };
     } else {
-      Room.updateOne(
+      return Room.updateOne(
         { _id: roomId },
         {
           $pull: {
@@ -904,7 +904,7 @@ exports.voteMusicRoomSocket = async (roomId, userId, trackId) => {
             music.vote.find((user) => user === userId) === undefined
         )
       ) {
-        Room.updateOne(
+        return Room.updateOne(
           { _id: roomId, musics: { $elemMatch: { trackId: trackId } } },
           {
             $inc: { "musics.$.nb_vote": 1 },

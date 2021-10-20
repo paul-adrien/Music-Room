@@ -12,6 +12,7 @@ import { map } from 'rxjs/operators';
 import { SearchComponent } from '../search/search.component';
 import { ItemReorderEventDetail } from '@ionic/core';
 import { SettingsRoomComponent } from '../settings-room/settings-room.component';
+import { WebsocketService } from '../_services/websocketService';
 
 @Component({
   selector: 'app-playlist',
@@ -114,6 +115,7 @@ import { SettingsRoomComponent } from '../settings-room/settings-room.component'
   styleUrls: ['./playlist.component.scss'],
 })
 export class PlaylistComponent implements OnInit {
+  public playlistId: string = this.route.snapshot.paramMap.get('id');
   constructor(
     private route: ActivatedRoute,
     private playlistService: PlaylistService,
@@ -122,12 +124,33 @@ export class PlaylistComponent implements OnInit {
     private location: Location,
     private authService: AuthService,
     public modalController: ModalController,
-    private popoverCtrl: PopoverController
-  ) {}
+    private popoverCtrl: PopoverController,
+    private socketService: WebsocketService
+  ) {
+    this.socketService.setupSocketConnection();
+    this.socketService
+      .listenToServer(`playlist update ${this.playlistId}`)
+      .subscribe((data) => {
+        console.log(data);
+        if (JSON.stringify(this.playlist) !== JSON.stringify(data)) {
+          this.playlist = data;
+        }
+
+        this.indexTrack = this.playlist.musics.findIndex(
+          (music) => music.trackId === this.playerInfo.item.id
+        );
+
+        if (data?.musics?.length > 0) {
+          this.getTracksInfo(data.musics);
+        } else {
+          this.tracks = [];
+        }
+        this.cd.detectChanges();
+      });
+  }
 
   public playlist: Playlist;
   public user: User;
-  public playlistId: string = this.route.snapshot.paramMap.get('id');
   public tracks = [];
 
   public isPublic = true;
@@ -175,21 +198,21 @@ export class PlaylistComponent implements OnInit {
     // where the gesture ended. Update the items variable to the
     // new order of items
     this.tracks = ev.detail.complete(this.tracks);
-    this.playlistService
-      .editPlaylist(
-        {
-          ...this.playlist,
-          musics: this.tracks.map((track) => ({ trackId: track.id })),
-        },
-        this.playlistId
-      )
-      .subscribe((res) => {});
+
+    this.socketService.emitToServer('playlist edit', {
+      playlistId: this.playlistId,
+      playlistBody: {
+        ...this.playlist,
+        musics: this.tracks.map((track) => ({ trackId: track.id })),
+      },
+    });
 
     // After complete is called the items will be in the new order
     console.log('After complete', this.tracks);
     this.indexTrack = this.tracks.findIndex(
       (track) => track.id === this.playerInfo.item.id
     );
+    this.cd.detectChanges();
   }
 
   ngAfterContentInit() {
@@ -219,17 +242,10 @@ export class PlaylistComponent implements OnInit {
             item: res.item as any,
             progress_ms: res.progress_ms,
           };
-          this.playlistService.getPlaylist(this.playlistId).subscribe((res) => {
-            this.playlist = res.playlist;
-            this.indexTrack = this.playlist.musics.findIndex(
-              (music) => music.trackId === this.playerInfo.item.id
-            );
-            if (res.playlist.musics?.length > 0) {
-              this.getTracksInfo(res.playlist.musics);
-            } else {
-              this.tracks = [];
-            }
-          });
+
+          this.indexTrack = this.playlist.musics.findIndex(
+            (music) => music.trackId === this.playerInfo.item.id
+          );
         }
         this.cd.detectChanges();
       });
@@ -266,20 +282,11 @@ export class PlaylistComponent implements OnInit {
         const track = res.data.track;
         console.log(track);
         if (!this.tracks.find((res) => res.id === track.id)) {
-          this.playlistService
-            .addTrack(track.id, this.playlistId, this.user.id)
-            .subscribe((res) => {
-              this.playlistService
-                .getPlaylist(this.playlistId)
-                .subscribe((res) => {
-                  this.playlist = res.playlist;
-
-                  if (this.tracks.length === 0) {
-                    this.spotifyService.playTrack(track.uri).subscribe();
-                  }
-                });
-              this.cd.detectChanges();
-            });
+          this.socketService.emitToServer('playlist add music', {
+            userId: this.user.id,
+            playlistId: this.playlistId,
+            trackId: track.id,
+          });
         }
       }
     });

@@ -32,6 +32,24 @@ exports.getAllPlaylist = (req, res) => {
   );
 };
 
+exports.getAllPlaylistSocket = async () => {
+  return Playlist.find({}).then((playlists) => {
+    if (!playlists) {
+      return {
+        status: true,
+        message: "no room",
+        playlists: null,
+      };
+    } else {
+      return {
+        status: true,
+        message: "playlists success",
+        playlists: playlists,
+      };
+    }
+  });
+};
+
 exports.CreatePlaylist = async (req, res) => {
   const { name, userId } = req.body;
   const user = await getUser({ id: userId });
@@ -56,6 +74,20 @@ exports.CreatePlaylist = async (req, res) => {
       playlist: playlist,
     });
   });
+};
+
+exports.CreatePlaylistSocket = async (name, userId) => {
+  const user = await getUser({ id: userId });
+
+  await Playlist.insertMany([
+    {
+      name: name,
+      created_by: userId,
+      users: [{ id: userId, username: user.userName }],
+      musics: [],
+      type: "public",
+    },
+  ]);
 };
 
 exports.checkName = (req, res) => {
@@ -111,6 +143,29 @@ exports.getPlaylist = (req, res, next) => {
       });
     }
     next();
+  });
+};
+
+exports.getPlaylistSocket = async (playlistId) => {
+  return Playlist.findOne({ _id: playlistId }).then((playlist) => {
+    if (!playlist) {
+      return {
+        status: true,
+        message: "no playlist",
+        playlist: null,
+      };
+    } else {
+      if (playlist.musics.length > 1) {
+        playlist.musics = playlist?.musics?.sort(
+          (a, b) => b.nb_vote - a.nb_vote
+        );
+      }
+      return {
+        status: true,
+        message: "detail of playlist",
+        playlist: playlist,
+      };
+    }
   });
 };
 
@@ -199,6 +254,29 @@ exports.editPlaylist = async (req, res, next) => {
           }
         }
       );
+    }
+  });
+};
+
+exports.editPlaylistSocket = async (playlistId, playlistBody) => {
+  return Playlist.findOne({ _id: playlistId }).then(async (playlist) => {
+    if (!playlist) {
+      return {
+        status: true,
+        message: "this playlist doesn't exist or you dont have the good right",
+        playlist: null,
+      };
+    } else {
+      return Playlist.updateOne(
+        { _id: playlistId },
+        { $set: playlistBody }
+      ).then(async (playlist) => {
+        return {
+          status: true,
+          playlist: playlist,
+          message: "playlist was changed",
+        };
+      });
     }
   });
 };
@@ -558,6 +636,34 @@ exports.addMusicPlaylist = async (req, res, next) => {
   });
 };
 
+exports.addMusicPlaylistSocket = async (playlistId, userId, trackId) => {
+  return Playlist.findOne({ _id: playlistId }).then((playlist) => {
+    if (!playlist) {
+      return {
+        status: true,
+        message: "this playlist doesn't exist or you dont have the good right",
+      };
+    } else {
+      return Playlist.updateOne(
+        { _id: playlistId },
+        {
+          $addToSet: {
+            musics: {
+              trackId: trackId,
+              duration: null,
+            },
+          },
+        }
+      ).then((playlist) => {
+        return {
+          status: true,
+          message: "music add to the list",
+        };
+      });
+    }
+  });
+};
+
 exports.delMusicPlaylist = async (req, res, next) => {
   const { playlistId, trackId } = req.params;
   const duration = req.body.duration;
@@ -596,6 +702,34 @@ exports.delMusicPlaylist = async (req, res, next) => {
             message: "music remove to the list",
           });
         }
+      });
+    }
+  });
+};
+
+exports.delMusicPlaylistSocket = async (playlistId, trackId) => {
+  return Playlist.findOne({ _id: playlistId }).then((playlist) => {
+    if (!playlist) {
+      return {
+        status: true,
+        message: "this playlist doesn't exist or you dont have the good right",
+      };
+    } else {
+      return Playlist.updateOne(
+        { _id: playlistId },
+        {
+          $pull: {
+            musics: {
+              trackId: trackId,
+            },
+          },
+        }
+      ).then((playlist) => {
+        return {
+          status: true,
+          playlist: playlist,
+          message: "music remove to the list",
+        };
       });
     }
   });
