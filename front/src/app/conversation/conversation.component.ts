@@ -8,11 +8,16 @@ import {
 import { ActivatedRoute } from '@angular/router';
 import { MessageService } from '../_services/message_service';
 import { WebsocketService } from '../_services/websocketService';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-conversation',
   template: `
-    <img class="back-img" src="./assets/chevron-back-outline.svg" />
+    <img
+      class="back-img"
+      (click)="this.back()"
+      src="./assets/chevron-back-outline.svg"
+    />
     <div *ngIf="this.conv">
       <p class="title">{{ conv.name }}</p>
       <p (click)="sendMessage()">Send message</p>
@@ -31,7 +36,8 @@ export class ConversationComponent implements OnInit, OnDestroy {
     private messageService: MessageService,
     private cd: ChangeDetectorRef,
     private route: ActivatedRoute,
-    private socketService: WebsocketService
+    private socketService: WebsocketService,
+    private location: Location
   ) {
     this.socketService.setupSocketConnection();
     this.socketService
@@ -58,6 +64,10 @@ export class ConversationComponent implements OnInit, OnDestroy {
         this.conv = res.conversation[0];
         this.cd.detectChanges();
       });
+  }
+
+  public back() {
+    this.location.back();
   }
 
   sendMessage() {

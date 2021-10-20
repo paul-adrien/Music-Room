@@ -15,4 +15,40 @@
     font-size: 1.6rem;
     margin: 1rem 1rem;
   }
+
+  .messages-container {
+    overflow-y: auto;
+  }
+
+  .conv-container {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+  }
+
+  .picture {
+    object-fit: contain;
+    height: 4rem;
+    width: 4rem;
+    background: white;
+    border-radius: 50%;
+    margin-left: 2rem;
+    margin-right: 1rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .conv-title {
+    align-self: flex-start;
+    font-size: 1.2rem;
+  }
+
+  hr {
+    flex-grow: 1;
+    background-color: #E5E5E5;
+    align-self: flex-end;
+    width: 100%;
+    margin-left: 2rem;
+    margin-right: 2rem;
+  }
 }
