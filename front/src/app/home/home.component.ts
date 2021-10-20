@@ -33,6 +33,11 @@ import { Playlist } from 'libs/playlist';
       <div>Rooms</div>
       <div class="buttons">
         <img
+          (click)="this.openMessages()"
+          class="img"
+          src="./assets/messages.svg"
+        />
+        <img
           (click)="this.openNotifs()"
           class="img"
           src="./assets/notifications-outline.svg"
@@ -282,6 +287,10 @@ export class HomeComponent implements OnInit {
 
   openNotifs() {
     this.router.navigate([`tabs/tab-home/notifications`]);
+  }
+
+  openMessages() {
+    this.router.navigate([`tabs/tab-home/messages`]);
   }
 
   async presentAlert() {
