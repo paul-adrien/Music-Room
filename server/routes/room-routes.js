@@ -31,7 +31,6 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.delMusicRoom
   );
-  // app.put("/:userId/playlist/:playlistId/music/:trackId", [authJwt.verifyToken], controller.chageOrderPlaylist);
 
   app.post(
     "/room/:roomId/invite/:friendId",
@@ -42,11 +41,6 @@ module.exports = function (app) {
     "/room/:roomId/acceptInvite",
     [authJwt.verifyToken],
     controller.acceptInviteRoom
-  );
-  app.delete(
-    "/:userId/playlist/:playlistId/refuseInvite",
-    [authJwt.verifyToken],
-    controller.refuseInviteToPlaylist
   );
 
   app.post(
@@ -78,6 +72,4 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.changeType
   );
-
-  //app.put("/:userId/playlist/:playlistId/friends/:friendId", [authJwt.verifyToken], controller.editUserPlaylist)
 };

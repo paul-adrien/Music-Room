@@ -1,3 +1,4 @@
+import { DelegationComponent } from './../delegation/delegation.component';
 import { IonicModule } from '@ionic/angular';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -19,7 +20,7 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
     MatProgressBarModule,
     NgxSliderModule,
   ],
-  entryComponents: [PlayerComponent],
+  entryComponents: [PlayerComponent, DelegationComponent],
   declarations: [TabsPage, PlayerComponent],
 })
 export class TabsPageModule {}

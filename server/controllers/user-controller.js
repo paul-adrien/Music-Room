@@ -26,6 +26,14 @@ exports.userUpdate = async (req, res, next) => {
   next();
 };
 
+exports.userUpdateSocket = async (userId, user) => {
+  if (await updateUser(userId, user)) {
+    return await getUser({ id: userId });
+  } else {
+    return undefined;
+  }
+};
+
 exports.getProfile = async (req, res, next) => {
   const user = await getUser({ id: req.params.id });
   if (user) {

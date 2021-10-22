@@ -46,7 +46,7 @@ export class TabsPage {
   ) {}
 
   ngAfterContentInit() {
-    //setInterval(() => this.getPlayerInfo(), 500);
+    // setInterval(() => this.getPlayerInfo(), 500);
   }
 
   getPlayerInfo() {

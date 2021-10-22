@@ -300,15 +300,35 @@ export class SpotifyService {
   pause(deviceId?: string) {
     return this.http
       .put<any>(
-        `https://api.spotify.com/v1/me/player/pause?device_id=${encodeURI(
-          deviceId
-        )}`,
+        deviceId
+          ? `https://api.spotify.com/v1/me/player/pause?device_id=${encodeURI(
+              deviceId
+            )}`
+          : `https://api.spotify.com/v1/me/player/pause`,
         {},
         httpApiSpotifyOptions
       )
       .pipe(
         catchError((err) => {
           console.log('ici petit cul');
+          if (err?.status === 401) {
+            return this.getRefreshToken();
+          } else {
+            return;
+          }
+        })
+      );
+  }
+
+  changeDevice(deviceId: string) {
+    return this.http
+      .put<any>(
+        `https://api.spotify.com/v1/me/player`,
+        { device_ids: [deviceId] },
+        httpApiSpotifyOptions
+      )
+      .pipe(
+        catchError((err) => {
           if (err?.status === 401) {
             return this.getRefreshToken();
           } else {

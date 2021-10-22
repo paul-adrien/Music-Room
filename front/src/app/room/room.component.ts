@@ -274,6 +274,12 @@ export class RoomComponent implements OnInit, OnDestroy {
               this.trackPlaying = this.tracks[0];
               this.spotifyService.playTrack(this.tracks[0]?.uri).subscribe();
             }
+          } else if (
+            res.progress_ms >= 0 &&
+            !res.is_playing &&
+            this.trackPlaying
+          ) {
+            // this.spotifyService.playTrack(this.trackPlaying?.uri).subscribe();
           }
           this.playerInfo = {
             is_playing: res.is_playing,

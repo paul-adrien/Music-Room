@@ -3,6 +3,7 @@ const app = require("./app");
 const messaging_controller = require("./controllers/messaging-controller");
 const room_controller = require("./controllers/room-controller");
 const playlist_controller = require("./controllers/playlist-controller");
+const user_controller = require("./controllers/user-controller");
 
 app.set("port", 8080);
 
@@ -32,6 +33,16 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("user disconnected");
   });
+
+  socket.on("user edit", (data) => {
+    console.log(data);
+    user_controller.userUpdate(data.userId, data.user).then((res) => {
+      if (res !== undefined) {
+        io.emit(`user update ${data.userId}`, res);
+      }
+    });
+  });
+
   socket.on("chat message", (data) => {
     console.log(data);
     messaging_controller.sendMessage(data.userId, data.convId, data.message);

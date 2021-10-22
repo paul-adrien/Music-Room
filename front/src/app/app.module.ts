@@ -25,9 +25,10 @@ import { CreateModalComponent } from './create-modal/create-modal.component';
 import { NotificationsComponent } from './notifications/notifications.component';
 import { PlaylistComponent } from './playlist/playlist.component';
 import { SettingsRoomComponent } from './settings-room/settings-room.component';
+import { DelegationComponent } from './delegation/delegation.component';
 
 @NgModule({
-  declarations: [
+  declarations: [	
     AppComponent,
     LoginComponent,
     SearchComponent,
@@ -40,7 +41,8 @@ import { SettingsRoomComponent } from './settings-room/settings-room.component';
     NotificationsComponent,
     PlaylistComponent,
     SettingsRoomComponent,
-  ],
+      DelegationComponent
+   ],
   entryComponents: [],
   imports: [
     FormsModule,

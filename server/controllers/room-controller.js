@@ -386,66 +386,6 @@ exports.inviteToRoom = async (req, res) => {
   });
 };
 
-exports.refuseInviteToPlaylist = async (req, res) => {
-  const { userId, playlistId } = req.params;
-
-  Playlist.findOne({ _id: playlistId }).exec((err, playlist) => {
-    if (err) {
-      return res.json({
-        status: false,
-        message: err,
-      });
-    } else if (!playlist) {
-      return res.json({
-        status: true,
-        message: "this playlist doesn't exist or you dont have the good right",
-      });
-    } else {
-      User.findOne({ id: userId }).exec(async (err, user) => {
-        if (err) {
-          return res.json({
-            status: false,
-            message: err,
-          });
-        } else if (!user) {
-          return res.json({
-            status: false,
-            message: "this user doesn't exist",
-          });
-        } else {
-          let notifIndex = user.notifs.playlist
-            .map(function (u) {
-              console.log(u);
-              return u.id;
-            })
-            .indexOf(playlistId);
-          if (notifIndex != -1) {
-            user.notifs.playlist.splice(notifIndex, 1);
-            let finalUser = new User(user);
-            finalUser.save((err, playlist) => {
-              if (err) {
-                return res.json({
-                  status: false,
-                  message: err,
-                });
-              } else
-                return res.json({
-                  status: true,
-                  message: "invitation delete",
-                });
-            });
-          } else {
-            return res.json({
-              status: false,
-              message: "you dont have invitation by this user",
-            });
-          }
-        }
-      });
-    }
-  });
-};
-
 exports.acceptInviteRoom = async (req, res) => {
   const { roomId } = req.params;
   const { userId } = req.body;

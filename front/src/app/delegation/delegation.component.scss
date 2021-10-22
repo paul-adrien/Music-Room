@@ -1,0 +1,30 @@
+:host {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin-top: 2rem;
+  align-items: center;
+
+  .title {
+    font-family: "Circular-medium";
+    font-size: 1.7rem;
+    padding: 0 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .sub-title {
+    width: 100%;
+    padding: 2rem 1rem;
+    font-size: 1.2rem;
+    font-family: "Circular-medium";
+  }
+
+  .primary-button {
+    width: fit-content;
+    text-transform: none;
+    background: var(--green-color);
+    border: none;
+  }
+}

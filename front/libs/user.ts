@@ -8,6 +8,7 @@ export interface User {
   picture: string;
   rand: number;
   validEmail: boolean;
+  devices: { id: string; name: string; userId: string }[];
   friends: { id: string }[];
   notifs: {
     playlist: {

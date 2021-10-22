@@ -1,5 +1,9 @@
+import { AuthService } from './../_services/auth_service';
+import { User } from 'libs/user';
+import { WebsocketService } from './../_services/websocketService';
+import { ActivatedRoute, Router } from '@angular/router';
 import { async } from '@angular/core/testing';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -10,11 +14,12 @@ import {
 import { ModalController } from '@ionic/angular';
 import { Options } from '@angular-slider/ngx-slider';
 import { SpotifyService } from '../_services/spotify_service';
+import { DelegationComponent } from '../delegation/delegation.component';
 
 @Component({
   selector: 'app-player',
   template: `
-    <div *ngIf="this.isModal === false; else modal">
+    <div *ngIf="this.isModal === false && !this.isRoom; else modal">
       <mat-progress-bar
         *ngIf="this.playerInfo !== undefined"
         mode="determinate"
@@ -37,6 +42,11 @@ import { SpotifyService } from '../_services/spotify_service';
           </div>
         </div>
         <img
+          (click)="this.openDelegation()"
+          class="play-pause"
+          src="./assets/volume-medium-white.svg"
+        />
+        <img
           *ngIf="this.playerInfo?.is_playing === false"
           (click)="this.play()"
           class="play-pause"
@@ -51,7 +61,7 @@ import { SpotifyService } from '../_services/spotify_service';
       </div>
     </div>
     <ng-template #modal>
-      <div *ngIf="this.playerInfo" class="player-container">
+      <div *ngIf="this.playerInfo && !this.isRoom" class="player-container">
         <div class="top-container">
           <img (click)="this.dismiss()" src="./assets/chevron-down.svg" />
         </div>
@@ -111,20 +121,45 @@ import { SpotifyService } from '../_services/spotify_service';
 })
 export class PlayerComponent {
   @Input() public isModal = false;
-  public playerInfo: { is_playing: boolean; item: any; progress_ms: number } =
-    undefined;
+  public isRoom = false;
+
+  public playerInfo: {
+    is_playing: boolean;
+    item: any;
+    progress_ms: number;
+    deviceName: string;
+  } = undefined;
 
   constructor(
     private spotifyService: SpotifyService,
     private cd: ChangeDetectorRef,
-    public modalController: ModalController
-  ) {}
+    public modalController: ModalController,
+    private router: Router,
+    private socketService: WebsocketService,
+    private authService: AuthService
+  ) {
+    const user = this.authService.getUser();
+    this.socketService.setupSocketConnection();
+    this.socketService
+      .listenToServer(`user update ${user.id}`)
+      .subscribe((data) => {
+        console.log(data);
+        if (
+          JSON.stringify(data) !== JSON.stringify(this.authService.getUser())
+        ) {
+          console.log("différent comme la musique d'Orelsan");
+        }
+        this.cd.detectChanges();
+      });
+  }
 
   ngAfterContentInit() {
-    //setInterval(() => this.getPlayerInfo(), 1500);
+    setInterval(() => this.getPlayerInfo(), 1500);
   }
 
   getPlayerInfo() {
+    this.isRoom = !!this.router.url.includes('/room');
+    forkJoin([]);
     this.spotifyService
       .getPlayerInfo()
       .toPromise()
@@ -134,6 +169,7 @@ export class PlayerComponent {
             is_playing: res.is_playing,
             item: res.item as any,
             progress_ms: res.progress_ms,
+            deviceName: res.device.name,
           };
         }
         this.cd.detectChanges();
@@ -157,6 +193,7 @@ export class PlayerComponent {
   async presentModal() {
     const modal = await this.modalController.create({
       component: PlayerComponent,
+      swipeToClose: true,
       cssClass: 'my-custom-class',
       componentProps: {
         isModal: true,
@@ -164,6 +201,19 @@ export class PlayerComponent {
     });
     return await modal.present();
   }
+
+  async openDelegation() {
+    const modal = await this.modalController.create({
+      component: DelegationComponent,
+      cssClass: ['my-custom-class', 'my-custom-modal'],
+      swipeToClose: true,
+      componentProps: {
+        deviceName: this.playerInfo.deviceName,
+      },
+    });
+    return await modal.present();
+  }
+
   dismiss() {
     // using the injected ModalController this page
     // can "dismiss" itself and optionally pass back data
