@@ -45,7 +45,7 @@ function ValidatorEmail(control: FormControl) {
   selector: 'app-edit-profile',
   template: `
     <div class="header">
-      <div>Annuler</div>
+      <div (click)="this.dismiss(false)">Annuler</div>
       <div class="title">Modifier le profil</div>
       <div (click)="this.saveProfile()">Enregistrer</div>
     </div>
@@ -124,6 +124,12 @@ export class EditProfileComponent implements OnInit {
     this.userService.getUser(this.user.id).subscribe(async (res) => {
       this.user = res;
 
+      if (typeof this.user.picture !== 'string' && this.user.picture) {
+        this.user.picture = 'data:image/jpeg;base64,' + res.picture.buffer;
+      } else {
+        this.user.picture = res.picture;
+      }
+
       this.userForm.patchValue({
         userName: this.user.userName,
         firstName: this.user.firstName,
@@ -176,21 +182,19 @@ export class EditProfileComponent implements OnInit {
     user.id = this.user.id;
     this.userService
       .updatePicture(this.uploadPicture, this.user.id)
-      .subscribe();
+      .subscribe((res) => {
+        this.dismiss(true);
+      });
     this.userService.updateUser(user).subscribe();
   }
 
-  dismiss(res?: any) {
-    // if (!this.isUser) {
-    //   this.modalController.dismiss({
-    //     dismissed: true,
-    //     track: res,
-    //   });
-    // } else if (this.isUser) {
-    //   this.modalController.dismiss({
-    //     dismissed: true,
-    //     user: res,
-    //   });
-    // }
+  dismiss(isSave?: boolean) {
+    if (!isSave) {
+      this.modalController.dismiss();
+    } else if (isSave) {
+      this.modalController.dismiss({
+        picture: this.user.picture,
+      });
+    }
   }
 }

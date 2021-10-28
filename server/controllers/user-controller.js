@@ -30,7 +30,7 @@ exports.userUpdate = async (req, res, next) => {
 
 exports.userUpdatePicture = async (req, res, next) => {
   const userId = req.userId;
-  console.log("picture", req.files[0], userId);
+  console.log("picture", req.files, userId);
 
   User.updateOne(
     { id: userId },

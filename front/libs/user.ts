@@ -5,7 +5,16 @@ export interface User {
   firstName: string;
   password: string;
   id: string;
-  picture: string | Blob;
+  picture:
+    | string
+    | {
+        fieldname: string;
+        originalname: string;
+        encoding: string;
+        mimetype: string;
+        buffer: ArrayBuffer;
+        size: number;
+      };
   rand: number;
   validEmail: boolean;
   devices: { id: string; name: string; userId: string }[];

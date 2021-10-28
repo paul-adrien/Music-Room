@@ -27,7 +27,7 @@
     "@capacitor/app": "^1.0.5",
     "@capacitor/camera": "^1.1.2",
     "@capacitor/core": "^3.1.1",
-    "@capacitor/filesystem": "^1.0.0",
+    "@capacitor/filesystem": "^1.0.5",
     "@capacitor/haptics": "1.0.0",
     "@capacitor/ios": "3.1.1",
     "@capacitor/keyboard": "1.0.0",

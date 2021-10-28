@@ -87,13 +87,11 @@ export class ProfileComponent implements OnInit {
     this.userService.getUser(this.user.id).subscribe(async (res) => {
       this.user = res;
       console.log(res);
-      // if (typeof this.user.picture !== 'string' && this.user.picture) {
-      //   await this.blobToBase64(new Blob(this.user.picture)).then((res: any) => {
-      //     console.log('picture', res);
-      //     this.user.picture = res;
-      //     this.cd.detectChanges();
-      //   });
-      // }
+      if (typeof this.user.picture !== 'string' && this.user.picture) {
+        this.user.picture = 'data:image/jpeg;base64,' + res.picture.buffer;
+      } else {
+        this.user.picture = res.picture;
+      }
     });
 
     this.playlists = this.playlistService.getAllPlaylist(this.user.id);
@@ -173,15 +171,10 @@ export class ProfileComponent implements OnInit {
       },
     });
     modal.onWillDismiss().then((res) => {
-      if (res?.data?.user) {
-        // const user = res.data.user;
-        // console.log(user);
-        // this.socketService.emitToServer('room invite', {
-        //   userId: this.user.id,
-        //   roomId: this.roomId,
-        //   friendId: user.id,
-        // });
+      if (res?.data?.picture) {
+        this.user.picture = res?.data?.picture;
       }
+      this.cd.detectChanges();
     });
     return await modal.present();
   }
