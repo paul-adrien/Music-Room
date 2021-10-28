@@ -388,7 +388,7 @@ export class RoomComponent implements OnInit, OnDestroy {
         type: 'room',
       },
     });
-    popover.onWillDismiss().then((res) => {});
+    popover.onWillDismiss().then((res) => { });
     return await popover.present();
   }
 
