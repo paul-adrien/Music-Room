@@ -21,6 +21,15 @@ const Room = mongoose.model(
         vote: [String],
       },
     ],
+    limits: {
+      radius: Number,
+      center: {
+        latitude: Number,
+        longitude: Number
+      },
+      start: String,
+      end: String
+    },
     type: "public" | "private",
     progress_ms: Number,
   })

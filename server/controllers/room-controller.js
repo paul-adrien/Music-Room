@@ -2,6 +2,7 @@ const db = require(appRoot + "/models");
 const { getUser } = require(appRoot + "/models/lib-user.model");
 const User = db.user;
 const Room = db.room;
+const geolib = require("geolib");
 
 exports.getAllRoom = (req, res) => {
   const { userId } = req.query;
@@ -1085,6 +1086,99 @@ exports.changeTypeSocket = async (userId, roomId, type) => {
           message: "this room change type",
         };
       });
+    }
+  });
+};
+
+async function isInCirc(latitude, longitude, radius, center) {
+  console.log(latitude, longitude, radius, center);
+  return new Promise((res, rej) => {
+    if (
+      geolib.isPointWithinRadius(
+        { latitude: parseFloat(latitude), longitude: parseFloat(longitude) },
+        {
+          latitude: parseFloat(center.latitude),
+          longitude: parseFloat(center.longitude),
+        },
+        radius
+      ) === true
+    ) {
+      res(true);
+    } else res(false);
+  });
+}
+
+async function checkLimits(lat, lng, limits) {
+  return new Promise(async (res, rej) => {
+    var date = new Date();
+    const hour = date.getHours();
+    const minutes = date.getMinutes();
+    const current = hour.toString() + minutes.toString();
+    const start = limits.start.replace(":", "");
+    const end = limits.end.replace(":", "");
+    if (
+      start < current &&
+      current < end &&
+      (await isInCirc(
+        48.821600006101455,
+        2.3128229145919192,
+        limits.radius,
+        limits.center
+      )) === true
+    )
+      res(true);
+    else res(false);
+  });
+}
+
+exports.addGeoHours = async (data) => {
+  return new Promise((res, rej) => {
+    console.log(data);
+    if (data && data.roomId && data.userId) {
+      Room.findOne({ _id: data.roomId, created_by: data.userId }).exec(
+        (err, room) => {
+          if (err) {
+            return res({
+              status: false,
+              message: err,
+            });
+          } else if (!room) {
+            return res({
+              status: false,
+              message:
+                "this room doesn't exist or you dont have the good right",
+            });
+          } else {
+            let limits = {
+              radius: data.radius,
+              center: data.center,
+              start: data.start,
+              end: data.end,
+            };
+            Room.updateOne(
+              { _id: data.roomId },
+              {
+                limits: limits,
+              }
+            ).exec(async (err, room) => {
+              if (err) {
+                return res({
+                  status: false,
+                  message: err,
+                });
+              } else {
+                console.log(await checkLimits(0, 0, limits));
+                return res({
+                  status: true,
+                  message: "this room change limits",
+                  room: room,
+                  roomId: data.roomId,
+                });
+              }
+            });
+          }
+        }
+      );
     }
   });
 };

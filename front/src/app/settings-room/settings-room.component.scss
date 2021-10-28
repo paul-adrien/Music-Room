@@ -17,4 +17,20 @@
     // --handle-background: #7a49a5;
     // --handle-background-checked: #000;
   }
+  #map {
+    height: 300px;
+    width: 100%;
+  }
+
+  input {
+    height: 2.5rem;
+    width: 100%;
+    padding: 6px 12px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 1rem;
+    background-color: grey;
+    color: var(--color-text);
+    border: none;
+  }
 }
