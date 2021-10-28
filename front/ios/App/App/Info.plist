@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-        <string>front</string>
+	<string>front</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -27,6 +27,16 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>need camera access to take pictures</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>need location access to find things nearby</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>To allow camera access for barcode scanning</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>need photo library access to save pictures there</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>need photo library access to get pictures from there</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

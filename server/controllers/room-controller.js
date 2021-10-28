@@ -386,6 +386,119 @@ exports.inviteToRoom = async (req, res) => {
   });
 };
 
+exports.inviteToRoomSocket = async (roomId, userId, friendId) => {
+  console.log(friendId);
+
+  return Room.findOne({
+    _id: roomId,
+  }).then((room) => {
+    if (!room) {
+      return {
+        status: true,
+        message: "this room doesn't exist or you dont have the good right",
+        room: null,
+      };
+    } else {
+      User.findOne({ id: userId }).then(async (user) => {
+        if (!user) {
+          return {
+            status: false,
+            message: "this user doesn't exist",
+          };
+        } else {
+          User.findOne({ id: friendId }).then(async (friend) => {
+            if (!friend) {
+              return {
+                status: false,
+                message: "this friend doesn't exist",
+              };
+            } else {
+              if (
+                friend.notifs !== undefined &&
+                friend.notifs.room !== undefined &&
+                friend.notifs.room.find((room) => room.id === roomId)
+              ) {
+                return {
+                  status: false,
+                  message: "this user already invite you",
+                };
+              }
+              if (
+                room.users?.length > 0 &&
+                room.users.find((el) => el.id === friendId)
+              ) {
+                console.log(room.users.find((el) => el.id === friendId));
+                return {
+                  status: false,
+                  message: "this user is already in this room or invited",
+                };
+              }
+              if (
+                friend.notifs.room === undefined ||
+                friend.notifs.room.length === 0
+              ) {
+                Room.updateOne(
+                  { _id: roomId },
+                  {
+                    $push: {
+                      invited: friendId,
+                    },
+                  }
+                ).then((user) => {
+                  User.updateOne(
+                    { id: friendId },
+                    {
+                      $push: {
+                        "notifs.rooms": {
+                          id: roomId,
+                          name: room.name,
+                          date: Date.now(),
+                        },
+                      },
+                    }
+                  ).then((user) => {
+                    return {
+                      status: true,
+                      message: "invite send",
+                    };
+                  });
+                });
+              } else {
+                Room.updateOne(
+                  { _id: roomId },
+                  {
+                    $push: {
+                      invited: friendId,
+                    },
+                  }
+                ).then((user) => {
+                  User.updateOne(
+                    { id: friendId },
+                    {
+                      $push: {
+                        "notifs.rooms": {
+                          id: roomId,
+                          name: room.name,
+                          date: Date.now(),
+                        },
+                      },
+                    }
+                  ).then((user) => {
+                    return {
+                      status: true,
+                      message: "invite send",
+                    };
+                  });
+                });
+              }
+            }
+          });
+        }
+      });
+    }
+  });
+};
+
 exports.acceptInviteRoom = async (req, res) => {
   const { roomId } = req.params;
   const { userId } = req.body;

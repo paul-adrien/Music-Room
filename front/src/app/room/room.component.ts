@@ -367,9 +367,11 @@ export class RoomComponent implements OnInit, OnDestroy {
       if (res?.data?.user) {
         const user = res.data.user;
         console.log(user);
-        this.roomService
-          .inviteUserToRoom(this.roomId, this.user.id, user.id)
-          .subscribe((res) => console.log(res));
+        this.socketService.emitToServer('room invite', {
+          userId: this.user.id,
+          roomId: this.roomId,
+          friendId: user.id,
+        });
       }
     });
     return await modal.present();

@@ -12,6 +12,8 @@ exports.userBoard = (req, res) => {
 
 exports.userUpdate = async (req, res, next) => {
   const { user } = req.body;
+  console.log(user);
+
   if (await updateUser(req.params.id, user)) {
     const user = await getUser({ id: req.params.id });
     res.message = "user was update";
@@ -26,6 +28,34 @@ exports.userUpdate = async (req, res, next) => {
   next();
 };
 
+exports.userUpdatePicture = async (req, res, next) => {
+  const userId = req.userId;
+  console.log("picture", req.files[0], userId);
+
+  User.updateOne(
+    { id: userId },
+    {
+      $set: {
+        picture: req.files[0],
+      },
+    }
+  ).exec((err, user) => {
+    if (err) {
+      return res.status(400).json({
+        status: false,
+        message: err,
+        user: null,
+      });
+    }
+    console.log(user);
+    return res.status(200).json({
+      status: true,
+      message: "user picture success",
+      user: user,
+    });
+  });
+};
+
 exports.userUpdateSocket = async (userId, user) => {
   if (await updateUser(userId, user)) {
     return await getUser({ id: userId });
@@ -35,6 +65,7 @@ exports.userUpdateSocket = async (userId, user) => {
 };
 
 exports.getProfile = async (req, res, next) => {
+  console.log("lololo", req.params.id);
   const user = await getUser({ id: req.params.id });
   if (user) {
     res.message = "send user";

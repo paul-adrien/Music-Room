@@ -40,7 +40,7 @@
     align-items: center;
 
     .logo-room {
-      height: 100%;
+      height: 4rem;
       object-fit: contain;
 
       &.no-img {
@@ -50,6 +50,8 @@
 
     .title-room {
       margin: 0 1rem;
+      width: 0;
+      flex-grow: 1;
       font-family: Circular-bold;
     }
   }

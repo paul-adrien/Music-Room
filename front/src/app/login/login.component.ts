@@ -1,6 +1,6 @@
 import { SpotifyService } from './../_services/spotify_service';
 import { AuthService } from './../_services/auth_service';
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { User } from 'libs/user';
@@ -291,6 +291,7 @@ export class LoginComponent implements OnInit {
     private spotifyService: SpotifyService,
     private iab: InAppBrowser,
     private device: Device,
+    private ngZone: NgZone,
     private cd: ChangeDetectorRef //public translate: TranslateService
   ) {}
 
@@ -388,12 +389,22 @@ export class LoginComponent implements OnInit {
       );
       browser.on('loadstart').subscribe((event) => {
         console.log('start', event);
+        if (event.url.includes('localhost:8100/login?data')) {
+          const data = event.url.slice(
+            event.url.indexOf('?data=') + '?data='.length
+          );
+          this.ngZone.run(() => {
+            this.route.navigate([`/login`], { queryParams: { data: data } });
+          });
+          console.log('close login');
+          browser.close();
+        }
       });
-      browser.on('exit').subscribe((event) => {
-        console.log('end', event);
+      // browser.on('exit').subscribe((event) => {
+      //   console.log('end', event);
 
-        browser.close();
-      });
+      //   browser.close();
+      // });
     }
   }
 
@@ -413,12 +424,21 @@ export class LoginComponent implements OnInit {
       );
       browser.on('loadstart').subscribe((event) => {
         console.log('start', event);
+        if (event.url.includes('localhost:8100/login?data')) {
+          const data = event.url.slice(
+            event.url.indexOf('?data=') + '?data='.length
+          );
+          this.ngZone.run(() => {
+            this.route.navigate([`/login`], { queryParams: { data: data } });
+          });
+          browser.close();
+        }
       });
-      browser.on('exit').subscribe((event) => {
-        console.log('end', event);
+      // browser.on('exit').subscribe((event) => {
+      //   console.log('end', event);
 
-        browser.close();
-      });
+      //   browser.close();
+      // });
     }
   }
 

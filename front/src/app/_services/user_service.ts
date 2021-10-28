@@ -28,10 +28,25 @@ export class UserService {
   }
 
   updateUser(user: User) {
+    console.log(user.id);
     return this.http.put(
       environment.AUTH_API + `user/${user.id}`,
       { user },
       httpOptions
+    );
+  }
+
+  updatePicture(picture: FormData, userId: string) {
+    const httpOptionsPicture = {
+      headers: new HttpHeaders({
+        'Content-Type': 'multipart/form-data',
+        Accept: 'application/x-www-form-urlencoded',
+      }),
+    };
+
+    return this.http.post(
+      environment.AUTH_API + `user/${userId}/update-picture`,
+      picture
     );
   }
 }

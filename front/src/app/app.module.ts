@@ -1,3 +1,4 @@
+import { Camera } from '@ionic-native/camera/ngx';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 import { Device } from '@ionic-native/device/ngx';
 import { authInterceptorProviders } from './_helpers/auth-interceptor';
@@ -26,9 +27,10 @@ import { NotificationsComponent } from './notifications/notifications.component'
 import { PlaylistComponent } from './playlist/playlist.component';
 import { SettingsRoomComponent } from './settings-room/settings-room.component';
 import { DelegationComponent } from './delegation/delegation.component';
+import { EditProfileComponent } from './edit-profile/edit-profile.component';
 
 @NgModule({
-  declarations: [	
+  declarations: [
     AppComponent,
     LoginComponent,
     SearchComponent,
@@ -41,8 +43,9 @@ import { DelegationComponent } from './delegation/delegation.component';
     NotificationsComponent,
     PlaylistComponent,
     SettingsRoomComponent,
-      DelegationComponent
-   ],
+    DelegationComponent,
+    EditProfileComponent,
+  ],
   entryComponents: [],
   imports: [
     FormsModule,
@@ -60,6 +63,7 @@ import { DelegationComponent } from './delegation/delegation.component';
     Device,
     WebsocketService,
     InAppBrowser,
+    Camera,
   ],
   bootstrap: [AppComponent],
 })

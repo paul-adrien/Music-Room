@@ -80,7 +80,10 @@ export class AuthService {
   }
 
   saveUser(user: any): void {
+    user.picture = undefined;
+
     window.localStorage.removeItem('auth-user');
+
     window.localStorage.setItem('auth-user', JSON.stringify(user));
   }
 

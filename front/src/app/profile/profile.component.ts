@@ -1,3 +1,5 @@
+import { UserService } from './../_services/user_service';
+import { EditProfileComponent } from './../edit-profile/edit-profile.component';
 import { RoomService } from './../_services/room_service';
 import { Room } from './../../../libs/room';
 import { SpotifyService } from './../_services/spotify_service';
@@ -9,7 +11,7 @@ import { Playlist } from 'libs/playlist';
 import { Observable } from 'rxjs-compat/Observable';
 import { Device } from '@ionic-native/device/ngx';
 import { Router } from '@angular/router';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ModalController } from '@ionic/angular';
 
 @Component({
   selector: 'app-profile',
@@ -22,7 +24,9 @@ import { AlertController } from '@ionic/angular';
       />
       <div class="name">{{ this.user.firstName }} {{ this.user.lastName }}</div>
       <div>{{ this.user.userName }}</div>
-      <div class="primary-button">Modifier le profil</div>
+      <div class="primary-button" (click)="this.presentModalEdit()">
+        Modifier le profil
+      </div>
     </div>
     <div class="bottom-container">
       <div class="title-category">Playlists</div>
@@ -64,20 +68,45 @@ export class ProfileComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
+    private userService: UserService,
     private spotifyService: SpotifyService,
     private playlistService: PlaylistService,
     private roomService: RoomService,
     private device: Device,
     private router: Router,
     private alertController: AlertController,
+    private modalController: ModalController,
+
     private cd: ChangeDetectorRef
   ) {}
 
-  ngOnInit(): void {
+  public base64data: string;
+
+  ngOnInit() {
     this.user = this.authService.getUser();
+    this.userService.getUser(this.user.id).subscribe(async (res) => {
+      this.user = res;
+      console.log(res);
+      // if (typeof this.user.picture !== 'string' && this.user.picture) {
+      //   await this.blobToBase64(new Blob(this.user.picture)).then((res: any) => {
+      //     console.log('picture', res);
+      //     this.user.picture = res;
+      //     this.cd.detectChanges();
+      //   });
+      // }
+    });
+
     this.playlists = this.playlistService.getAllPlaylist(this.user.id);
     this.rooms = this.roomService.getAllRoom(this.user.id);
     this.cd.detectChanges();
+  }
+
+  blobToBase64(blob) {
+    return new Promise((resolve, _) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result);
+      reader.readAsDataURL(blob as Blob);
+    });
   }
 
   openRoom(roomId: string) {
@@ -131,6 +160,30 @@ export class ProfileComponent implements OnInit {
 
     const { role } = await alert.onDidDismiss();
     console.log('onDidDismiss resolved with role', role);
+  }
+
+  async presentModalEdit() {
+    const modal = await this.modalController.create({
+      component: EditProfileComponent,
+      cssClass: ['my-custom-class', 'my-custom-modal'],
+      swipeToClose: true,
+      componentProps: {
+        isModal: true,
+        isUser: true,
+      },
+    });
+    modal.onWillDismiss().then((res) => {
+      if (res?.data?.user) {
+        // const user = res.data.user;
+        // console.log(user);
+        // this.socketService.emitToServer('room invite', {
+        //   userId: this.user.id,
+        //   roomId: this.roomId,
+        //   friendId: user.id,
+        // });
+      }
+    });
+    return await modal.present();
   }
 
   logOut() {

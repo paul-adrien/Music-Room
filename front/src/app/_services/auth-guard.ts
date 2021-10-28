@@ -1,36 +1,46 @@
-import { Injectable } from "@angular/core";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { Observable } from "rxjs";
-import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from "@angular/router";
-import { AuthService } from "./auth_service";
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import {
+  Router,
+  CanActivate,
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot,
+} from '@angular/router';
+import { AuthService } from './auth_service';
 
 const httpOptions = {
-  headers: new HttpHeaders({ "Content-Type": "application/json" }),
+  headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
 };
 
-@Injectable({ providedIn: "root" })
+@Injectable({ providedIn: 'root' })
 export class AuthGuard implements CanActivate {
   constructor(
     private router: Router,
     private authenticationService: AuthService,
-    private http: HttpClient
+    private http: HttpClient,
+    private authService: AuthService
   ) {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     let res: boolean;
 
-    return this.authenticationService.checkIfUserCo()
+    return this.authenticationService
+      .checkIfUserCo()
       .toPromise()
       .then(
-        data => {
-          if (JSON.parse(data)['status'] === true) {
+        (data) => {
+          if (
+            JSON.parse(data)['status'] === true &&
+            this.authService.getUser()
+          ) {
             return true;
           } else {
             this.authenticationService.logOut();
             return false;
           }
         },
-        err => {
+        (err) => {
           this.authenticationService.logOut();
           return false;
         }

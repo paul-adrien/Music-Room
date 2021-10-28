@@ -9,7 +9,15 @@ const User = mongoose.model(
     firstName: String,
     password: String,
     id: String,
-    picture: String,
+    picture:
+      {
+        fieldname: String,
+        originalname: String,
+        encoding: String,
+        mimetype: String,
+        buffer: Buffer,
+        size: Number,
+      } | String,
     rand: Number,
     validEmail: Boolean,
     friends: [{ id: String }],
