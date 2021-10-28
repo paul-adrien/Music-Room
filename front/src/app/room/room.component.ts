@@ -208,6 +208,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   public wait = false;
 
   ngOnInit(): void {
+    console.log('test');
     this.user = this.authService.getUser();
 
     this.roomService.getRoom(this.roomId).subscribe((res) => {
