@@ -119,21 +119,26 @@ export class SpotifyService {
     if (this.device?.platform === null) {
       window.location.href = url;
     } else {
-      const browser = this.iab.create(url, 'defaults');
-      browser.on('loadstart').subscribe((event) => {
-        console.log('start', event);
-        if (
-          event.url.indexOf('localhost') !== -1 &&
-          event.url.indexOf('?code=') !== -1
-        ) {
-          code = event.url.slice(event.url.indexOf('?code=') + '?code='.length);
-          console.log(code);
-          this.ngZone.run(() => {
-            this.route.navigate([`/login`], { queryParams: { code: code } });
-          });
-          browser.close();
-        }
-      });
+      setTimeout(() => {
+        const browser = this.iab.create(url, 'defaults');
+        browser.on('loadstart').subscribe((event) => {
+          console.log('start spotify', event);
+          if (
+            event.url.indexOf('localhost') !== -1 &&
+            event.url.indexOf('?code=') !== -1
+          ) {
+            code = event.url.slice(
+              event.url.indexOf('?code=') + '?code='.length
+            );
+            console.log(code);
+            this.ngZone.run(() => {
+              this.route.navigate([`/login`], { queryParams: { code: code } });
+            });
+            console.log('close spotify');
+            browser.close();
+          }
+        });
+      }, 2000);
     }
 
     // Show Spotify's authorization screen

@@ -4,6 +4,7 @@ const messaging_controller = require("./controllers/messaging-controller");
 const room_controller = require("./controllers/room-controller");
 const playlist_controller = require("./controllers/playlist-controller");
 const user_controller = require("./controllers/user-controller");
+const { getUser } = require("./models/lib-user.model");
 
 app.set("port", 8080);
 
@@ -89,6 +90,18 @@ io.on("connection", (socket) => {
         room_controller.getRoomSocket(data.roomId).then((res) => {
           if (res.status) {
             io.emit(`room update ${data.roomId}`, res.room);
+          }
+        })
+      );
+  });
+
+  socket.on("room invite", (data) => {
+    room_controller
+      .inviteToRoomSocket(data.roomId, data.userId, data.friendId)
+      .then(() =>
+        getUser({ id: data.friendId }).then((res) => {
+          if (res !== null) {
+            io.emit(`user update ${data.friendId}`, res);
           }
         })
       );

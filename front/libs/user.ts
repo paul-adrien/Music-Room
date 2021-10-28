@@ -5,7 +5,7 @@ export interface User {
   firstName: string;
   password: string;
   id: string;
-  picture: string;
+  picture: string | Blob;
   rand: number;
   validEmail: boolean;
   devices: { id: string; name: string; userId: string }[];

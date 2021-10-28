@@ -1,3 +1,4 @@
+import { EditProfileComponent } from './../edit-profile/edit-profile.component';
 import { DelegationComponent } from './../delegation/delegation.component';
 import { IonicModule } from '@ionic/angular';
 import { NgModule } from '@angular/core';
@@ -20,7 +21,7 @@ import { NgxSliderModule } from '@angular-slider/ngx-slider';
     MatProgressBarModule,
     NgxSliderModule,
   ],
-  entryComponents: [PlayerComponent, DelegationComponent],
+  entryComponents: [PlayerComponent, DelegationComponent, EditProfileComponent],
   declarations: [TabsPage, PlayerComponent],
 })
 export class TabsPageModule {}

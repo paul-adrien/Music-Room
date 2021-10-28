@@ -125,9 +125,12 @@ export class HomeComponent implements OnInit {
   }
 
   ngAfterContentInit() {
+    this.user = this.authService.getUser();
     this.interval = setInterval(() => {
       this.userService.getUser(this.user.id).subscribe((res) => {
-        this.authService.saveUser(res);
+        if (res) {
+          this.authService.saveUser(res);
+        }
         this.user = this.authService.getUser();
         // this.rooms = this.roomService.getAllRoom();
         // this.playlists = this.playlistService.getAllPlaylist();
