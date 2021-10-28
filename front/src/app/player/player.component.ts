@@ -122,6 +122,7 @@ import { DelegationComponent } from '../delegation/delegation.component';
 export class PlayerComponent {
   @Input() public isModal = false;
   public isRoom = false;
+  public interval;
 
   public playerInfo: {
     is_playing: boolean;
@@ -154,7 +155,7 @@ export class PlayerComponent {
   }
 
   ngAfterContentInit() {
-    setInterval(() => this.getPlayerInfo(), 1500);
+    this.interval = setInterval(() => this.getPlayerInfo(), 1500);
   }
 
   getPlayerInfo() {
@@ -234,8 +235,9 @@ export class PlayerComponent {
     this.spotifyService.previous().subscribe();
   }
   ngOnDestroy() {
-    if (!this.isModal) {
-      this.pause();
-    }
+    // if (!this.isModal) {
+    //   this.pause();
+    // }
+    clearInterval(this.interval);
   }
 }
