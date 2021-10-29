@@ -27,6 +27,14 @@ export class UserService {
     );
   }
 
+  checkUsername(userId: string, userName: string): Observable<any> {
+    return this.http.get(
+      environment.AUTH_API +
+        `user/${userId}/check-username?userName=${userName}`,
+      httpOptions
+    );
+  }
+
   updateUser(user: User) {
     console.log(user.id);
     return this.http.put(

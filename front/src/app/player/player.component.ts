@@ -25,7 +25,7 @@ import { DelegationComponent } from '../delegation/delegation.component';
         mode="determinate"
         [value]="
           (this.playerInfo?.progress_ms * 100) /
-          this.playerInfo?.item.duration_ms
+          this.playerInfo?.item?.duration_ms
         "
         [color]="'warn'"
       ></mat-progress-bar>
@@ -160,7 +160,6 @@ export class PlayerComponent {
 
   getPlayerInfo() {
     this.isRoom = !!this.router.url.includes('/room');
-    forkJoin([]);
     this.spotifyService
       .getPlayerInfo()
       .toPromise()
@@ -170,7 +169,7 @@ export class PlayerComponent {
             is_playing: res.is_playing,
             item: res.item as any,
             progress_ms: res.progress_ms,
-            deviceName: res.device.name,
+            deviceName: res?.device?.name,
           };
         }
         this.cd.detectChanges();

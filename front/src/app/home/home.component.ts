@@ -100,6 +100,8 @@ export class HomeComponent implements OnInit {
     private cd: ChangeDetectorRef,
     private socketService: WebsocketService
   ) {
+    const user = this.authService.getUser();
+
     this.socketService.setupSocketConnection();
     this.socketService.listenToServer('room create').subscribe((data) => {
       console.log(data);
@@ -108,6 +110,13 @@ export class HomeComponent implements OnInit {
       }
       this.cd.detectChanges();
     });
+    this.socketService
+      .listenToServer(`user update ${user.id}`)
+      .subscribe((data) => {
+        this.user = data;
+
+        this.cd.detectChanges();
+      });
   }
 
   public interval;
@@ -201,19 +210,16 @@ export class HomeComponent implements OnInit {
           this.device.platform.toLocaleLowerCase() === 'ios') &&
         res?.device?.id
       ) {
-        this.roomService
-          .enterRoom(this.user.id, roomId, res?.device?.id)
-          .subscribe((res) => {
-            if (res?.status) {
-              this.router.navigate([`tabs/tab-home/room/${roomId}`]);
-            }
-          });
+        this.socketService.emitToServer('room enter', {
+          userId: this.user.id,
+          roomId: roomId,
+          device: res?.device?.id,
+        });
+        this.router.navigate([`tabs/tab-home/room/${roomId}`]);
       } else if (this.device.platform === null && !res?.device?.id) {
         await this.presentAlert();
       }
     });
-    // this.roomService.enterRoom(this.user.id, roomId);
-    //com.spotify.music
   }
 
   openPlaylist(playlistId: string) {

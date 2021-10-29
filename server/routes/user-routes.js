@@ -19,6 +19,13 @@ module.exports = function (app) {
 
   app.get("/token", [authJwt.verifyToken], controller.userBoard);
   app.get("/user/:id", [authJwt.verifyToken], controller.getProfile, logs);
+  app.get(
+    "/user/:id/check-username",
+    [authJwt.verifyToken],
+    controller.checkUsername,
+    logs
+  );
+
   app.get("/user", [authJwt.verifyToken], controller.getSearchProfile, logs);
   app.put("/user/:id", [authJwt.verifyToken], controller.userUpdate, logs);
   app.post(

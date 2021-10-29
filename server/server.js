@@ -35,20 +35,27 @@ io.on("connection", (socket) => {
     console.log("user disconnected");
   });
 
+  // USER /////////////////////////////////////////////////////////////////////////////
+
   socket.on("user edit", (data) => {
     console.log(data);
-    user_controller.userUpdate(data.userId, data.user).then((res) => {
-      if (res !== undefined) {
-        io.emit(`user update ${data.userId}`, res);
+    user_controller.userUpdateSocket(data.userId, data.user).then((res) => {
+      console.log(res);
+      if (res?.status) {
+        io.emit(`user update ${data.userId}`, res?.user);
       }
     });
   });
+
+  // CHAT //////////////////////////////////////////////////////////////////////////////
 
   socket.on("chat message", (data) => {
     console.log(data);
     messaging_controller.sendMessage(data.userId, data.convId, data.message);
     io.emit("chat message", data.message);
   });
+
+  //ROOM ///////////////////////////////////////////////////////////////////////////////
 
   socket.on("room create", (data) => {
     room_controller.CreateRoomSocket(data.name, data.userId).then(() =>
@@ -58,6 +65,18 @@ io.on("connection", (socket) => {
         }
       })
     );
+  });
+
+  socket.on("room enter", (data) => {
+    room_controller
+      .enterRoomSocket(data.userId, data.roomId, data.deviceId)
+      .then(() =>
+        room_controller.getRoomSocket(data.roomId).then((res) => {
+          if (res.status) {
+            io.emit(`room update ${data.roomId}`, res.room);
+          }
+        })
+      );
   });
 
   socket.on("room add music", (data) => {
@@ -107,6 +126,30 @@ io.on("connection", (socket) => {
       );
   });
 
+  socket.on("room accept invite", (data) => {
+    room_controller.acceptInviteRoomSocket(data.userId, data.roomId).then(() =>
+      room_controller.getRoomSocket(data.roomId).then((res) => {
+        if (res.status) {
+          io.emit(`room update ${data.roomId}`, res.room);
+        }
+      })
+    );
+  });
+
+  socket.on("room change type", (data) => {
+    room_controller
+      .changeTypeSocket(data.userId, data.roomId, data.type)
+      .then(() =>
+        room_controller.getRoomSocket(data.roomId).then((res) => {
+          if (res.status) {
+            io.emit(`room update ${data.roomId}`, res.room);
+          }
+        })
+      );
+  });
+
+  // PLAYLIST ////////////////////////////////////////////////////////////////////
+
   socket.on("playlist create", (data) => {
     playlist_controller.CreatePlaylistSocket(data.name, data.userId).then(() =>
       playlist_controller.getAllPlaylistSocket().then((res) => {
@@ -152,6 +195,42 @@ io.on("connection", (socket) => {
           }
         });
       });
+  });
+
+  socket.on("playlist invite", (data) => {
+    playlist_controller
+      .inviteToPlaylistSocket(data.userId, data.playlistId, data.friendId)
+      .then(() =>
+        getUser({ id: data.friendId }).then((res) => {
+          if (res !== null) {
+            io.emit(`user update ${data.friendId}`, res);
+          }
+        })
+      );
+  });
+
+  socket.on("playlist accept invite", (data) => {
+    playlist_controller
+      .acceptInvitePlaylistSocket(data.userId, data.playlistId)
+      .then(() =>
+        playlist_controller.getPlaylistSocket(data.playlistId).then((res) => {
+          if (res.status) {
+            io.emit(`playlist update ${data.playlistId}`, res.playlist);
+          }
+        })
+      );
+  });
+
+  socket.on("playlist change type", (data) => {
+    playlist_controller
+      .changeTypeSocket(data.userId, data.playlistId, data.type)
+      .then(() =>
+        playlist_controller.getPlaylistSocket(data.playlistId).then((res) => {
+          if (res.status) {
+            io.emit(`playlist update ${data.playlistId}`, res.playlist);
+          }
+        })
+      );
   });
 });
 

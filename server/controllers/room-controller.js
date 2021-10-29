@@ -273,6 +273,14 @@ exports.inviteToRoom = async (req, res) => {
               });
             } else {
               if (
+                room.invited?.length > 0 &&
+                room.invited.find((el) => el.id === friendId)
+              ) {
+                return res.json({
+                  status: false,
+                  message: "this user is already in this room or invited",
+                });
+              } else if (
                 friend.notifs !== undefined &&
                 friend.notifs.room !== undefined &&
                 friend.notifs.room.find((room) => room.id === roomId)
@@ -281,67 +289,16 @@ exports.inviteToRoom = async (req, res) => {
                   status: false,
                   message: "this user already invite you",
                 });
-              }
-              if (
-                room.users?.length > 0 &&
-                room.users.find((el) => el.id === friendId)
-              ) {
-                console.log(room.users.find((el) => el.id === friendId));
-                return res.json({
-                  status: false,
-                  message: "this user is already in this room or invited",
-                });
-              }
-              if (
-                friend.notifs.room === undefined ||
-                friend.notifs.room.length === 0
-              ) {
-                Room.updateOne(
-                  { _id: roomId },
-                  {
-                    $push: {
-                      invited: friendId,
-                    },
-                  }
-                ).exec((err, user) => {
-                  if (err) {
-                    return res.json({
-                      status: false,
-                      message: err,
-                    });
-                  } else {
-                    User.updateOne(
-                      { id: friendId },
-                      {
-                        $push: {
-                          "notifs.rooms": {
-                            id: roomId,
-                            name: room.name,
-                            date: Date.now(),
-                          },
-                        },
-                      }
-                    ).exec((err, user) => {
-                      if (err) {
-                        return res.json({
-                          status: false,
-                          message: err,
-                        });
-                      } else {
-                        return res.json({
-                          status: true,
-                          message: "invite send",
-                        });
-                      }
-                    });
-                  }
-                });
               } else {
-                Room.updateOne(
-                  { _id: roomId },
+                User.updateOne(
+                  { id: friendId },
                   {
                     $push: {
-                      invited: friendId,
+                      "notifs.rooms": {
+                        id: roomId,
+                        name: room.name,
+                        date: Date.now(),
+                      },
                     },
                   }
                 ).exec((err, user) => {
@@ -351,29 +308,9 @@ exports.inviteToRoom = async (req, res) => {
                       message: err,
                     });
                   } else {
-                    User.updateOne(
-                      { id: friendId },
-                      {
-                        $push: {
-                          "notifs.rooms": {
-                            id: roomId,
-                            name: room.name,
-                            date: Date.now(),
-                          },
-                        },
-                      }
-                    ).exec((err, user) => {
-                      if (err) {
-                        return res.json({
-                          status: false,
-                          message: err,
-                        });
-                      } else {
-                        return res.json({
-                          status: true,
-                          message: "invite send",
-                        });
-                      }
+                    return res.json({
+                      status: true,
+                      message: "invite send",
                     });
                   }
                 });
@@ -387,8 +324,6 @@ exports.inviteToRoom = async (req, res) => {
 };
 
 exports.inviteToRoomSocket = async (roomId, userId, friendId) => {
-  console.log(friendId);
-
   return Room.findOne({
     _id: roomId,
   }).then((room) => {
@@ -399,14 +334,14 @@ exports.inviteToRoomSocket = async (roomId, userId, friendId) => {
         room: null,
       };
     } else {
-      User.findOne({ id: userId }).then(async (user) => {
+      return User.findOne({ id: userId }).then(async (user) => {
         if (!user) {
           return {
             status: false,
             message: "this user doesn't exist",
           };
         } else {
-          User.findOne({ id: friendId }).then(async (friend) => {
+          return User.findOne({ id: friendId }).then(async (friend) => {
             if (!friend) {
               return {
                 status: false,
@@ -414,6 +349,14 @@ exports.inviteToRoomSocket = async (roomId, userId, friendId) => {
               };
             } else {
               if (
+                room.invited?.length > 0 &&
+                room.invited.find((el) => el.id === friendId)
+              ) {
+                return {
+                  status: false,
+                  message: "this user is already in this room or invited",
+                };
+              } else if (
                 friend.notifs !== undefined &&
                 friend.notifs.room !== undefined &&
                 friend.notifs.room.find((room) => room.id === roomId)
@@ -422,73 +365,23 @@ exports.inviteToRoomSocket = async (roomId, userId, friendId) => {
                   status: false,
                   message: "this user already invite you",
                 };
-              }
-              if (
-                room.users?.length > 0 &&
-                room.users.find((el) => el.id === friendId)
-              ) {
-                console.log(room.users.find((el) => el.id === friendId));
-                return {
-                  status: false,
-                  message: "this user is already in this room or invited",
-                };
-              }
-              if (
-                friend.notifs.room === undefined ||
-                friend.notifs.room.length === 0
-              ) {
-                Room.updateOne(
-                  { _id: roomId },
-                  {
-                    $push: {
-                      invited: friendId,
-                    },
-                  }
-                ).then((user) => {
-                  User.updateOne(
-                    { id: friendId },
-                    {
-                      $push: {
-                        "notifs.rooms": {
-                          id: roomId,
-                          name: room.name,
-                          date: Date.now(),
-                        },
-                      },
-                    }
-                  ).then((user) => {
-                    return {
-                      status: true,
-                      message: "invite send",
-                    };
-                  });
-                });
               } else {
-                Room.updateOne(
-                  { _id: roomId },
+                return User.updateOne(
+                  { id: friendId },
                   {
                     $push: {
-                      invited: friendId,
+                      "notifs.rooms": {
+                        id: roomId,
+                        name: room.name,
+                        date: Date.now(),
+                      },
                     },
                   }
                 ).then((user) => {
-                  User.updateOne(
-                    { id: friendId },
-                    {
-                      $push: {
-                        "notifs.rooms": {
-                          id: roomId,
-                          name: room.name,
-                          date: Date.now(),
-                        },
-                      },
-                    }
-                  ).then((user) => {
-                    return {
-                      status: true,
-                      message: "invite send",
-                    };
-                  });
+                  return {
+                    status: true,
+                    message: "invite send",
+                  };
                 });
               }
             }
@@ -554,6 +447,39 @@ exports.acceptInviteRoom = async (req, res) => {
   });
 };
 
+exports.acceptInviteRoomSocket = async (userId, roomId) => {
+  return Room.findOne({ _id: roomId }).then((room) => {
+    if (!room) {
+      return {
+        status: true,
+        message: "this room doesn't exist or you dont have the good right",
+      };
+    } else {
+      Room.updateOne({ _id: roomId }, { $push: { invited: userId } }).then(
+        (room) => {
+          User.updateOne(
+            { id: userId },
+            {
+              notifs: {
+                $pull: {
+                  rooms: {
+                    id: roomId,
+                  },
+                },
+              },
+            }
+          ).then((user) => {
+            return {
+              status: true,
+              message: "you accept to enter in the room",
+            };
+          });
+        }
+      );
+    }
+  });
+};
+
 exports.enterRoom = async (req, res) => {
   const { roomId } = req.params;
   const { userId, deviceId } = req.body;
@@ -574,15 +500,7 @@ exports.enterRoom = async (req, res) => {
     } else {
       Room.updateOne(
         { _id: roomId },
-        {
-          $push: {
-            users: {
-              id: userId,
-              deviceId: deviceId,
-              username: user.userName,
-            },
-          },
-        }
+        { $pull: { users: { id: userId } } }
       ).exec((err, room) => {
         if (err) {
           return res.json({
@@ -590,11 +508,68 @@ exports.enterRoom = async (req, res) => {
             message: err,
           });
         } else {
-          return res.json({
-            status: true,
-            message: "you have enter this room",
+          Room.updateOne(
+            { _id: roomId },
+            {
+              $push: {
+                users: {
+                  id: userId,
+                  deviceId: deviceId,
+                  username: user.userName,
+                },
+              },
+            }
+          ).exec((err, room) => {
+            if (err) {
+              return res.json({
+                status: false,
+                message: err,
+              });
+            } else {
+              return res.json({
+                status: true,
+                message: "you have enter this room",
+              });
+            }
           });
         }
+      });
+    }
+  });
+};
+
+exports.enterRoomSocket = async (userId, roomId, deviceId) => {
+  const user = await getUser({ id: userId });
+  console.log(roomId);
+
+  return Room.findOne({ _id: roomId }).then((room) => {
+    if (!room) {
+      return {
+        status: true,
+        message: "this room doesn't exist or you dont have the good right",
+      };
+    } else {
+      return Room.updateOne(
+        { _id: roomId },
+        { $pull: { users: { id: userId } } }
+      ).then((room) => {
+        return Room.updateOne(
+          { _id: roomId },
+          {
+            $push: {
+              users: {
+                id: userId,
+                deviceId: deviceId,
+                username: user.userName,
+              },
+            },
+          }
+        ).then((room) => {
+          return {
+            status: true,
+            message: "you have enter this room",
+          };
+        });
       });
     }
   });
@@ -706,6 +681,61 @@ exports.quitRoom = async (req, res) => {
               message: "you have quit this room",
             });
           }
+        });
+      } else {
+        return res.json({
+          status: false,
+          message: "this user is not in this room",
+        });
+      }
+    }
+  });
+};
+
+exports.quitRoomSocket = async (userId, roomId) => {
+  return Room.findOne({ _id: roomId }).then((err, room) => {
+    if (!room) {
+      return {
+        status: true,
+        message: "this room doesn't exist or you dont have the good right",
+      };
+    } else {
+      let roomIndex = room.users
+        .map((u) => {
+          return u.id;
+        })
+        .indexOf(userId);
+      if (roomIndex != -1 && room.created_by === userId) {
+        // Room.deleteOne({ _id: roomId }).exec((err, room) => {
+        //   if (err) {
+        //     return res.json({
+        //       status: false,
+        //       message: err,
+        //     });
+        //   } else {
+        // return res.json({
+        //   status: true,
+        //   message: "you have quit this room and delete this room",
+        //   }
+        // });
+        return Room.updateOne(
+          { _id: roomId },
+          { $pull: { users: { id: userId } } }
+        ).then((room) => {
+          return {
+            status: true,
+            message: "you have quit this room",
+          };
+        });
+      } else if (roomIndex != -1) {
+        return Room.updateOne(
+          { _id: roomId },
+          { $pull: { users: { id: userId } } }
+        ).then((room) => {
+          return {
+            status: true,
+            message: "you have quit this room",
+          };
         });
       } else {
         return res.json({
@@ -1016,6 +1046,29 @@ exports.changeType = async (req, res) => {
             message: "this room change type",
           });
         }
+      });
+    }
+  });
+};
+
+exports.changeTypeSocket = async (userId, roomId, type) => {
+  return Room.findOne({ _id: roomId, created_by: userId }).then((room) => {
+    if (!room) {
+      return {
+        status: false,
+        message: "this room doesn't exist or you dont have the good right",
+      };
+    } else {
+      return Room.updateOne(
+        { _id: roomId },
+        {
+          type: type,
+        }
+      ).then((room) => {
+        return {
+          status: true,
+          message: "this room change type",
+        };
       });
     }
   });

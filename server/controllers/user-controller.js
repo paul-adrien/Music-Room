@@ -12,7 +12,7 @@ exports.userBoard = (req, res) => {
 
 exports.userUpdate = async (req, res, next) => {
   const { user } = req.body;
-  console.log(user);
+  console.log("test socket", res);
 
   if (await updateUser(req.params.id, user)) {
     const user = await getUser({ id: req.params.id });
@@ -26,6 +26,22 @@ exports.userUpdate = async (req, res, next) => {
     });
   }
   next();
+};
+
+exports.userUpdateSocket = async (userId, user) => {
+  if (await updateUser(userId, user)) {
+    const user = await getUser({ id: userId });
+    return {
+      status: true,
+      message: "user was update",
+      user: user,
+    };
+  } else {
+    return {
+      status: false,
+      message: "user update error",
+    };
+  }
 };
 
 exports.userUpdatePicture = async (req, res, next) => {
@@ -54,14 +70,6 @@ exports.userUpdatePicture = async (req, res, next) => {
       user: user,
     });
   });
-};
-
-exports.userUpdateSocket = async (userId, user) => {
-  if (await updateUser(userId, user)) {
-    return await getUser({ id: userId });
-  } else {
-    return undefined;
-  }
 };
 
 exports.getProfile = async (req, res, next) => {
@@ -94,12 +102,33 @@ exports.getSearchProfile = async (req, res, next) => {
     res.status(200).json(users);
   } else {
     res.message = "user doesn't exist";
-    res.status(400).json({
+    res.status(204).json({
       status: false,
       message: "user doesn't exist",
     });
   }
   next();
+};
+
+exports.checkUsername = async (req, res, next) => {
+  const { userName } = req.query;
+  const userId = req.params.id;
+  const user = await getUser({
+    id: { $ne: userId },
+    userName: userName.toString(),
+  });
+  if (user) {
+    ///res.message = "get user search";
+    res.status(200).json({
+      status: false,
+      message: "userName already exist",
+    });
+  } else {
+    res.status(200).json({
+      status: true,
+      message: "userName doesn't exist",
+    });
+  }
 };
 
 exports.forgotPass_send = async (req, res) => {

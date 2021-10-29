@@ -1,3 +1,4 @@
+import { forkJoin } from 'rxjs';
 import { UserService } from './../_services/user_service';
 import { User } from 'libs/user';
 import { ModalController, Platform } from '@ionic/angular';
@@ -10,6 +11,7 @@ import {
 import { AuthService } from '../_services/auth_service';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Camera, CameraOptions } from '@ionic-native/camera/ngx';
+import { WebsocketService } from '../_services/websocketService';
 
 function ValidatorUserNameLength(control: FormControl) {
   const test = /^(?=.{3,20}$)[a-zA-Z0-9]+(?:[-' ][a-zA-Z0-9]+)*$/;
@@ -67,6 +69,9 @@ function ValidatorEmail(control: FormControl) {
           class="input"
         />
         <div class="name-input">Pseudo</div>
+        <div class="error" *ngIf="this.userForm.get('userName').errors?.error">
+          {{ this.userForm.get('userName').errors.error }}
+        </div>
       </div>
       <div class="input-container">
         <input
@@ -76,6 +81,9 @@ function ValidatorEmail(control: FormControl) {
           class="input"
         />
         <div class="name-input">Prénom</div>
+        <div class="error" *ngIf="this.userForm.get('firstName').errors?.error">
+          {{ this.userForm.get('firstName').errors.error }}
+        </div>
       </div>
       <div class="input-container">
         <input
@@ -85,11 +93,14 @@ function ValidatorEmail(control: FormControl) {
           class="input"
         />
         <div class="name-input">Nom</div>
+        <div class="error" *ngIf="this.userForm.get('lastName').errors?.error">
+          {{ this.userForm.get('lastName').errors.error }}
+        </div>
       </div>
-      <div class="input-container">
+      <!-- <div class="input-container">
         <input formControlName="email" id="email" required class="input" />
         <div class="name-input">Email</div>
-      </div>
+      </div> -->
     </form>
   `,
   styleUrls: ['./edit-profile.component.scss'],
@@ -105,8 +116,11 @@ export class EditProfileComponent implements OnInit {
     private camera: Camera,
     private platform: Platform,
     private cd: ChangeDetectorRef,
-    private userService: UserService
-  ) {}
+    private userService: UserService,
+    private socketService: WebsocketService
+  ) {
+    this.user = this.authSercive.getUser();
+  }
 
   public userForm = new FormGroup({
     userName: new FormControl('', ValidatorUserNameLength),
@@ -177,15 +191,46 @@ export class EditProfileComponent implements OnInit {
     });
   }
 
-  saveProfile() {
+  async saveProfile() {
     const user = this.userForm.getRawValue();
     user.id = this.user.id;
-    this.userService
-      .updatePicture(this.uploadPicture, this.user.id)
-      .subscribe((res) => {
-        this.dismiss(true);
-      });
-    this.userService.updateUser(user).subscribe();
+    let stop = false;
+    if (
+      (this.user.firstName !== user.firstName ||
+        this.user.lastName !== user.lastName ||
+        this.user.userName !== user.userName) &&
+      this.userForm.valid
+    ) {
+      await this.userService
+        .checkUsername(this.user.id, user.userName)
+        .toPromise()
+        .then((res: any) => {
+          if (res.status) {
+            this.socketService.emitToServer('user edit', {
+              userId: user.id,
+              user: user,
+            });
+          } else {
+            stop = true;
+            this.userForm.get('userName').setErrors({
+              error: 'Ce pseudo existe déjà',
+            });
+          }
+        });
+    } else {
+      stop = true;
+    }
+
+    if (this.uploadPicture.has('file') && !stop) {
+      this.userService
+        .updatePicture(this.uploadPicture, this.user.id)
+        .subscribe((res) => {
+          this.dismiss(true);
+        });
+    } else if (!stop) {
+      this.dismiss(false);
+    }
+    this.cd.detectChanges();
   }
 
   dismiss(isSave?: boolean) {

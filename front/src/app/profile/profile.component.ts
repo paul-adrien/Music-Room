@@ -1,3 +1,4 @@
+import { WebsocketService } from './../_services/websocketService';
 import { UserService } from './../_services/user_service';
 import { EditProfileComponent } from './../edit-profile/edit-profile.component';
 import { RoomService } from './../_services/room_service';
@@ -76,9 +77,25 @@ export class ProfileComponent implements OnInit {
     private router: Router,
     private alertController: AlertController,
     private modalController: ModalController,
-
+    private socketService: WebsocketService,
     private cd: ChangeDetectorRef
-  ) {}
+  ) {
+    const user = this.authService.getUser();
+
+    this.socketService.setupSocketConnection();
+    this.socketService
+      .listenToServer(`user update ${user.id}`)
+      .subscribe((data) => {
+        this.user = data;
+        console.log('ici bg');
+        if (typeof this.user.picture !== 'string' && this.user.picture) {
+          this.user.picture = 'data:image/jpeg;base64,' + data.picture.buffer;
+        } else {
+          this.user.picture = data.picture;
+        }
+        this.cd.detectChanges();
+      });
+  }
 
   public base64data: string;
 
@@ -92,19 +109,12 @@ export class ProfileComponent implements OnInit {
       } else {
         this.user.picture = res.picture;
       }
+      this.cd.detectChanges();
     });
 
     this.playlists = this.playlistService.getAllPlaylist(this.user.id);
     this.rooms = this.roomService.getAllRoom(this.user.id);
     this.cd.detectChanges();
-  }
-
-  blobToBase64(blob) {
-    return new Promise((resolve, _) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.readAsDataURL(blob as Blob);
-    });
   }
 
   openRoom(roomId: string) {

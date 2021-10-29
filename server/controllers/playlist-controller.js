@@ -327,77 +327,34 @@ exports.inviteToPlaylist = async (req, res, next) => {
               });
             } else {
               if (
+                playlist.invited?.length > 0 &&
+                playlist.invited.find((el) => el === friendId)
+              ) {
+                return res.json({
+                  status: false,
+                  message: "this user is already invited",
+                });
+              } else if (
                 friend.notifs !== undefined &&
                 friend.notifs.playlist !== undefined &&
-                friend.notifs.playlist.find(
+                friend?.notifs?.playlist.find(
                   (playlist) => playlist.id === playlistId
                 )
               ) {
                 return res.json({
                   status: false,
-                  message: "this user already invite you",
-                });
-              }
-              if (
-                playlist.users?.length > 0 &&
-                playlist.users.find((el) => el.id === friendId)
-              ) {
-                console.log(playlist.users.find((el) => el.id === friendId));
-                return res.json({
-                  status: false,
-                  message: "this user is already in this playlist or invited",
-                });
-              }
-              if (
-                friend.notifs.playlist === undefined ||
-                friend.notifs.playlist.length === 0
-              ) {
-                Playlist.updateOne(
-                  { _id: playlistId },
-                  {
-                    $push: {
-                      invited: friendId,
-                    },
-                  }
-                ).exec((err, user) => {
-                  if (err) {
-                    return res.json({
-                      status: false,
-                      message: err,
-                    });
-                  } else {
-                    User.updateOne(
-                      { id: friendId },
-                      {
-                        $push: {
-                          "notifs.playlist": {
-                            id: playlistId,
-                            name: playlist.name,
-                            date: Date.now(),
-                          },
-                        },
-                      }
-                    ).exec((err, user) => {
-                      if (err) {
-                        return res.json({
-                          status: false,
-                          message: err,
-                        });
-                      } else {
-                        return res.json({
-                          status: true,
-                          message: "invite send",
-                        });
-                      }
-                    });
-                  }
+                  message: "this user is already invited",
                 });
               } else {
-                Playlist.updateOne(
-                  { _id: playlistId },
+                User.updateOne(
+                  { id: friendId },
                   {
                     $push: {
-                      invited: friendId,
+                      "notifs.playlist": {
+                        id: playlistId,
+                        name: playlist.name,
+                        date: Date.now(),
+                      },
                     },
                   }
                 ).exec((err, user) => {
@@ -407,31 +364,82 @@ exports.inviteToPlaylist = async (req, res, next) => {
                       message: err,
                     });
                   } else {
-                    User.updateOne(
-                      { id: friendId },
-                      {
-                        $push: {
-                          "notifs.playlist": {
-                            id: playlistId,
-                            name: playlist.name,
-                            date: Date.now(),
-                          },
-                        },
-                      }
-                    ).exec((err, user) => {
-                      if (err) {
-                        return res.json({
-                          status: false,
-                          message: err,
-                        });
-                      } else {
-                        return res.json({
-                          status: true,
-                          message: "invite send",
-                        });
-                      }
+                    return res.json({
+                      status: true,
+                      message: "invite send",
                     });
                   }
+                });
+              }
+            }
+          });
+        }
+      });
+    }
+  });
+};
+
+exports.inviteToPlaylistSocket = async (userId, playlistId, friendId) => {
+  return Playlist.findOne({
+    _id: playlistId,
+  }).then((playlist) => {
+    if (!playlist) {
+      return {
+        status: true,
+        message: "this playlist doesn't exist or you dont have the good right",
+        playlist: null,
+      };
+    } else {
+      return User.findOne({ id: userId }).then(async (user) => {
+        if (!user) {
+          return {
+            status: false,
+            message: "this user doesn't exist",
+          };
+        } else {
+          return User.findOne({ id: friendId }).then(async (friend) => {
+            if (!friend) {
+              return {
+                status: false,
+                message: "this friend doesn't exist",
+              };
+            } else {
+              if (
+                playlist.invited?.length > 0 &&
+                playlist.invited.find((el) => el === friendId)
+              ) {
+                return {
+                  status: false,
+                  message: "this user is already invited",
+                };
+              } else if (
+                friend.notifs !== undefined &&
+                friend.notifs.playlist !== undefined &&
+                friend?.notifs?.playlist.find(
+                  (playlist) => playlist.id === playlistId
+                )
+              ) {
+                return {
+                  status: false,
+                  message: "this user is already invited",
+                };
+              } else {
+                return User.updateOne(
+                  { id: friendId },
+                  {
+                    $push: {
+                      "notifs.playlist": {
+                        id: playlistId,
+                        name: playlist.name,
+                        date: Date.now(),
+                      },
+                    },
+                  }
+                ).then((user) => {
+                  return {
+                    status: true,
+                    message: "invite send",
+                  };
                 });
               }
             }
@@ -543,6 +551,27 @@ exports.acceptInvitePlaylist = async (req, res) => {
             message: "you accept to enter this playlist",
           });
         }
+      });
+    }
+  });
+};
+
+exports.acceptInvitePlaylistSocket = async (userId, playlistId) => {
+  return Playlist.findOne({ _id: playlistId }).then((playlist) => {
+    if (!playlist) {
+      return {
+        status: true,
+        message: "this playlist doesn't exist or you dont have the good right",
+      };
+    } else {
+      return Playlist.updateOne(
+        { _id: playlistId },
+        { $push: { invited: userId } }
+      ).then((playlist) => {
+        return {
+          status: true,
+          message: "you accept to enter this playlist",
+        };
       });
     }
   });
@@ -770,6 +799,32 @@ exports.changeType = async (req, res) => {
               message: "this playlist change type",
             });
           }
+        });
+      }
+    }
+  );
+};
+
+exports.changeTypeSocket = async (userId, playlistId, type) => {
+  return Playlist.findOne({ _id: playlistId, created_by: userId }).then(
+    (playlist) => {
+      if (!playlist) {
+        return {
+          status: true,
+          message:
+            "this playlist doesn't exist or you dont have the good right",
+        };
+      } else {
+        return Playlist.updateOne(
+          { _id: playlistId },
+          {
+            type: type,
+          }
+        ).then((playlist) => {
+          return {
+            status: true,
+            message: "this playlist change type",
+          };
         });
       }
     }

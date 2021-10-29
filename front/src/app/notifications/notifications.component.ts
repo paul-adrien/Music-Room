@@ -12,6 +12,7 @@ import { Device } from '@ionic-native/device/ngx';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { isAfter, isBefore } from 'date-fns';
+import { WebsocketService } from '../_services/websocketService';
 
 @Component({
   selector: 'app-notifications',
@@ -92,8 +93,43 @@ export class NotificationsComponent implements OnInit {
     private spotifyService: SpotifyService,
     private device: Device,
     private router: Router,
-    private alertController: AlertController
-  ) {}
+    private alertController: AlertController,
+    private socketService: WebsocketService
+  ) {
+    const user = this.authService.getUser();
+
+    this.socketService.setupSocketConnection();
+    this.socketService
+      .listenToServer(`user update ${user.id}`)
+      .subscribe((data) => {
+        this.user = data;
+
+        const tmpRoom = this.user.notifs.rooms.map((room) => ({
+          ...room,
+          type: 'rooms',
+        }));
+        const tmpPlaylist = this.user.notifs.playlist.map((playlist) => ({
+          ...playlist,
+          type: 'playlist',
+        }));
+        const tmpFriend = this.user.notifs.friends.map((friend) => ({
+          ...friend,
+          type: 'friends',
+        }));
+        this.notifs = this.notifs
+          .concat(tmpRoom, tmpPlaylist, tmpFriend)
+          .sort((a, b) => {
+            if (isBefore(new Date(a.date), new Date(b.date))) {
+              return -1;
+            } else if (isAfter(new Date(a.date), new Date(b.date))) {
+              return 1;
+            } else {
+              return 0;
+            }
+          });
+        this.cd.detectChanges();
+      });
+  }
 
   public user: User;
 

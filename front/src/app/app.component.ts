@@ -20,7 +20,7 @@ export class AppComponent implements OnInit {
     }
 
     this.platform.ready().then(() => {
-      if (this.platform.is('mobile')) {
+      if (this.platform.is('mobile') && !this.platform.is('mobileweb')) {
         StatusBar.setStyle({ style: Style.Dark });
       }
     });
