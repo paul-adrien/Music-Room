@@ -212,3 +212,27 @@ exports.forgotPass_change = async (req, res) => {
     });
   }
 };
+
+exports.userUpdateAccount = async (req, res) => {
+  const id = req.body.id;
+  const user = await getUser({ userId: id });
+  if (user) {
+    user.type = "premium";
+    if (await updateUser(user.id, user)) {
+      res.json({
+        status: true,
+        message: "Account was upgraded",
+      });
+    } else {
+      res.json({
+        status: false,
+        message: "user doesn't exist",
+      });
+    }
+  } else {
+    res.json({
+      status: false,
+      message: "user doesn't exist",
+    });
+  }
+};

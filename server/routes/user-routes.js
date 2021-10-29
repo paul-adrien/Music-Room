@@ -34,4 +34,5 @@ module.exports = function (app) {
     controller.userUpdatePicture,
     logs
   );
+  app.put("/user/:id/premium", [authJwt.verifyToken], controller.userUpdateAccount, logs);
 };

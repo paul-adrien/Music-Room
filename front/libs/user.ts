@@ -38,6 +38,7 @@ export interface User {
       date: string;
     }[];
   };
+  type: "free" | "premium";
 }
 
 export function mapUserBackToUserFront(user: any): Partial<User> {
@@ -49,5 +50,6 @@ export function mapUserBackToUserFront(user: any): Partial<User> {
     email: user['email'],
     picture: user['picture'],
     validEmail: user['validEmail'],
+    type: user['type'],
   };
 }

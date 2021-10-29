@@ -46,6 +46,7 @@ const User = mongoose.model(
         },
       ],
     },
+    type: "free" | "premium",
   })
 );
 

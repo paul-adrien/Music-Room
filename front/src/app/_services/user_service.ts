@@ -57,4 +57,8 @@ export class UserService {
       picture
     );
   }
+
+  updateUserAccount(userId: string) {
+
+  }
 }

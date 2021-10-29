@@ -29,6 +29,9 @@ import { forkJoin } from 'rxjs';
       <div class="primary-button" (click)="this.presentModalEdit()">
         Modifier le profil
       </div>
+      <div class="primary-button" (click)="this.presentModalEdit()">
+        Passer premium
+      </div>
     </div>
     <div class="bottom-container">
       <div *ngIf="(this.playlists)?.length > 0" class="title-category">
@@ -253,5 +256,9 @@ export class ProfileComponent implements OnInit {
       () => this.authService.logOut(),
       () => this.authService.logOut()
     );
+  }
+
+  upgradeAccount() {
+    this.userService.updateUserAccount().subscribe();
   }
 }
