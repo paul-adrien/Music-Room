@@ -190,28 +190,26 @@ exports.getRoomSocket = async (roomId) => {
 };
 
 exports.delRoom = async (req, res) => {
-  const { userId, playlistId } = req.params;
-
-  Playlist.findOne({
+  const { userId, roomId } = req.params;
+  console.log(userId, roomId)
+  Room.findOne({
     $and: [
-      { _id: playlistId },
-      {
-        $or: [{ created_by: userId }, { invited: { $in: [{ userId }] } }],
-      },
+      { _id: roomId },
+      { created_by: userId }
     ],
-  }).exec((err, playlist) => {
+  }).exec((err, room) => {
     if (err) {
       return res.json({
         status: false,
         message: err,
       });
-    } else if (!playlist) {
+    } else if (!room) {
       return res.json({
         status: true,
-        message: "this playlist doesn't exist or you dont have the good right",
+        message: "this room doesn't exist or you dont have the good right",
       });
     } else {
-      Playlist.deleteOne({ _id: playlistId }).exec((err) => {
+      Room.deleteOne({ _id: roomId }).exec((err) => {
         if (err) {
           return res.json({
             status: false,
@@ -221,7 +219,7 @@ exports.delRoom = async (req, res) => {
       });
       return res.json({
         status: true,
-        message: "playlist was delete",
+        message: "Room was delete",
       });
     }
   });

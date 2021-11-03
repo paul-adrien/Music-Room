@@ -1,4 +1,4 @@
-var axios = require("axios");
+const axios = require("axios");
 
 var base_url = "http://localhost:8080/"
 
@@ -10,75 +10,42 @@ userTest = {
     lastName: "test",
     firstName: "test",
     accessToken: "",
-    lang: "en"
+    lang: "en",
+    password: "gkjHK56f-hGK"
 }
 
-describe("get all playlist", function () {
+describe("simple creation of an user", function () {
+
+    beforeAll(() => {
+        axios.post(base_url + 'user/register', {
+            userName: "test",
+            email: "test@gmail.com",
+            lastName: "test",
+            firstName: "test",
+            password: "gkjHK56f-hGK"
+        }).then(function (res) {
+        }).catch((err) => {
+        });
+    })
+
     it("returns Hello World", function (done) {
         axios.get(base_url, {})
             .then(function (res) {
-                console.log(res);
-                expect(res).toBe("Hello World");
-                done();
-            });
-    });
-
-    it("create account test", function (done) {
-        axios.post(base_url + 'user/register', {
-            data: {
-                userName: "test",
-                email: "test@gmail.com",
-                lastName: "test",
-                firstName: "test",
-                password: "gkjHK56f-hGK"
-            }
-        })
-            .then(function (res) {
-                console.log(res);
-                expect(res).toBe(Object);
+                expect(res.data).toBe("Hello World");
                 done();
             });
     });
 
     it("login", function (done) {
         axios.post(base_url + 'user/authenticate', {
-            data: {
-                userName: 'test',
-                password: 'gkjHK56f-hGK'
-            }
+            userName: 'test',
+            password: 'gkjHK56f-hGK'
         }).then(function (res) {
-            console.log(res);
-            expect(res).toBe(Object);
+            userTest.accessToken = res.data.accessToken;
+            userTest.id = res.data.id;
+            expect(res.data.status).toBe(true);
             done();
         });
-    });
-
-    it("get user", function (done) {
-        axios.get(base_url + 'user/' + userTest.id, {
-            headers: { 'x-access-token': userTest.accessToken }
-        }).then(function (res) {
-            console.log(res);
-            expect(res).toBe(Object);
-            done();
-        });
-    });
-
-    it("modif user", function (done) {
-        axios.put(base_url + 'user/' + userTest.id, {
-            headers: { 'x-access-token': userTest.accessToken },
-            data: {
-                userName: "test",
-                email: "test@gmail.com",
-                lastName: "test",
-                firstName: "test",
-                password: "gkjHK56f-hGK"
-            }
-        })
-            .then(function (res) {
-                console.log(res);
-                expect(res).toBe(Object);
-                done();
-            });
     });
 
     it("check token", function (done) {
@@ -86,8 +53,7 @@ describe("get all playlist", function () {
             headers: { 'x-access-token': userTest.accessToken }
         })
             .then(function (res) {
-                console.log(res);
-                expect(res).toBe(Object);
+                expect(res.data.status).toBe(true);
                 done();
             });
     });
