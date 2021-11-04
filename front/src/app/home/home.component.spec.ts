@@ -8,8 +8,11 @@ import { HomeComponent } from './home.component';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 import { Device } from '@ionic-native/device/ngx';
 import { AngularDelegate, ModalController } from '@ionic/angular';
+import { environment } from 'src/environments/environment';
 
-const config: SocketIoConfig = { url: 'http://localhost:8080', options: {} };
+const config: SocketIoConfig = {
+  url: environment.AUTH_API, options: {}
+};
 
 describe('HomeComponent', () => {
   let component: HomeComponent;

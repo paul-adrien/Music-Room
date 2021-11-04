@@ -12,8 +12,11 @@ import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { WebsocketService } from '../_services/websocketService';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { environment } from 'src/environments/environment';
 
-const config: SocketIoConfig = { url: 'http://localhost:8080', options: {} };
+const config: SocketIoConfig = {
+  url: environment.AUTH_API, options: {}
+};
 
 describe('EditProfileComponent', () => {
   let component: EditProfileComponent;

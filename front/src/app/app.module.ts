@@ -30,7 +30,7 @@ import { DelegationComponent } from './delegation/delegation.component';
 import { EditProfileComponent } from './edit-profile/edit-profile.component';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 
-const config: SocketIoConfig = { url: 'http://localhost:8080', options: {} };
+const config: SocketIoConfig = { url: environnement.AUTH_API, options: {} };
 
 @NgModule({
   declarations: [

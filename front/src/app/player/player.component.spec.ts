@@ -11,8 +11,11 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { Device } from '@ionic-native/device/ngx';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 import { AngularDelegate, ModalController } from '@ionic/angular';
+import { environment } from 'src/environments/environment';
 
-const config: SocketIoConfig = { url: 'http://localhost:8080', options: {} };
+const config: SocketIoConfig = {
+  url: environment.AUTH_API, options: {}
+};
 
 describe('PlayerComponent', () => {
   let component: PlayerComponent;

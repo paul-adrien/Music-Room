@@ -8,8 +8,11 @@ import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { WebsocketService } from '../_services/websocketService';
 
 import { ProfileComponent } from './profile.component';
+import { environment } from 'src/environments/environment';
 
-const config: SocketIoConfig = { url: 'http://localhost:8080', options: {} };
+const config: SocketIoConfig = {
+  url: environment.AUTH_API, options: {}
+};
 
 describe('ProfileComponent', () => {
   let component: ProfileComponent;

@@ -11,8 +11,11 @@ import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { WebsocketService } from '../_services/websocketService';
 import { AuthService } from '../_services/auth_service';
+import { environment } from 'src/environments/environment';
 
-const config: SocketIoConfig = { url: 'http://localhost:8080', options: {} };
+const config: SocketIoConfig = {
+  url: environment.AUTH_API, options: {}
+};
 
 describe('NotificationsComponent', () => {
   let component: NotificationsComponent;
