@@ -35,9 +35,9 @@ export class CreateModalComponent implements OnInit {
     private modalController: ModalController,
     private roomService: RoomService,
     private cd: ChangeDetectorRef
-  ) {}
+  ) { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   dismiss(isQuit: boolean) {
     this.roomService

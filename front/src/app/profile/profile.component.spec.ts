@@ -1,6 +1,15 @@
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { Device } from '@ionic-native/device/ngx';
+import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
+import { AngularDelegate, ModalController } from '@ionic/angular';
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
+import { WebsocketService } from '../_services/websocketService';
 
 import { ProfileComponent } from './profile.component';
+
+const config: SocketIoConfig = { url: 'http://localhost:8080', options: {} };
 
 describe('ProfileComponent', () => {
   let component: ProfileComponent;
@@ -8,9 +17,23 @@ describe('ProfileComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ProfileComponent ]
+      imports: [
+        HttpClientTestingModule,
+        SocketIoModule.forRoot(config),
+        RouterTestingModule
+      ],
+      declarations: [ProfileComponent],
+      providers: [
+        Device,
+        InAppBrowser,
+        ModalController,
+        AngularDelegate,
+        // PopoverController,
+        WebsocketService,
+        // AuthService
+      ]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {

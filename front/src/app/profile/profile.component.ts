@@ -84,9 +84,8 @@ export class ProfileComponent implements OnInit {
   ) {
     const user = this.authService.getUser();
 
-    this.socketService.setupSocketConnection();
     this.socketService
-      .listenToServer(`user update ${user.id}`)
+      .listenToServer(`user update ${user?.id}`)
       .subscribe((data) => {
         this.user = data;
         console.log('ici bg');
@@ -103,19 +102,19 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit() {
     this.user = this.authService.getUser();
-    this.userService.getUser(this.user.id).subscribe(async (res) => {
+    this.userService.getUser(this.user?.id).subscribe(async (res) => {
       this.user = res;
       console.log(res);
-      if (typeof this.user.picture !== 'string' && this.user.picture) {
+      if (typeof this.user?.picture !== 'string' && this.user?.picture) {
         this.user.picture = 'data:image/jpeg;base64,' + res.picture.buffer;
       } else {
-        this.user.picture = res.picture;
+        this.user.picture = res?.picture;
       }
       this.cd.detectChanges();
     });
 
-    this.playlists = this.playlistService.getAllPlaylist(this.user.id);
-    this.rooms = this.roomService.getAllRoom(this.user.id);
+    this.playlists = this.playlistService.getAllPlaylist(this.user?.id);
+    this.rooms = this.roomService.getAllRoom(this.user?.id);
     this.cd.detectChanges();
   }
 
@@ -193,7 +192,7 @@ export class ProfileComponent implements OnInit {
 
   logOut() {
     this.spotifyService.pause().subscribe(
-      (res) => {},
+      (res) => { },
       () => this.authService.logOut(),
       () => this.authService.logOut()
     );

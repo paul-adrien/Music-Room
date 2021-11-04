@@ -28,6 +28,9 @@ import { PlaylistComponent } from './playlist/playlist.component';
 import { SettingsRoomComponent } from './settings-room/settings-room.component';
 import { DelegationComponent } from './delegation/delegation.component';
 import { EditProfileComponent } from './edit-profile/edit-profile.component';
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
+
+const config: SocketIoConfig = { url: 'http://localhost:8080', options: {} };
 
 @NgModule({
   declarations: [
@@ -51,6 +54,7 @@ import { EditProfileComponent } from './edit-profile/edit-profile.component';
     FormsModule,
     BrowserModule,
     IonicModule.forRoot(),
+    SocketIoModule.forRoot(config),
     AppRoutingModule,
     HttpClientModule,
     MatProgressBarModule,
@@ -67,4 +71,4 @@ import { EditProfileComponent } from './edit-profile/edit-profile.component';
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

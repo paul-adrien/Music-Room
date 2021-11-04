@@ -84,23 +84,22 @@ import { WebsocketService } from '../_services/websocketService';
 })
 export class NotificationsComponent implements OnInit {
   constructor(
-    private location: Location,
-    private authService: AuthService,
-    private cd: ChangeDetectorRef,
-    private roomService: RoomService,
-    private playlistService: PlaylistService,
-    private userService: UserService,
-    private spotifyService: SpotifyService,
-    private device: Device,
-    private router: Router,
-    private alertController: AlertController,
-    private socketService: WebsocketService
+    private readonly location: Location,
+    private readonly authService: AuthService,
+    private readonly cd: ChangeDetectorRef,
+    private readonly roomService: RoomService,
+    private readonly playlistService: PlaylistService,
+    private readonly userService: UserService,
+    private readonly spotifyService: SpotifyService,
+    private readonly device: Device,
+    private readonly router: Router,
+    private readonly alertController: AlertController,
+    private readonly socketService: WebsocketService
   ) {
     const user = this.authService.getUser();
 
-    this.socketService.setupSocketConnection();
     this.socketService
-      .listenToServer(`user update ${user.id}`)
+      .listenToServer(`user update ${user?.id}`)
       .subscribe((data) => {
         this.user = data;
 
@@ -137,29 +136,31 @@ export class NotificationsComponent implements OnInit {
 
   ngOnInit() {
     this.user = this.authService.getUser();
-    const tmpRoom = this.user.notifs.rooms.map((room) => ({
+    const tmpRoom = this.user?.notifs.rooms.map((room) => ({
       ...room,
       type: 'rooms',
     }));
-    const tmpPlaylist = this.user.notifs.playlist.map((playlist) => ({
+    const tmpPlaylist = this.user?.notifs.playlist.map((playlist) => ({
       ...playlist,
       type: 'playlist',
     }));
-    const tmpFriend = this.user.notifs.friends.map((friend) => ({
+    const tmpFriend = this.user?.notifs.friends.map((friend) => ({
       ...friend,
       type: 'friends',
     }));
-    this.notifs = this.notifs
-      .concat(tmpRoom, tmpPlaylist, tmpFriend)
-      .sort((a, b) => {
-        if (isBefore(new Date(a.date), new Date(b.date))) {
-          return -1;
-        } else if (isAfter(new Date(a.date), new Date(b.date))) {
-          return 1;
-        } else {
-          return 0;
-        }
-      });
+    if (tmpFriend && tmpPlaylist && tmpRoom) {
+      this.notifs = this.notifs
+        .concat(tmpRoom, tmpPlaylist, tmpFriend)
+        .sort((a, b) => {
+          if (isBefore(new Date(a?.date), new Date(b?.date))) {
+            return -1;
+          } else if (isAfter(new Date(a?.date), new Date(b?.date))) {
+            return 1;
+          } else {
+            return 0;
+          }
+        });
+    }
     //this.notifs = {playlist: this.user.notifs.playlist, friends: this.user.notifs.friends, rooms: this.user.notifs.rooms.map(room => {...room, this.})}
     this.cd.detectChanges();
   }
@@ -208,8 +209,8 @@ export class NotificationsComponent implements OnInit {
 
   removeNotif(notif: any, type: string) {
     let user = this.user;
-    user.notifs[type] = user.notifs[type].filter(
-      (el) => el.id === notif.id && new Date(el.date) === new Date(notif.date)
+    user.notifs[type] = user?.notifs[type].filter(
+      (el) => el?.id === notif?.id && new Date(el?.date) === new Date(notif?.date)
     );
     console.log(user);
     this.socketService.emitToServer('user edit', {

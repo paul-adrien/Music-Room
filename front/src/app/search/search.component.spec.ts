@@ -1,4 +1,9 @@
+import { HttpClient, HttpHandler } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { Device } from '@ionic-native/device/ngx';
+import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
+import { AngularDelegate, ModalController } from '@ionic/angular';
 
 import { SearchComponent } from './search.component';
 
@@ -8,9 +13,20 @@ describe('SearchComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SearchComponent ]
+      imports: [RouterTestingModule],
+      declarations: [SearchComponent],
+      providers: [
+        Device,
+        HttpClient,
+        HttpHandler,
+        InAppBrowser,
+        ModalController,
+        AngularDelegate
+        // WebsocketService,
+        // AuthService
+      ],
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {

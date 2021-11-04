@@ -21,7 +21,7 @@ module.exports = function (app) {
     logs
   );
   app.delete(
-    "/playlist/:playlistId",
+    "/playlist/:playlistId/:userId",
     [authJwt.verifyToken],
     controller.delPlaylist,
     logs

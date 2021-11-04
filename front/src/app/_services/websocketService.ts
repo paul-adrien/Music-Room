@@ -1,29 +1,31 @@
 
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import * as Rx from 'rxjs/Rx';
-import { environment } from '../../environments/environment';
-import { io } from 'socket.io-client';
+import { Subject } from 'rxjs';
+import { Socket } from 'ngx-socket-io';
 
 @Injectable()
 export class WebsocketService {
 
     // Our socket connection
-    socket;
 
-    constructor() { }
-
-    //https://deepinder.me/creating-a-real-time-app-with-angular-8-and-socket-io-with-nodejs
-    setupSocketConnection() {
-        this.socket = io('http://localhost:8080', {
-            auth: {
-                token: 'socketToken'
-            }
+    public socketId: string;
+    constructor(private readonly socket: Socket) {
+        socket.on('connect', () => {
+            //   utils.log(`Socket id :: ${this.socket.ioSocket.id}`);
+            this.setSocketId(this.socket.ioSocket.id);
         });
+    }
 
-        this.socket.on('chat message', (data: string) => {
-            console.log(data);
-        });
+    private socketIdSetter = new Subject<any>();
+    socketIdSetterObs = this.socketIdSetter.asObservable();
+    setSocketId(id: string) {
+        this.socketId = id;
+        this.socketIdSetter.next();
+    }
+
+    ngOnDestroy() {
+        this.socket.removeAllListeners();
     }
 
     listenToServer(connection: string): Observable<any> {

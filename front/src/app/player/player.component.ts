@@ -140,9 +140,8 @@ export class PlayerComponent {
     private authService: AuthService
   ) {
     const user = this.authService.getUser();
-    this.socketService.setupSocketConnection();
     this.socketService
-      .listenToServer(`user update ${user.id}`)
+      .listenToServer(`user update ${user?.id}`)
       .subscribe((data) => {
         console.log(data);
         if (
@@ -237,6 +236,7 @@ export class PlayerComponent {
     // if (!this.isModal) {
     //   this.pause();
     // }
-    clearInterval(this.interval);
+    if (this.interval)
+      clearInterval(this.interval);
   }
 }

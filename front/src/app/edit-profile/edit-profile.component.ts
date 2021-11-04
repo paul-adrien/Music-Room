@@ -135,7 +135,7 @@ export class EditProfileComponent implements OnInit {
 
   ngOnInit() {
     this.user = this.authSercive.getUser();
-    this.userService.getUser(this.user.id).subscribe(async (res) => {
+    this.userService.getUser(this.user?.id).subscribe(async (res) => {
       this.user = res;
 
       if (typeof this.user.picture !== 'string' && this.user.picture) {
@@ -193,7 +193,7 @@ export class EditProfileComponent implements OnInit {
 
   async saveProfile() {
     const user = this.userForm.getRawValue();
-    user.id = this.user.id;
+    user.id = this.user?.id;
     let stop = false;
     if (
       (this.user.firstName !== user.firstName ||
@@ -238,7 +238,7 @@ export class EditProfileComponent implements OnInit {
       this.modalController.dismiss();
     } else if (isSave) {
       this.modalController.dismiss({
-        picture: this.user.picture,
+        picture: this.user?.picture,
       });
     }
   }

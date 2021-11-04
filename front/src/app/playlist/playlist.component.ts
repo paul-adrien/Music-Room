@@ -127,7 +127,6 @@ export class PlaylistComponent implements OnInit {
     private popoverCtrl: PopoverController,
     private socketService: WebsocketService
   ) {
-    this.socketService.setupSocketConnection();
     this.socketService
       .listenToServer(`playlist update ${this.playlistId}`)
       .subscribe((data) => {
@@ -328,7 +327,7 @@ export class PlaylistComponent implements OnInit {
         type: 'playlist',
       },
     });
-    popover.onWillDismiss().then((res) => {});
+    popover.onWillDismiss().then((res) => { });
     return await popover.present();
   }
 

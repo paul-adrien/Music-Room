@@ -1,19 +1,32 @@
 /* tslint:disable:no-unused-variable */
-import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
 import { DelegationComponent } from './delegation.component';
+import { RouterTestingModule } from '@angular/router/testing';
+import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
+import { AngularDelegate, ModalController } from '@ionic/angular';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('DelegationComponent', () => {
   let component: DelegationComponent;
   let fixture: ComponentFixture<DelegationComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ DelegationComponent ]
+      imports: [
+        HttpClientTestingModule,
+        RouterTestingModule
+      ],
+      declarations: [DelegationComponent],
+      providers: [
+        InAppBrowser,
+        ModalController,
+        AngularDelegate
+      ]
     })
-    .compileComponents();
+      .compileComponents();
   }));
 
   beforeEach(() => {

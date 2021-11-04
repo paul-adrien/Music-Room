@@ -1,192 +1,164 @@
-// var axios = require("axios");
+// const axios = require("axios");
+const { room } = require("../models");
+var io = require('socket.io-client');
 
-// var base_url = "http://localhost:8080/"
+var base_url = "http://localhost:8080"
 
-// userTest = {
-//     status: true,
-//     id: "",
-//     userName: "test",
-//     email: "test@gmail.com",
-//     lastName: "test",
-//     firstName: "test",
-//     accessToken: "",
-//     lang: "en"
-// }
+userTest = {
+    status: true,
+    id: "",
+    userName: "test",
+    email: "test@gmail.com",
+    lastName: "test",
+    firstName: "test",
+    accessToken: "",
+    lang: "en",
+    password: "gkjHK56f-hGK"
+};
 
-// userTest2 = {
-//     status: true,
-//     id: "",
-//     userName: "test2",
-//     email: "test2@gmail.com",
-//     lastName: "test2",
-//     firstName: "test2",
-//     accessToken: "",
-//     lang: "en"
-// }
+userInviteTest = {
+    status: true,
+    id: "",
+    userName: "InviteTest",
+    email: "InviteTest@gmail.com",
+    lastName: "InviteTest",
+    firstName: "InviteTest",
+    accessToken: "",
+    lang: "en",
+    password: "gkjHK56f-hGK"
+};
 
-// userTest3 = {
-//     status: true,
-//     id: "",
-//     userName: "test3",
-//     email: "test3@gmail.com",
-//     lastName: "test3",
-//     firstName: "test3",
-//     accessToken: "",
-//     lang: "en"
-// }
+playlistData = {
+    id: "",
+    musicId: ""
+};
 
-// describe("get all playlist", function () {
-//     it("returns Hello World", function (done) {
-//         axios.get(base_url, {})
-//             .then(function (res) {
-//                 console.log(res);
-//                 expect(res).toBe("Hello World");
-//                 done();
-//             });
-//     });
+describe("action with friends", function () {
 
-//     it("login", function (done) {
-//         axios.post(base_url + 'user/authenticate', {
-//             data: {
-//                 userName: 'test',
-//                 password: 'gkjHK56f-hGK'
-//             }
-//         }).then(function (res) {
-//             console.log(res);
-//             expect(res).toBe(Object);
-//             done();
-//         });
-//     });
+    var socket;
 
-//     it("create account test 2", function (done) {
-//         axios.post(base_url + 'user/register', {
-//             data: {
-//                 userName: "test2",
-//                 email: "test2@gmail.com",
-//                 lastName: "test2",
-//                 firstName: "test2",
-//                 password: "gkjHK56f-hGK"
-//             }
-//         })
-//             .then(function (res) {
-//                 console.log(res);
-//                 expect(res).toBe(Object);
-//                 done();
-//             });
-//     });
+    beforeAll(() => {
+        socket = io(base_url, {
+            auth: {
+                token: 'socketToken'
+            }
+        });
+        axios.post(base_url + '/user/authenticate', {
+            userName: 'test',
+            password: 'gkjHK56f-hGK'
+        }).then(function (res) {
+            userTest.accessToken = res.data.accessToken;
+            userTest.id = res.data.id;
+        });
+        axios.post(base_url + '/user/authenticate', {
+            userName: 'InviteTest',
+            password: 'gkjHK56f-hGK'
+        }).then(function (res) {
+            if (res.data.status === true) {
+                userInviteTest.accessToken = res.data.accessToken;
+                userInviteTest.id = res.data.id;
+            } else {
+                axios.post(base_url + '/user/register', {
+                    userName: "InviteTest",
+                    email: "InviteTest@gmail.com",
+                    lastName: "InviteTest",
+                    firstName: "InviteTest",
+                    password: "gkjHK56f-hGK"
+                }).then(function (res) {
+                    userInviteTest.accessToken = res.data.accessToken;
+                    userInviteTest.id = res.data.id;
+                }).catch((err) => {
+                });
+            }
+        });
+    });
 
-//     it("create account test 3", function (done) {
-//         axios.post(base_url + 'user/register', {
-//             data: {
-//                 userName: "test3",
-//                 email: "test3@gmail.com",
-//                 lastName: "test3",
-//                 firstName: "test3",
-//                 password: "gkjHK56f-hGK"
-//             }
-//         })
-//             .then(function (res) {
-//                 console.log(res);
-//                 expect(res).toBe(Object);
-//                 done();
-//             });
-//     });
+    afterAll(() => {
+        if (socket.connected) {
+            console.log('disconnecting...');
+            socket.disconnect();
+        } else {
+            console.log('no connection to break...');
+        }
+        // axios({
+        //     method: 'delete',
+        //     url: base_url + '/playlist/' + playlistData.id + '/' + userTest.id,
+        //     headers: { 'x-access-token': userTest.accessToken },
+        // }).then(function (res) {
+        // }).catch((err) => { console.log(err) });
+    });
 
-//     it("get friend list", function (done) {
-//         axios.get(base_url + 'user/' + userTest.id + '/friends', {
-//             headers: { 'x-access-token': userTest.accessToken }
-//         }).then(function (res) {
-//             console.log(res);
-//             expect(res).toBe(Object);
-//             done();
-//         });
-//     });
+    // it('create playlist', (done) => {
+    //     socket.emit('playlist create', { userId: userTest.id, name: 'testPlaylist' });
 
-//     it("userTest1 Invite friend userTest2", function (done) {
-//         axios.post(base_url + 'user/' + userTest.id + '/friends/' + userTest2.id, {
-//             headers: { 'x-access-token': userTest.accessToken }
-//         })
-//             .then(function (res) {
-//                 console.log(res);
-//                 expect(res).toBe(Object);
-//                 done();
-//             });
-//     });
+    //     socket.once('playlist create', (data) => {
+    //         let playlistIndex = data.map((r) => { return r.name }).indexOf('testPlaylist');
+    //         playlistData.id = data[playlistIndex]._id;
+    //         expect(data).not.toEqual(null);
+    //         done();
+    //     });
+    // });
 
-//     it("userTest2 Invite friend userTest3", function (done) {
-//         axios.post(base_url + 'user/' + userTest2.id + '/friends/' + userTest3.id, {
-//             headers: { 'x-access-token': userTest.accessToken }
-//         })
-//             .then(function (res) {
-//                 console.log(res);
-//                 expect(res).toBe(Object);
-//                 done();
-//             });
-//     });
+    // it('add music in playlist', (done) => {
+    //     socket.emit('playlist add music', { playlistId: playlistData.id, userId: userTest.id, trackId: 'test' });
 
-//     it("userTest1 Invite friend userTest3", function (done) {
-//         axios.post(base_url + 'user/' + userTest.id + '/friends/' + userTest3.id, {
-//             headers: { 'x-access-token': userTest.accessToken }
-//         })
-//             .then(function (res) {
-//                 console.log(res);
-//                 expect(res).toBe(Object);
-//                 done();
-//             });
-//     });
+    //     socket.once(`playlist update ${playlistData.id}`, (data) => {
+    //         roomData.musicId = data.musics[0]._id;
+    //         expect(data.musics.length).not.toEqual(0);
+    //         done();
+    //     });
+    // });
 
-//     it("userTest3 Invite friend userTest1", function (done) {
-//         axios.post(base_url + 'user/' + userTest3.id + '/friends/' + userTest.id, {
-//             headers: { 'x-access-token': userTest.accessToken }
-//         })
-//             .then(function (res) {
-//                 console.log(res);
-//                 expect(res).toBe(Object);
-//                 done();
-//             });
-//     });
+    // it('delete a music in a playlist', (done) => {
+    //     socket.emit('playlist del music', { playlistId: playlistData.id, trackId: 'test' });
 
-//     it("userTest3 accepte invite", function (done) {
-//         axios.post(base_url + 'user/' + userTest.id + '/friends/' + userTest3.id + '/acceptInvitation', {
-//             headers: { 'x-access-token': userTest.accessToken }
-//         })
-//             .then(function (res) {
-//                 console.log(res);
-//                 expect(res).toBe(Object);
-//                 done();
-//             });
-//     });
+    //     socket.once(`playlist update ${playlistData.id}`, (data) => {
+    //         expect(data.musics.length).toEqual(0);
+    //         done();
+    //     });
+    // });
 
-//     it("userTest2 accepte invite", function (done) {
-//         axios.post(base_url + 'user/' + userTest2.id + '/friends/' + userTest1.id + '/acceptInvitation', {
-//             headers: { 'x-access-token': userTest.accessToken }
-//         })
-//             .then(function (res) {
-//                 console.log(res);
-//                 expect(res).toBe(Object);
-//                 done();
-//             });
-//     });
+    // it('add music in playlist public with other user', (done) => {
+    //     socket.emit('playlist add music', { playlistId: playlistData.id, userId: userInviteTest.id, trackId: 'test2' });
 
-//     it("userTest3 refuse invite of userTest2", function (done) {
-//         axios.delete(base_url + 'user/' + userTest3.id + '/friends/' + userTest2.id + '/refuseInvitation', {
-//             headers: { 'x-access-token': userTest.accessToken }
-//         })
-//             .then(function (res) {
-//                 console.log(res);
-//                 expect(res).toBe(Object);
-//                 done();
-//             });
-//     });
+    //     socket.once(`playlist update ${playlistData.id}`, (data) => {
+    //         roomData.musicId = data.musics[0]._id;
+    //         expect(data.musics.length).not.toEqual(0);
+    //         done();
+    //     });
+    // });
 
-//     it("userTest3 delete friend userTest1", function (done) {
-//         axios.delete(base_url + 'user/' + userTest3.id + '/friends/' + userTest1.id, {
-//             headers: { 'x-access-token': userTest.accessToken }
-//         })
-//             .then(function (res) {
-//                 console.log(res);
-//                 expect(res).toBe(Object);
-//                 done();
-//             });
-//     });
-// })
+    // it('change type of a playlist to private', (done) => {
+    //     socket.emit('playlist change type', { playlistId: playlistData.id, userId: userTest.id, type: 'private' });
+
+    //     socket.once(`playlist update ${playlistData.id}`, (data) => {
+    //         expect(data.type).toEqual('private');
+    //         done();
+    //     });
+    // });
+
+    // it('add music in playlist private with other user', (done) => {
+    //     socket.emit('playlist add music', { playlistId: playlistData.id, userId: userInviteTest.id, trackId: 'test3' });
+
+    //     socket.once(`playlist update ${playlistData.id}`, (data) => {
+    //         done();
+    //     });
+    // });
+
+    // it('invite an other user to a playlist', (done) => {
+    //     socket.emit('playlist invite', { playlistId: playlistData.id, userId: userTest.id, friendId: userInviteTest.id });
+
+    //     socket.once(`user update ${userInviteTest.id}`, (data) => {
+    //         done();
+    //     });
+    // });
+
+    // it('accepte invite to a playlist', (done) => {
+    //     socket.emit('playlist accept invite', { playlistId: playlistData.id, userId: userInviteTest.id });
+
+    //     socket.once(`playlist update ${playlistData.id}`, (data) => {
+    //         done();
+    //     });
+    // });
+
+})

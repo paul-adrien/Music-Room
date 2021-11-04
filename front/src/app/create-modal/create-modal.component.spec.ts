@@ -1,4 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { AngularDelegate, ModalController } from '@ionic/angular';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 import { CreateModalComponent } from './create-modal.component';
 
@@ -8,9 +11,22 @@ describe('CreateModalComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CreateModalComponent ]
+      imports: [
+        HttpClientTestingModule,
+        RouterTestingModule
+      ],
+      declarations: [CreateModalComponent],
+      providers: [
+        // Device,
+        // InAppBrowser,
+        ModalController,
+        AngularDelegate,
+        // PopoverController,
+        // WebsocketService,
+        // AuthService
+      ]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {

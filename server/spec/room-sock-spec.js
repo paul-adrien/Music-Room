@@ -85,7 +85,7 @@ describe("action with rooms in socket", function () {
             url: base_url + '/room/' + roomData.id + '/user/' + userTest.id,
             headers: { 'x-access-token': userTest.accessToken },
         }).then(function (res) {
-        }).catch((err) => { console.log(err) });
+        }).catch((err) => { });
     });
 
     it('create room', (done) => {
@@ -127,6 +127,41 @@ describe("action with rooms in socket", function () {
         });
     });
 
+    it('enter in a room when is public without access right', (done) => {
+        socket.emit('room enter', { roomId: roomData.id, userId: userTest.id, deviceId: 'test' });
+
+        socket.once(`room update ${roomData.id}`, (data) => {
+            done();
+        });
+    });
+
+    it('leave a room', (done) => {
+        axios({
+            method: 'delete',
+            url: base_url + '/room/' + roomData.id + '/quitRoom?userId=' + userInviteTest.id,
+            headers: { 'x-access-token': userTest.accessToken }
+        }).then(function (res) {
+            done();
+        }).catch((err) => { console.log(err) });
+    });
+
+    it('change type of a room to private', (done) => {
+        socket.emit('room change type', { roomId: roomData.id, userId: userTest.id, type: 'private' });
+
+        socket.once(`room update ${roomData.id}`, (data) => {
+            expect(data.type).toEqual('private');
+            done();
+        });
+    });
+
+    it('enter in a room when is private without access right', (done) => {
+        socket.emit('room enter', { roomId: roomData.id, userId: userTest.id, deviceId: 'test' });
+
+        socket.once(`room update ${roomData.id}`, (data) => {
+            done();
+        });
+    });
+
     it('invite an other user to a room', (done) => {
         socket.emit('room invite', { roomId: roomData.id, userId: userTest.id, friendId: userInviteTest.id });
 
@@ -136,17 +171,19 @@ describe("action with rooms in socket", function () {
     });
 
     it('accepte invite to a room', (done) => {
-        axios({
-            method: 'post',
-            url: base_url + '/room/' + roomData.id + '/acceptInvite',
-            headers: { 'x-access-token': userTest.accessToken },
-            data: {
-                userId: userInviteTest.id
-            }
-        }).then(function (res) {
-            console.log(res.data)
+        socket.emit('room accept invite', { roomId: roomData.id, userId: userInviteTest.id });
+
+        socket.once(`room update ${roomData.id}`, (data) => {
             done();
-        }).catch((err) => { console.log(err) });
+        });
+    });
+
+    it('enter in a room when is private with access right', (done) => {
+        socket.emit('room enter', { roomId: roomData.id, userId: userTest.id, deviceId: 'test' });
+
+        socket.once(`room update ${roomData.id}`, (data) => {
+            done();
+        });
     });
 
     it('vote for a music in a room', (done) => {
@@ -158,16 +195,15 @@ describe("action with rooms in socket", function () {
         });
     });
 
-    // it('leave a room', (done) => {
-    //     axios({
-    //         method: 'delete',
-    //         url: base_url + '/room/' + roomData.id + '/quitRoom?userId=' + userInviteTest.id,
-    //         headers: { 'x-access-token': userTest.accessToken }
-    //     }).then(function (res) {
-    //         console.log(res.data)
-    //         done();
-    //     }).catch((err) => { console.log(err) });
-    // });
+    it('leave a room', (done) => {
+        axios({
+            method: 'delete',
+            url: base_url + '/room/' + roomData.id + '/quitRoom?userId=' + userInviteTest.id,
+            headers: { 'x-access-token': userTest.accessToken }
+        }).then(function (res) {
+            done();
+        }).catch((err) => { });
+    });
 
     it('delete music in room', (done) => {
         socket.emit('room del music', { roomId: roomData.id, trackId: 'test' });

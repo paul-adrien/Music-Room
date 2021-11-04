@@ -43,7 +43,7 @@ export class TabsPage {
     private spotifyService: SpotifyService,
     private cd: ChangeDetectorRef,
     public modalController: ModalController
-  ) {}
+  ) { }
 
   ngAfterContentInit() {
     // setInterval(() => this.getPlayerInfo(), 500);

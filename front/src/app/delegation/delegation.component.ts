@@ -7,7 +7,7 @@ import { SearchComponent } from '../search/search.component';
 @Component({
   selector: 'app-delegation',
   template: `
-    <div class="title">Écoute sur {{ this.user.userName }}</div>
+    <div class="title">Écoute sur {{ this.user?.userName }}</div>
     <div class="primary-button">Déléguer le controle</div>
     <div class="sub-title">Autres appareils</div>
     <div class="devices">
@@ -21,7 +21,7 @@ export class DelegationComponent implements OnInit {
   constructor(
     private modalController: ModalController,
     private authService: AuthService
-  ) {}
+  ) { }
 
   public user: User;
 

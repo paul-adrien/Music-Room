@@ -1,10 +1,9 @@
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
-import { ChangeDetectorRef, Injectable, NgZone } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Injectable, NgZone } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import * as querystring from 'querystring';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 import { Device } from '@ionic-native/device/ngx';
 
 const httpOptions = {
@@ -32,7 +31,7 @@ export class SpotifyService {
     private iab: InAppBrowser,
     private ngZone: NgZone,
     private device: Device
-  ) {}
+  ) { }
 
   searchMusic(search: string) {
     return this.http
@@ -79,8 +78,8 @@ export class SpotifyService {
       .put<any>(
         deviceId
           ? `https://api.spotify.com/v1/me/player/play?device_id=${encodeURI(
-              deviceId
-            )}`
+            deviceId
+          )}`
           : `https://api.spotify.com/v1/me/player/play`,
         { uris: [uri], position_ms },
         httpApiSpotifyOptions
@@ -285,8 +284,8 @@ export class SpotifyService {
       .put<any>(
         deviceId
           ? `https://api.spotify.com/v1/me/player/play?device_id=${encodeURI(
-              deviceId
-            )}`
+            deviceId
+          )}`
           : `https://api.spotify.com/v1/me/player/play`,
         {},
         httpApiSpotifyOptions
@@ -307,8 +306,8 @@ export class SpotifyService {
       .put<any>(
         deviceId
           ? `https://api.spotify.com/v1/me/player/pause?device_id=${encodeURI(
-              deviceId
-            )}`
+            deviceId
+          )}`
           : `https://api.spotify.com/v1/me/player/pause`,
         {},
         httpApiSpotifyOptions

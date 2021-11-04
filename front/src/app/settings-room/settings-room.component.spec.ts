@@ -1,4 +1,8 @@
+import { HttpClient, HttpHandler } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { AngularDelegate, NavController, PopoverController } from '@ionic/angular';
+import { popoverController } from '@ionic/core';
 
 import { SettingsRoomComponent } from './settings-room.component';
 
@@ -8,9 +12,17 @@ describe('SettingsRoomComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SettingsRoomComponent ]
+      imports: [RouterTestingModule],
+      declarations: [SettingsRoomComponent],
+      providers: [
+        { provide: PopoverController },
+        AngularDelegate,
+        HttpClient,
+        { provide: NavController },
+        HttpHandler
+      ]
     })
-    .compileComponents();
+      .compileComponents();
   });
 
   beforeEach(() => {

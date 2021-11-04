@@ -164,7 +164,6 @@ export class RoomComponent implements OnInit, OnDestroy {
     private popoverCtrl: PopoverController,
     private socketService: WebsocketService
   ) {
-    this.socketService.setupSocketConnection();
     this.socketService
       .listenToServer(`room update ${this.roomId}`)
       .subscribe((data) => {
@@ -303,7 +302,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   quitRoom() {
-    this.roomService.quitRoom(this.user.id, this.roomId).subscribe((res) => {
+    this.roomService.quitRoom(this.user?.id, this.roomId).subscribe((res) => {
       if (res.status) {
         //this.location.back();
         this.location.historyGo(-1);
@@ -487,7 +486,9 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    clearInterval(this.interval);
-    this.quitRoom();
+    if (this.interval) {
+      clearInterval(this.interval);
+      this.quitRoom();
+    }
   }
 }

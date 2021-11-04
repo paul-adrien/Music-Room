@@ -23,7 +23,6 @@ export class ConversationComponent implements OnInit, OnDestroy {
     private cd: ChangeDetectorRef,
     private route: ActivatedRoute,
     private socketService: WebsocketService) {
-    this.socketService.setupSocketConnection();
     this.socketService.listenToServer('chat message').subscribe((data) => {
       console.log(data);
       if (this.conv) {

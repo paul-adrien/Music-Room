@@ -102,7 +102,6 @@ export class HomeComponent implements OnInit {
   ) {
     const user = this.authService.getUser();
 
-    this.socketService.setupSocketConnection();
     this.socketService.listenToServer('room create').subscribe((data) => {
       console.log(data);
       if (JSON.stringify(this.rooms) !== JSON.stringify(data)) {
@@ -111,7 +110,7 @@ export class HomeComponent implements OnInit {
       this.cd.detectChanges();
     });
     this.socketService
-      .listenToServer(`user update ${user.id}`)
+      .listenToServer(`user update ${user?.id}`)
       .subscribe((data) => {
         this.user = data;
 
@@ -136,7 +135,7 @@ export class HomeComponent implements OnInit {
   ngAfterContentInit() {
     this.user = this.authService.getUser();
     this.interval = setInterval(() => {
-      this.userService.getUser(this.user.id).subscribe((res) => {
+      this.userService.getUser(this.user?.id).subscribe((res) => {
         if (res) {
           this.authService.saveUser(res);
         }
