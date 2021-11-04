@@ -33,7 +33,12 @@ export class AuthService {
       )
       .pipe(
         map((res: any) => {
-          return { user: mapUserBackToUserFront(res), token: res.accessToken };
+          if (res.status) {
+            return {
+              user: mapUserBackToUserFront(res),
+              token: res.accessToken,
+            };
+          } else return res;
         })
       );
   }
@@ -65,7 +70,12 @@ export class AuthService {
       )
       .pipe(
         map((res: any) => {
-          return { user: mapUserBackToUserFront(res), token: res.accessToken };
+          if (res.status) {
+            return {
+              user: mapUserBackToUserFront(res),
+              token: res.accessToken,
+            };
+          } else return res;
         })
       );
   }

@@ -307,9 +307,11 @@ export class PlaylistComponent implements OnInit {
       if (res?.data?.user) {
         const user = res.data.user;
         console.log(user);
-        this.playlistService
-          .inviteUserToPlaylist(this.playlistId, this.user.id, user.id)
-          .subscribe((res) => console.log(res));
+        this.socketService.emitToServer('playlist invite', {
+          userId: this.user.id,
+          playlistId: this.playlistId,
+          friendId: user.id,
+        });
       }
     });
     return await modal.present();

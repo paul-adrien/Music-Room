@@ -104,15 +104,15 @@ export class NotificationsComponent implements OnInit {
       .subscribe((data) => {
         this.user = data;
 
-        const tmpRoom = this.user.notifs.rooms.map((room) => ({
+        const tmpRoom = this.user?.notifs?.rooms?.map((room) => ({
           ...room,
           type: 'rooms',
         }));
-        const tmpPlaylist = this.user.notifs.playlist.map((playlist) => ({
+        const tmpPlaylist = this.user?.notifs?.playlist?.map((playlist) => ({
           ...playlist,
           type: 'playlist',
         }));
-        const tmpFriend = this.user.notifs.friends.map((friend) => ({
+        const tmpFriend = this.user?.notifs?.friends?.map((friend) => ({
           ...friend,
           type: 'friends',
         }));
@@ -170,19 +170,17 @@ export class NotificationsComponent implements OnInit {
 
   acceptNotif(id: string, type: string) {
     if (type === 'rooms') {
-      this.roomService.acceptInviteRoom(id, this.user.id).subscribe((res) => {
-        if (res.status) {
-          this.openNotif(id, type);
-        }
+      this.socketService.emitToServer('room accept invite', {
+        userId: this.user.id,
+        roomId: id,
       });
+      this.openNotif(id, type);
     } else if (type === 'playlist') {
-      this.playlistService
-        .acceptInvitePlaylist(id, this.user.id)
-        .subscribe((res) => {
-          if (res.status) {
-            this.openNotif(id, type);
-          }
-        });
+      this.socketService.emitToServer('playlist accept invite', {
+        userId: this.user.id,
+        playlistId: id,
+      });
+      this.openNotif(id, type);
     }
   }
 
@@ -191,13 +189,12 @@ export class NotificationsComponent implements OnInit {
       console.log(this.device.platform, res);
       if (this.device.platform === null && res?.device?.id) {
         if (type === 'rooms') {
-          this.roomService
-            .enterRoom(this.user.id, id, res?.device?.id)
-            .subscribe((res) => {
-              if (res?.status) {
-                this.router.navigate([`tabs/tab-home/room/${id}`]);
-              }
-            });
+          this.socketService.emitToServer('room enter', {
+            userId: this.user.id,
+            roomId: id,
+            device: res?.device?.id,
+          });
+          this.router.navigate([`tabs/tab-home/room/${id}`]);
         } else if (type === 'playlist') {
           this.router.navigate([`tabs/tab-home/playlist/${id}`]);
         }
@@ -215,11 +212,10 @@ export class NotificationsComponent implements OnInit {
       (el) => el.id === notif.id && new Date(el.date) === new Date(notif.date)
     );
     console.log(user);
-    this.userService.updateUser(user).subscribe((res) => {});
-  }
-
-  getRoomName(roomId: string) {
-    return this.roomService.getRoom(roomId).pipe(map((room) => room.name));
+    this.socketService.emitToServer('user edit', {
+      userId: user.id,
+      user: user,
+    });
   }
 
   async presentAlert() {

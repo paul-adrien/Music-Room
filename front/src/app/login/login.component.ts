@@ -179,7 +179,7 @@ function ValidatorPass(control: FormControl) {
         </div>
       </div>
       <div class="error">{{ this.errorMessageReg }}</div>
-      <button class="primary-button green" (click)="test()">
+      <button class="primary-button green">
         {{ !this.loginMode ? 'signUp' : 'signIn' }}
       </button>
     </form>
@@ -225,7 +225,7 @@ function ValidatorPass(control: FormControl) {
         />
       </div>
       <div class="error">{{ this.errorMessageLog }}</div>
-      <button class="primary-button green" (click)="test()">
+      <button class="primary-button green">
         {{ !this.loginMode ? 'signUp' : 'signIn' }}
       </button>
     </form>
@@ -325,16 +325,12 @@ export class LoginComponent implements OnInit {
     this.loginMode = loginMode;
   }
 
-  test() {
-    this.isSuccessful = false;
-  }
-
   onSubmit() {
     if (this.loginMode === false) {
       const form: Partial<User> = this.registerForm.getRawValue();
       this.authService.register(form).subscribe(
         (data) => {
-          if (data) {
+          if (data?.user && data?.token) {
             this.authService.saveToken(data.token);
             this.authService.saveUser(data.user);
             this.spotifyService.requestAuthorization();
@@ -357,13 +353,17 @@ export class LoginComponent implements OnInit {
       const form: Partial<User> = this.loginForm.getRawValue();
       this.authService.login(form).subscribe(
         (data) => {
-          this.authService.saveToken(data.token);
-          this.authService.saveUser(data.user);
-          this.spotifyService.requestAuthorization();
-          if (localStorage.getItem('access_token')) {
-            this.route.navigate(['/tabs/search']);
-            this.isSuccessful = true;
-            this.isSignUpFailed = false;
+          if (data?.user && data?.token) {
+            this.authService.saveToken(data.token);
+            this.authService.saveUser(data.user);
+            this.spotifyService.requestAuthorization();
+            if (localStorage.getItem('access_token')) {
+              this.route.navigate(['/tabs/search']);
+              this.isSuccessful = true;
+              this.isSignUpFailed = false;
+            }
+          } else {
+            this.errorMessageLog = data.message;
           }
           this.cd.detectChanges();
         },

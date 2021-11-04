@@ -173,16 +173,10 @@ export class RoomComponent implements OnInit, OnDestroy {
           this.room = data;
         }
 
-        if (this.trackPlaying === undefined && this.room?.musics?.length > 0) {
-          this.spotifyService
-            .playTrack(this.room.musics[0].trackId)
-            .subscribe();
-        }
-
         this.isInvited =
           this.room.invited.indexOf(this.user.id) >= 0 ? true : false;
         this.room.musics = this.room.musics.filter(
-          (music) => music.trackId !== this.trackPlaying.id
+          (music) => music?.trackId !== this.trackPlaying?.id
         );
         if (data?.musics?.length > 0) {
           this.getTracksInfo(data.musics);
@@ -221,14 +215,14 @@ export class RoomComponent implements OnInit, OnDestroy {
           .subscribe((res) => {
             this.trackPlaying = res[0];
             this.tracks = res?.filter(
-              (music) => music.id !== this.trackPlaying.id
+              (music) => music.id !== this.trackPlaying?.id
             );
             this.room.musics = this.room.musics.filter(
-              (music) => music.trackId !== this.trackPlaying.id
+              (music) => music.trackId !== this.trackPlaying?.id
             );
             this.spotifyService
               .playTrack(
-                this.trackPlaying.uri,
+                this.trackPlaying?.uri,
                 undefined,
                 this.room?.progress_ms
               )
@@ -296,7 +290,14 @@ export class RoomComponent implements OnInit, OnDestroy {
       .getTracksInfo(musics.map((music) => music.trackId))
       .pipe(map((res: any) => res.tracks))
       .subscribe((res) => {
-        this.tracks = res?.filter((music) => music.id !== this.trackPlaying.id);
+        this.tracks = res?.filter(
+          (music) => music?.id !== this.trackPlaying?.id
+        );
+
+        if (this.trackPlaying === undefined && this.room?.musics?.length > 0) {
+          this.spotifyService.playTrack(this.tracks[0]?.uri).subscribe();
+        }
+
         this.cd.detectChanges();
       });
   }
@@ -388,7 +389,7 @@ export class RoomComponent implements OnInit, OnDestroy {
         type: 'room',
       },
     });
-    popover.onWillDismiss().then((res) => { });
+    popover.onWillDismiss().then((res) => {});
     return await popover.present();
   }
 

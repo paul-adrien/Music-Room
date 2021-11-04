@@ -30,7 +30,9 @@ import { AlertController, ModalController } from '@ionic/angular';
       </div>
     </div>
     <div class="bottom-container">
-      <div class="title-category">Playlists</div>
+      <div *ngIf="(this.playlists | async)?.length > 0" class="title-category">
+        Playlists
+      </div>
       <div class="playlists" *ngIf="this.playlists | async">
         <div
           class="result-item"
@@ -44,7 +46,7 @@ import { AlertController, ModalController } from '@ionic/angular';
           </div>
         </div>
       </div>
-      <div class="title-category">Rooms</div>
+      <div *ngIf="this.rooms | async" class="title-category">Rooms</div>
       <div class="rooms" *ngIf="this.rooms | async">
         <div
           class="result-item"

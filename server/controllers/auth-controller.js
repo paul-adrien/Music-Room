@@ -78,7 +78,9 @@ exports.signin = (req, res) => {
       });
     }
 
-    if (!user) {
+    console.log(user);
+
+    if (user === null) {
       return res.json({
         status: false,
         message: "User Not found.",
