@@ -5,10 +5,10 @@ const db = {};
 
 db.mongoose = mongoose;
 
-db.user = require("./users.model");
-db.playlist = require("./playlist.model");
-db.event = require("./event.model");
-db.room = require("./room.model");
-db.conversation = require("./messaging.model");
+db.user = require(appRoot + "/models/users.model");
+db.playlist = require(appRoot + "/models/playlist.model");
+db.event = require(appRoot + "/models/event.model");
+db.room = require(appRoot + "/models/room.model");
+db.conversation = require(appRoot + "/models/messaging.model");
 
 module.exports = db;

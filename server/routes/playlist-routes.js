@@ -1,6 +1,6 @@
-const { authJwt } = require("../middlewares");
-const controller = require("../controllers/playlist-controller");
-const logs = require("../middlewares/logs");
+const { authJwt } = require(appRoot + "/middlewares");
+const controller = require(appRoot + "/controllers/playlist-controller");
+const logs = require(appRoot + "/middlewares/logs");
 
 module.exports = function (app) {
   app.use(function (req, res, next) {

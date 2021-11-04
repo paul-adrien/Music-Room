@@ -1,12 +1,12 @@
-const { keys } = require("./auth.js");
-const { checkUserExist, getUser } = require("../models/lib-user.model");
+const { keys } = require(appRoot + "/config/auth.js");
+const { checkUserExist, getUser } = require(appRoot + "/models/lib-user.model");
 const FortyTwoStrategy = require("passport-42").Strategy;
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const GitHubStrategy = require("passport-github2").Strategy;
-const User = require("../models/users.model");
+const User = require(appRoot + "/models/users.model");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
-const config = require("../config/auth");
+const config = require(appRoot + "/config/auth");
 
 passport.use(
   new FortyTwoStrategy(

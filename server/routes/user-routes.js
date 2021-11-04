@@ -1,6 +1,6 @@
-const { authJwt } = require("../middlewares");
-const controller = require("../controllers/user-controller");
-const logs = require("../middlewares/logs");
+const { authJwt } = require(appRoot + "/middlewares");
+const controller = require(appRoot + "/controllers/user-controller");
+const logs = require(appRoot + "/middlewares/logs");
 let multer = require("multer");
 
 module.exports = function (app) {

@@ -1,4 +1,4 @@
-const db = require("../models");
+const db = require(appRoot + "/models");
 const User = db.user;
 
 checkDuplicateUsernameOrEmail = (req, res, next) => {

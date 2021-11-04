@@ -1,5 +1,5 @@
-const { conversation } = require("../models");
-const db = require("../models");
+const { conversation } = require(appRoot + "/models");
+const db = require(appRoot + "/models");
 const Conversation = db.conversation;
 
 exports.getConversationList = (req, res, next) => {

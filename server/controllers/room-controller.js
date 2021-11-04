@@ -1,5 +1,5 @@
-const db = require("../models");
-const { getUser } = require("../models/lib-user.model");
+const db = require(appRoot + "/models");
+const { getUser } = require(appRoot + "/models/lib-user.model");
 const User = db.user;
 const Room = db.room;
 

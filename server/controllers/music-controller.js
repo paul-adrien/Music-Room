@@ -1,5 +1,5 @@
 var SpotifyWebApi = require("spotify-web-api-node");
-const { keys } = require("../config/auth.js");
+const { keys } = require(appRoot + "/config/auth.js");
 
 exports.searchMusic = async (req, res) => {
   var spotifyApi = new SpotifyWebApi({

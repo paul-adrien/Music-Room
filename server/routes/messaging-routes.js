@@ -1,4 +1,4 @@
-const controller = require("../controllers/messaging-controller");
+const controller = require(appRoot + "/controllers/messaging-controller");
 
 module.exports = function (app) {
     app.use(function (req, res, next) {

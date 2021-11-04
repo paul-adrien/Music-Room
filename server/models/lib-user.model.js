@@ -1,4 +1,4 @@
-const User = require("./users.model");
+const User = require(appRoot + "/models/users.model");
 
 const getUser = async function (query) {
   if (query !== null) {

@@ -1,6 +1,6 @@
-const { updateUser, getUser, getUsers } = require("../models/lib-user.model");
+const { updateUser, getUser, getUsers } = require(appRoot + "/models/lib-user.model");
 var nodemailer = require("nodemailer");
-const User = require("../models/users.model");
+const User = require(appRoot + "/models/users.model");
 var bcrypt = require("bcryptjs");
 
 exports.userBoard = (req, res) => {

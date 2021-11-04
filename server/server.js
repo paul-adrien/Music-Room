@@ -1,10 +1,12 @@
+var path = require('path');
+global.appRoot = path.resolve(__dirname);
 const http = require("http");
-const app = require("./app");
-const messaging_controller = require("./controllers/messaging-controller");
-const room_controller = require("./controllers/room-controller");
-const playlist_controller = require("./controllers/playlist-controller");
-const user_controller = require("./controllers/user-controller");
-const { getUser } = require("./models/lib-user.model");
+const app = require(appRoot + "/app");
+const messaging_controller = require(appRoot + "/controllers/messaging-controller");
+const room_controller = require(appRoot + "/controllers/room-controller");
+const playlist_controller = require(appRoot + "/controllers/playlist-controller");
+const user_controller = require(appRoot + "/controllers/user-controller");
+const { getUser } = require(appRoot + "/models/lib-user.model");
 
 app.set("port", 8080);
 

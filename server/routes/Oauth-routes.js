@@ -1,8 +1,8 @@
-const { verifySignUp } = require("../middlewares");
-const passport = require("../config/passport-config");
-const config = require("../config/auth");
+const { verifySignUp } = require(appRoot + "/middlewares");
+const passport = require(appRoot + "/config/passport-config");
+const config = require(appRoot + "/config/auth");
 var jwt = require("jsonwebtoken");
-const { getUser } = require("../models/lib-user.model");
+const { getUser } = require(appRoot + "/models/lib-user.model");
 
 module.exports = function (app) {
   app.use(function (req, res, next) {
@@ -29,12 +29,12 @@ module.exports = function (app) {
 
         return res.redirect(
           "http://localhost:8100/login?data=" +
-            encodeURI(
-              JSON.stringify({
-                user: userDb,
-                token: token,
-              })
-            )
+          encodeURI(
+            JSON.stringify({
+              user: userDb,
+              token: token,
+            })
+          )
         );
       }
     )(req, res, next);
@@ -60,12 +60,12 @@ module.exports = function (app) {
 
         return res.redirect(
           "http://localhost:8100/login?data=" +
-            encodeURI(
-              JSON.stringify({
-                user: userDb,
-                token: token,
-              })
-            )
+          encodeURI(
+            JSON.stringify({
+              user: userDb,
+              token: token,
+            })
+          )
         );
       }
     )(req, res, next);

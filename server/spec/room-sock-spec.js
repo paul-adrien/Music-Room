@@ -1,5 +1,4 @@
 const axios = require("axios");
-const { room } = require("../models");
 var io = require('socket.io-client');
 
 var base_url = "http://localhost:8080"

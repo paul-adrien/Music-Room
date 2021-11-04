@@ -1,4 +1,4 @@
-const controller = require("../controllers/music-controller");
+const controller = require(appRoot + "/controllers/music-controller");
 
 module.exports = function (app) {
   app.use(function (req, res, next) {

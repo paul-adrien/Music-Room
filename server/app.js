@@ -1,11 +1,11 @@
 const express = require("express");
 const cors = require("cors");
-const dbConfig = require("./config/db");
-const db = require("./models");
+const dbConfig = require(appRoot + "/config/db");
+const db = require(appRoot + "/models");
 const passport = require("passport");
 
 const swaggerUi = require("swagger-ui-express");
-const openApiDocumentation = require("./openApiDocumentation");
+const openApiDocumentation = require(appRoot + "/openApiDocumentation");
 
 const app = express();
 
@@ -34,14 +34,14 @@ app.get("/", function (req, res) {
   res.send("Hello World");
 });
 
-require("./routes/auth-routes")(app);
-require("./routes/user-routes")(app);
-require("./routes/music-routes")(app);
-require("./routes/Oauth-routes")(app);
-require("./routes/friends-routes")(app);
-require("./routes/playlist-routes")(app);
-require("./routes/room-routes")(app);
-require("./routes/event-routes")(app);
-require("./routes/messaging-routes")(app);
+require(appRoot + "/routes/auth-routes")(app);
+require(appRoot + "/routes/user-routes")(app);
+require(appRoot + "/routes/music-routes")(app);
+require(appRoot + "/routes/Oauth-routes")(app);
+require(appRoot + "/routes/friends-routes")(app);
+require(appRoot + "/routes/playlist-routes")(app);
+require(appRoot + "/routes/room-routes")(app);
+require(appRoot + "/routes/event-routes")(app);
+require(appRoot + "/routes/messaging-routes")(app);
 
 module.exports = app;
