@@ -171,8 +171,12 @@ export class RoomComponent implements OnInit, OnDestroy {
         if (JSON.stringify(this.room) !== JSON.stringify(data)) {
           this.room = data;
 
-          this.isInvited = (this.room.invited.indexOf(this.user.id) >= 0 || this.room.created_by === this.user.id) ? true : false;
-          if (this.isInvited === false)
+          this.isInvited =
+            this.room.invited.indexOf(this.user.id) >= 0 ||
+            this.room.created_by === this.user.id
+              ? true
+              : false;
+          if (this.isInvited === false && this.room.type === 'private')
             this.quitRoom();
         }
 
@@ -212,7 +216,11 @@ export class RoomComponent implements OnInit, OnDestroy {
 
     this.roomService.getRoom(this.roomId).subscribe((res) => {
       this.room = res.room;
-      this.isInvited = (this.room.invited.indexOf(this.user.id) >= 0 || this.room.created_by === this.user.id) ? true : false;
+      this.isInvited =
+        this.room.invited.indexOf(this.user.id) >= 0 ||
+        this.room.created_by === this.user.id
+          ? true
+          : false;
       if (this.isInvited === false && this.room.type === 'private')
         this.quitRoom();
       if (res.room.musics.length > 0) {
@@ -396,7 +404,7 @@ export class RoomComponent implements OnInit, OnDestroy {
         type: 'room',
       },
     });
-    popover.onWillDismiss().then((res) => { });
+    popover.onWillDismiss().then((res) => {});
     return await popover.present();
   }
 
