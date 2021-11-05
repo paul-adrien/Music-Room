@@ -191,12 +191,9 @@ exports.getRoomSocket = async (roomId) => {
 
 exports.delRoom = async (req, res) => {
   const { userId, roomId } = req.params;
-  console.log(userId, roomId)
+  console.log(userId, roomId);
   Room.findOne({
-    $and: [
-      { _id: roomId },
-      { created_by: userId }
-    ],
+    $and: [{ _id: roomId }, { created_by: userId }],
   }).exec((err, room) => {
     if (err) {
       return res.json({

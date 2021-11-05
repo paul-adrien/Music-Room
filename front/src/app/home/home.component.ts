@@ -305,4 +305,8 @@ export class HomeComponent implements OnInit {
     const { role } = await alert.onDidDismiss();
     console.log('onDidDismiss resolved with role', role);
   }
+
+  ngOnDestroy() {
+    clearInterval(this.interval);
+  }
 }

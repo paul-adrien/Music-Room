@@ -22,7 +22,7 @@
     text-align: center;
     font-size: 1.5rem;
     font-family: "Circular-bold";
-    margin-bottom: 4rem;
+    margin-bottom: 2rem;
   }
 
   .input {
@@ -48,5 +48,54 @@
     color: var(--background-color-grey);
     letter-spacing: 1px;
     padding: 1rem 1.5rem;
+    margin-top: 4rem;
+  }
+
+  .users {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+  }
+
+  .user-container {
+    display: flex;
+    align-items: center;
+  }
+
+  .user-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    height: 100%;
+    width: 50%;
+    flex-grow: 1;
+    padding-right: 3rem;
+
+    .info-top {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .info-bottom {
+      color: var(--light-grey-color);
+    }
+  }
+  .logo {
+    height: 100%;
+    object-fit: contain;
+    margin: 0 1rem;
+
+    &.round {
+      width: 3rem;
+      height: 3rem;
+      border-radius: 5rem;
+      background: white;
+    }
+  }
+
+  .add {
+    padding: 0.5rem 1rem;
+    margin-top: 1rem;
   }
 }

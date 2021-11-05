@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ModalController } from '@ionic/angular';
+import { CreateModalComponent } from './../create-modal/create-modal.component';
+import { AuthService } from './../_services/auth_service';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { MessageService } from '../_services/message_service';
 import { WebsocketService } from '../_services/websocketService';
@@ -8,70 +17,121 @@ import { Location } from '@angular/common';
 @Component({
   selector: 'app-messages',
   template: `
-  <img
+    <img
       class="back-img"
       (click)="this.back()"
       src="./assets/chevron-back-outline.svg"
-  />
-  <div class="title">Mes conversations</div>
-  <button (click)="createConv()">Créer une conversation</button>
-  <div *ngIf="this.convList" class="messages-container">
-    <div *ngFor="let conv of this.convList.conversations" class="conv-container">
+    />
+    <div class="header">
+      <div class="title">Mes conversations</div>
       <img
-        class="picture"
-        [src]="this.user?.picture ? this.user.picture : './assets/person.svg'"
+        (click)="this.createConv()"
+        class="img"
+        src="./assets/add-outline.svg"
       />
-      <p class="conv-title" (click)="conversation(conv._id)">{{ conv.name }}</p>
-      <hr>
     </div>
-  </div>
+    <div *ngIf="this.convList" class="messages-container">
+      <div
+        (click)="this.openConversation(conv._id)"
+        *ngFor="let conv of this.convList"
+        class="conv-container"
+      >
+        <img
+          class="picture"
+          [src]="this.user?.picture ? this.user.picture : './assets/person.svg'"
+        />
+        <div class="info-container">
+          <div class="conv-title">
+            {{ conv.name }}
+          </div>
+          <div class="last-message">
+            {{ conv?.messages[0] || 'Envoyez un message !' }}
+          </div>
+        </div>
+      </div>
+    </div>
   `,
   styleUrls: ['./messages.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MessagesComponent implements OnInit {
-
   public user: Partial<User>;
-  public convList = null;
-  private users = [{
-    name: "u1",
-    userId: "60b7dc84c32e29ce6919e2a6"
-  },
-  {
-    name: "u2",
-    userId: "60c1e2e36aad9926448caef2"
-  }];
+  public convList = [];
 
-  constructor(private messageService: MessageService,
+  constructor(
+    private messageService: MessageService,
     private cd: ChangeDetectorRef,
     private router: Router,
-    private location: Location,) { }
+    private location: Location,
+    private authService: AuthService,
+    private socketService: WebsocketService,
+    private modalController: ModalController
+  ) {
+    const user = this.authService.getUser();
+
+    this.socketService.setupSocketConnection();
+    this.socketService
+      .listenToServer(`chat convs ${user.id}`)
+      .subscribe((data) => {
+        console.log(data);
+        this.convList.push(data);
+
+        this.cd.detectChanges();
+      });
+  }
 
   ngOnInit() {
-    this.messageService.getConvList('60b7dc84c32e29ce6919e2a6').subscribe((res) => {
+    this.user = this.authService.getUser();
+    this.messageService.getConvList(this.user.id).subscribe((res) => {
       console.log(res);
-      this.convList = res;
+      if (res.status) {
+        this.convList = res.conversations;
+      }
       this.cd.detectChanges();
-    })
+    });
+    this.cd.detectChanges();
   }
 
   public back() {
     this.location.back();
   }
 
-  createConv() {
-    this.messageService.createConv('60b7dc84c32e29ce6919e2a6', 'ionicTest2', this.users).subscribe((res) => {
-      console.log(res);
+  async createConv() {
+    const modal = await this.modalController.create({
+      component: CreateModalComponent,
+      cssClass: ['my-custom-class', 'my-custom-modal'],
+      swipeToClose: true,
+      componentProps: {
+        isConv: true,
+      },
     });
-    this.messageService.getConvList('60b7dc84c32e29ce6919e2a6').subscribe((res) => {
-      console.log(res);
-      this.convList = res;
-      this.cd.detectChanges();
-    })
+    modal.onWillDismiss().then((res) => {
+      if (res?.data?.users && res?.data?.name)
+        this.socketService.emitToServer('chat create conv', {
+          users: [
+            ...res?.data?.users,
+            { userId: this.user.id, name: this.user.userName },
+          ],
+          name: res?.data?.name,
+        });
+    });
+    return await modal.present();
+
+    // this.messageService
+    //   .createConv('60b7dc84c32e29ce6919e2a6', 'ionicTest2', this.users)
+    //   .subscribe((res) => {
+    //     console.log(res);
+    //   });
+    // this.messageService
+    //   .getConvList('60b7dc84c32e29ce6919e2a6')
+    //   .subscribe((res) => {
+    //     console.log(res);
+    //     this.convList = res;
+    //     this.cd.detectChanges();
+    //   });
   }
 
-  conversation(id: string) {
-    this.router.navigate(["conversation/" + id]);
+  openConversation(id: string) {
+    this.router.navigate(['conversation/' + id]);
   }
-
 }
