@@ -111,12 +111,14 @@ export class HomeComponent implements OnInit {
       console.log(data);
       if (JSON.stringify(this.rooms) !== JSON.stringify(data)) {
         this.rooms = data.filter((room: Room) => {
-          if (room.type === 'public'
-            || (room.type === 'private'
-              && (room.created_by === this.user.id || room.invited.indexOf(this.user.id) >= 0)))
+          if (
+            room.type === 'public' ||
+            (room.type === 'private' &&
+              (room.created_by === this.user.id ||
+                room.invited.indexOf(this.user.id) >= 0))
+          )
             return true;
-          else
-            return false;
+          else return false;
         });
         this.cd.detectChanges();
       }
@@ -126,13 +128,15 @@ export class HomeComponent implements OnInit {
       console.log(data);
       if (JSON.stringify(this.playlists) !== JSON.stringify(data)) {
         this.playlists = data.filter((playlist: Playlist) => {
-          if (playlist.type === 'public'
-            || (playlist.type === 'private'
-              && (playlist.created_by === this.user.id || playlist.invited.indexOf(this.user.id) >= 0)))
+          if (
+            playlist.type === 'public' ||
+            (playlist.type === 'private' &&
+              (playlist.created_by === this.user.id ||
+                playlist.invited.indexOf(this.user.id) >= 0))
+          )
             return true;
-          else
-            return false;
-        });;
+          else return false;
+        });
       }
       this.cd.detectChanges();
     });
@@ -155,20 +159,24 @@ export class HomeComponent implements OnInit {
       this.playlistService.getAllPlaylist(),
     ]).subscribe(([rooms, playlists]) => {
       this.rooms = rooms.filter((room: Room) => {
-        if (room.type === 'public'
-          || (room.type === 'private'
-            && (room.created_by === this.user.id || room.invited.indexOf(this.user.id) >= 0)))
+        if (
+          room.type === 'public' ||
+          (room.type === 'private' &&
+            (room.created_by === this.user.id ||
+              room.invited.indexOf(this.user.id) >= 0))
+        )
           return true;
-        else
-          return false;
+        else return false;
       });
       this.playlists = playlists.filter((playlist: Playlist) => {
-        if (playlist.type === 'public'
-          || (playlist.type === 'private'
-            && (playlist.created_by === this.user.id || playlist.invited.indexOf(this.user.id) >= 0)))
+        if (
+          playlist.type === 'public' ||
+          (playlist.type === 'private' &&
+            (playlist.created_by === this.user.id ||
+              playlist.invited.indexOf(this.user.id) >= 0))
+        )
           return true;
-        else
-          return false;
+        else return false;
       });
       this.cd.detectChanges();
     });
@@ -198,6 +206,7 @@ export class HomeComponent implements OnInit {
       showBackdrop: true,
       componentProps: {
         isModal: true,
+        isRoom: true,
       },
     });
     modal.onWillDismiss().then((res) => {
@@ -227,6 +236,7 @@ export class HomeComponent implements OnInit {
       showBackdrop: true,
       componentProps: {
         isModal: true,
+        isPlaylist: true,
       },
     });
     modal.onWillDismiss().then((res) => {
