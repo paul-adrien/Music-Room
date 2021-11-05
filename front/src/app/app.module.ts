@@ -29,8 +29,9 @@ import { SettingsRoomComponent } from './settings-room/settings-room.component';
 import { DelegationComponent } from './delegation/delegation.component';
 import { EditProfileComponent } from './edit-profile/edit-profile.component';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
+import { environment } from 'src/environments/environment';
 
-const config: SocketIoConfig = { url: environnement.AUTH_API, options: {} };
+const config: SocketIoConfig = { url: environment.AUTH_API, options: {} };
 
 @NgModule({
   declarations: [

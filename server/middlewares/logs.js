@@ -12,7 +12,8 @@ module.exports = (req, res) => {
     log += "status=" + res.statusCode.toString() + ";"
     if (res.message)
         log += "message=" + res.message + "\r\n";
-    fs.appendFile(fileName, log, (err) => {
+    console.log(__dirname + fileName)
+    fs.appendFile(__dirname + fileName, log, (err) => {
         if (err) {
             console.log(err)
             console.log("Error when trying to write log!")
