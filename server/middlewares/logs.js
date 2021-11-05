@@ -3,7 +3,7 @@ const fs = require('fs');
 module.exports = (req, res) => {
     let log = "";
 
-    let fileName = "./logs/" + req.headers["x-access-token"] + ".logs"
+    let fileName = "/logs/" + req.headers["x-access-token"] + ".logs"
     log = "date=" + new Date().toISOString() + ";"
     // log += "deviceModel=" + req.headers.devicemodel + ";"
     // log += "deviceOSVersion=" + req.headers.deviceosversion + ";"
