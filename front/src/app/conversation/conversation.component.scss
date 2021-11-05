@@ -1,0 +1,31 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+
+  .back-img {
+    height: 1.8rem;
+    width: 1.8rem;
+    margin-top: 1rem;
+    margin-left: 0.5rem;
+  }
+
+  .title {
+    font-family: "Circular-bold";
+    font-size: 1.6rem;
+    margin: 1rem 1rem;
+  }
+
+  .conv-container {
+    overflow-y: auto;
+  }
+
+  .message-container {
+    display: flex;
+    background-color: var(--background-color-light-grey);
+    border-radius: 4px;
+    box-sizing: content-box;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+}

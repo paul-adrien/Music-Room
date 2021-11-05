@@ -1,3 +1,4 @@
+import { AuthService } from './../_services/auth_service';
 import { UserService } from './../_services/user_service';
 import { SpotifyService } from './../_services/spotify_service';
 import {
@@ -66,7 +67,8 @@ export class SearchComponent {
     private spotifyService: SpotifyService,
     private cd: ChangeDetectorRef,
     public modalController: ModalController,
-    private userService: UserService
+    private userService: UserService,
+    private authService: AuthService
   ) {}
 
   play(uri: string) {
@@ -74,6 +76,7 @@ export class SearchComponent {
   }
 
   search(event: any) {
+    const user = this.authService.getUser();
     console.log(event);
     if (!this.isUser) {
       this.spotifyService.searchMusic(event.target.value).subscribe((data) => {
@@ -84,7 +87,7 @@ export class SearchComponent {
     } else if (this.isUser) {
       this.userService.searchUser(event.target.value).subscribe((data) => {
         console.log(data);
-        this.searchRes = data;
+        this.searchRes = data.filter((el) => el.id !== user.id);
         this.cd.detectChanges();
       });
     }

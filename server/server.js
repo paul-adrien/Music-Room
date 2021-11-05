@@ -53,11 +53,43 @@ io.on("connection", (socket) => {
 
   socket.on("chat message", (data) => {
     console.log(data);
-    messaging_controller.sendMessage(data.userId, data.convId, data.message);
-    io.emit("chat message", data.message);
+    messaging_controller
+      .sendMessage(data.userId, data.convId, data.message)
+      .then((res) =>
+        messaging_controller.getConversationDetailSocket(
+          data.userId,
+          data.convId
+        )
+      )
+      .then((res) => {
+        if (res.status) {
+          io.emit(`chat message ${data.convId}`, data.message);
+          res?.conversation?.users?.map((user) => {
+            io.emit(`chat convs ${user.userId}`, res.conversation);
+          });
+        }
+      });
   });
 
-  //ROOM ///////////////////////////////////////////////////////////////////////////////
+  socket.on("chat create conv", async (data) => {
+    console.log(data);
+    messaging_controller
+      .createConversationSocket(data.name, data.users)
+      .then(async (res) => {
+        let conv = await messaging_controller.getConversationByNameSocket(
+          data.users[0].userId,
+          data.name
+        );
+        console.log(conv);
+        if (res.status) {
+          data?.users?.map((user) => {
+            io.emit(`chat convs ${user.userId}`, conv);
+          });
+        }
+      });
+  });
+
+  // ROOM ///////////////////////////////////////////////////////////////////////////////
 
   socket.on("room create", (data) => {
     room_controller.CreateRoomSocket(data.name, data.userId).then(() =>
