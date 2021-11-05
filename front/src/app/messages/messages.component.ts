@@ -69,7 +69,6 @@ export class MessagesComponent implements OnInit {
   ) {
     const user = this.authService.getUser();
 
-    this.socketService.setupSocketConnection();
     this.socketService
       .listenToServer(`chat convs ${user.id}`)
       .subscribe((data) => {

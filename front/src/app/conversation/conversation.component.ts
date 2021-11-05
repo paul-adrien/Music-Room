@@ -44,7 +44,6 @@ export class ConversationComponent implements OnInit, OnDestroy {
     private location: Location,
     private authService: AuthService
   ) {
-    this.socketService.setupSocketConnection();
     this.socketService
       .listenToServer(`chat message ${this.convId}`)
       .subscribe((data) => {
