@@ -47,8 +47,8 @@ import { forkJoin } from 'rxjs';
           class="result-item"
           *ngFor="let playlist of this.playlists"
         >
-          <img (click)="this.openPlaylist(playlist._id)" class="logo no-img" src="./assets/musical-notes.svg" />
-          <div (click)="this.openPlaylist(playlist._id)" class="item-info">
+          <img (click)="this.user.type == 'premium' ? this.openPlaylist(playlist._id) : premiumAlert()" class="logo no-img" src="./assets/musical-notes.svg" />
+          <div (click)="this.user.type == 'premium' ? this.openPlaylist(playlist._id) : premiumAlert()" class="item-info">
             <div class="info-top">{{ playlist.name }}</div>
             <!-- <div class="info-bottom">{{ item.artists[0].name }}</div> -->
           </div>
@@ -280,5 +280,19 @@ export class ProfileComponent implements OnInit {
         this.cd.detectChanges();
       });
     this.cd.detectChanges();
+  }
+
+  async premiumAlert() {
+    console.log("premiumAlert trigered", this.user.type)
+    const alert = await this.alertController.create({
+      header: 'Attention',
+      message: 'T\'es pas premium enfoiré !',
+      buttons: ['OK'],
+    });
+
+    await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+    console.log('onDidDismiss resolved with role', role);
   }
 }
