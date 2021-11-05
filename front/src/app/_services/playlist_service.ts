@@ -20,18 +20,18 @@ export class PlaylistService {
     private http: HttpClient,
     private route: Router,
     public navCtrl: NavController
-  ) {}
+  ) { }
 
-  createPlaylist(user: Partial<User>, name: string): Observable<any> {
-    return this.http.post(
-      environment.AUTH_API + `playlist`,
-      {
-        userId: user.id,
-        name: name,
-      },
-      httpOptions
-    );
-  }
+  // createPlaylist(user: Partial<User>, name: string): Observable<any> {
+  //   return this.http.post(
+  //     environment.AUTH_API + `playlist`,
+  //     {
+  //       userId: user.id,
+  //       name: name,
+  //     },
+  //     httpOptions
+  //   );
+  // }
 
   enterPlaylist(userId: string, playlistId: string, deviceId: string) {
     return this.http.post<any>(
@@ -47,7 +47,7 @@ export class PlaylistService {
   quitPlaylist(userId: string, PlaylistId: string) {
     return this.http.delete<any>(
       environment.AUTH_API +
-        `playlist/${PlaylistId}/quitPlaylist?userId=${userId}`,
+      `playlist/${PlaylistId}/quitPlaylist?userId=${userId}`,
       httpOptions
     );
   }

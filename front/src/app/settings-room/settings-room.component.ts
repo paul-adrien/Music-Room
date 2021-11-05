@@ -11,6 +11,7 @@ import {
 import { PopoverController } from '@ionic/angular';
 import { Playlist } from 'libs/playlist';
 import { FormControl } from '@angular/forms';
+import { WebsocketService } from '../_services/websocketService';
 
 @Component({
   selector: 'app-settings-room',
@@ -45,10 +46,20 @@ export class SettingsRoomComponent implements OnInit {
 
   constructor(
     private popoverCtrl: PopoverController,
-    private roomService: RoomService,
-    private playlistService: PlaylistService,
-    private cd: ChangeDetectorRef
-  ) {}
+    private cd: ChangeDetectorRef,
+    private socketService: WebsocketService
+  ) {
+    this.socketService.listenToServer('room update ' + this.room?._id).subscribe((data) => {
+      if (data.status === false)
+        this.toggle = !this.toggle;
+      this.cd.detectChanges();
+    });
+    this.socketService.listenToServer('playlist update ' + this.playlist?._id).subscribe((data) => {
+      if (data.status === false)
+        this.toggle = !this.toggle;
+      this.cd.detectChanges();
+    });
+  }
 
   ngOnInit(): void {
     if (this.type === 'room') {
@@ -61,37 +72,19 @@ export class SettingsRoomComponent implements OnInit {
 
   changeType(event: any) {
     if (this.type === 'room') {
-      this.roomService
-        .changeType(
-          this.room._id,
-          this.userId,
-          !this.toggle ? 'private' : 'public'
-        )
-        .subscribe((res) => {
-          if (res.status) {
-            this.room.type = event?.detail?.checked;
-          } else {
-            this.toggle = !this.toggle;
-          }
-          this.cd.detectChanges();
-        });
+      this.socketService.emitToServer('room change type', {
+        userId: this.userId,
+        roomId: this.room?._id,
+        type: !this.toggle ? 'private' : 'public'
+      });
     } else if (this.type === 'playlist') {
-      this.playlistService
-        .changeType(
-          this.playlist._id,
-          this.userId,
-          !this.toggle ? 'private' : 'public'
-        )
-        .subscribe((res) => {
-          if (res.status) {
-            this.playlist.type = event?.detail?.checked;
-          } else {
-            this.toggle = !this.toggle;
-          }
-          this.cd.detectChanges();
-        });
+      this.socketService.emitToServer('playlist change type', {
+        userId: this.userId,
+        playlistId: this.playlist?._id,
+        type: !this.toggle ? 'private' : 'public'
+      });
     }
-    this.cd.detectChanges();
+    // this.cd.detectChanges();
   }
 
   close() {

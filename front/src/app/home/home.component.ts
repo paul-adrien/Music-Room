@@ -105,10 +105,33 @@ export class HomeComponent implements OnInit {
     this.socketService.listenToServer('room create').subscribe((data) => {
       console.log(data);
       if (JSON.stringify(this.rooms) !== JSON.stringify(data)) {
-        this.rooms = data;
+        this.rooms = data.filter((room: Room) => {
+          if (room.type === 'public'
+            || (room.type === 'private'
+              && (room.created_by === this.user.id || room.invited.indexOf(this.user.id) >= 0)))
+            return true;
+          else
+            return false;
+        });
+        this.cd.detectChanges();
+      }
+    });
+
+    this.socketService.listenToServer('playlist create').subscribe((data) => {
+      console.log(data);
+      if (JSON.stringify(this.playlists) !== JSON.stringify(data)) {
+        this.playlists = data.filter((playlist: Playlist) => {
+          if (playlist.type === 'public'
+            || (playlist.type === 'private'
+              && (playlist.created_by === this.user.id || playlist.invited.indexOf(this.user.id) >= 0)))
+            return true;
+          else
+            return false;
+        });;
       }
       this.cd.detectChanges();
     });
+
     this.socketService
       .listenToServer(`user update ${user?.id}`)
       .subscribe((data) => {
@@ -126,8 +149,22 @@ export class HomeComponent implements OnInit {
       this.roomService.getAllRoom(),
       this.playlistService.getAllPlaylist(),
     ]).subscribe(([rooms, playlists]) => {
-      this.rooms = rooms;
-      this.playlists = playlists;
+      this.rooms = rooms.filter((room: Room) => {
+        if (room.type === 'public'
+          || (room.type === 'private'
+            && (room.created_by === this.user.id || room.invited.indexOf(this.user.id) >= 0)))
+          return true;
+        else
+          return false;
+      });
+      this.playlists = playlists.filter((playlist: Playlist) => {
+        if (playlist.type === 'public'
+          || (playlist.type === 'private'
+            && (playlist.created_by === this.user.id || playlist.invited.indexOf(this.user.id) >= 0)))
+          return true;
+        else
+          return false;
+      });
       this.cd.detectChanges();
     });
   }
@@ -189,13 +226,18 @@ export class HomeComponent implements OnInit {
     });
     modal.onWillDismiss().then((res) => {
       if (res?.data?.name) {
-        this.playlistService
-          .createPlaylist(this.user, res?.data?.name)
-          .subscribe((res) => {
-            console.log(res);
-            // this.playlists = this.playlistService.getAllPlaylist();
-            this.cd.detectChanges();
-          });
+        // this.playlistService
+        //   .createPlaylist(this.user, res?.data?.name)
+        //   .subscribe((res) => {
+        //     console.log(res);
+        //     // this.playlists = this.playlistService.getAllPlaylist();
+        //     this.cd.detectChanges();
+        //   });
+
+        this.socketService.emitToServer('playlist create', {
+          userId: this.user.id,
+          name: res?.data?.name,
+        });
       }
     });
     return await modal.present();

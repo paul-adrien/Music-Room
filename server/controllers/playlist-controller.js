@@ -213,6 +213,26 @@ exports.delPlaylist = async (req, res, next) => {
   });
 };
 
+exports.delPlaylistSocket = async (userId, playlistId) => {
+  return Playlist.findOne({
+    $and: [{ _id: playlistId }, { created_by: userId }],
+  }).then((playlist) => {
+    if (!playlist) {
+      return {
+        status: false,
+        message: "this playlist doesn't exist or you dont have the good right",
+      };
+    } else {
+      return Playlist.deleteOne({ _id: playlistId }).then(() => {
+        return {
+          status: true,
+          message: "Playlist was delete",
+        };
+      });
+    }
+  });
+};
+
 exports.editPlaylist = async (req, res, next) => {
   const { userId, playlistId } = req.params;
   const playlistBody = req.body.playlist;

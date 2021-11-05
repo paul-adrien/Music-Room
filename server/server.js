@@ -143,11 +143,30 @@ io.on("connection", (socket) => {
       .changeTypeSocket(data.userId, data.roomId, data.type)
       .then(() =>
         room_controller.getRoomSocket(data.roomId).then((res) => {
+          console.log(res)
           if (res.status) {
             io.emit(`room update ${data.roomId}`, res.room);
+            room_controller.getAllRoomSocket().then((res) => {
+              if (res.status) {
+                io.emit("room create", res.rooms);
+              }
+            })
           }
         })
       );
+  });
+
+  socket.on("room delete", (data) => {
+    room_controller
+      .delRoomSocket(data.userId, data.roomId)
+      .then(() => {
+        io.emit(`room delete ${data.roomId}`);
+        room_controller.getAllRoomSocket().then((res) => {
+          if (res.status) {
+            io.emit("room create", res.rooms);
+          }
+        })
+      });
   });
 
   // PLAYLIST ////////////////////////////////////////////////////////////////////
@@ -230,9 +249,27 @@ io.on("connection", (socket) => {
         playlist_controller.getPlaylistSocket(data.playlistId).then((res) => {
           if (res.status) {
             io.emit(`playlist update ${data.playlistId}`, res.playlist);
+            playlist_controller.getAllPlaylistSocket().then((res) => {
+              if (res.status) {
+                io.emit("playlist create", res.playlists);
+              }
+            })
           }
         })
       );
+  });
+
+  socket.on("playlist delete", (data) => {
+    playlist_controller
+      .delPlaylistSocket(data.userId, data.playlistId)
+      .then(() => {
+        io.emit(`playlist delete ${data.playlistId}`);
+        playlist_controller.getAllPlaylistSocket().then((res) => {
+          if (res.status) {
+            io.emit("playlist create", res.playlists);
+          }
+        })
+      });
   });
 });
 

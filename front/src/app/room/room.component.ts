@@ -170,10 +170,12 @@ export class RoomComponent implements OnInit, OnDestroy {
         console.log(data);
         if (JSON.stringify(this.room) !== JSON.stringify(data)) {
           this.room = data;
+
+          this.isInvited = (this.room.invited.indexOf(this.user.id) >= 0 || this.room.created_by === this.user.id) ? true : false;
+          if (this.isInvited === false)
+            this.quitRoom();
         }
 
-        this.isInvited =
-          this.room.invited.indexOf(this.user.id) >= 0 ? true : false;
         this.room.musics = this.room.musics.filter(
           (music) => music?.trackId !== this.trackPlaying?.id
         );
@@ -183,6 +185,11 @@ export class RoomComponent implements OnInit, OnDestroy {
           this.tracks = [];
         }
         this.cd.detectChanges();
+      });
+    this.socketService
+      .listenToServer(`room delete ${this.roomId}`)
+      .subscribe((data) => {
+        this.location.historyGo(-1);
       });
   }
 
@@ -205,8 +212,9 @@ export class RoomComponent implements OnInit, OnDestroy {
 
     this.roomService.getRoom(this.roomId).subscribe((res) => {
       this.room = res.room;
-      this.isInvited =
-        this.room.invited.indexOf(this.user.id) >= 0 ? true : false;
+      this.isInvited = (this.room.invited.indexOf(this.user.id) >= 0 || this.room.created_by === this.user.id) ? true : false;
+      if (this.isInvited === false && this.room.type === 'private')
+        this.quitRoom();
       if (res.room.musics.length > 0) {
         this.spotifyService
           .getTracksInfo(this.room.musics.map((music) => music.trackId))
@@ -388,7 +396,7 @@ export class RoomComponent implements OnInit, OnDestroy {
         type: 'room',
       },
     });
-    popover.onWillDismiss().then((res) => {});
+    popover.onWillDismiss().then((res) => { });
     return await popover.present();
   }
 

@@ -133,6 +133,9 @@ export class PlaylistComponent implements OnInit {
         console.log(data);
         if (JSON.stringify(this.playlist) !== JSON.stringify(data)) {
           this.playlist = data;
+          this.isInvited = (this.playlist.invited.indexOf(this.user.id) >= 0 || this.playlist.created_by === this.user.id) ? true : false;
+          if (this.isInvited === false && this.playlist.type === 'private')
+            this.quitPlaylist();
         }
 
         this.indexTrack = this.playlist.musics.findIndex(
@@ -146,6 +149,12 @@ export class PlaylistComponent implements OnInit {
         }
         this.cd.detectChanges();
       });
+
+    this.socketService
+      .listenToServer(`playlist delete ${this.playlistId}`)
+      .subscribe((data) => {
+        this.quitPlaylist();
+      });
   }
 
   public playlist: Playlist;
@@ -153,6 +162,7 @@ export class PlaylistComponent implements OnInit {
   public tracks = [];
 
   public isPublic = true;
+  public isInvited = false;
 
   public playerInfo: { is_playing: boolean; item: any; progress_ms: number } =
     undefined;
@@ -164,11 +174,15 @@ export class PlaylistComponent implements OnInit {
   public indexTrack = undefined;
 
   ngOnInit() {
+    console.log(this.playlistId)
     this.user = this.authService.getUser();
 
     this.playlistService.getPlaylist(this.playlistId).subscribe((res) => {
       this.playlist = res.playlist;
       this.isPublic = this.playlist.type === 'public' ? true : false;
+      this.isInvited = (this.playlist.invited.indexOf(this.user.id) >= 0 || this.playlist.created_by === this.user.id) ? true : false;
+      if (this.isInvited === false && this.playlist.type === 'private')
+        this.quitPlaylist();
       if (res.playlist.musics.length > 0) {
         this.spotifyService
           .getTracksInfo(this.playlist.musics.map((music) => music.trackId))

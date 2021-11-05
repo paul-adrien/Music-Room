@@ -13,6 +13,7 @@ import { Observable } from 'rxjs-compat/Observable';
 import { Device } from '@ionic-native/device/ngx';
 import { Router } from '@angular/router';
 import { AlertController, ModalController } from '@ionic/angular';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-profile',
@@ -30,34 +31,34 @@ import { AlertController, ModalController } from '@ionic/angular';
       </div>
     </div>
     <div class="bottom-container">
-      <div *ngIf="(this.playlists | async)?.length > 0" class="title-category">
+      <div *ngIf="(this.playlists)?.length > 0" class="title-category">
         Playlists
       </div>
-      <div class="playlists" *ngIf="this.playlists | async">
+      <div class="playlists" *ngIf="this.playlists">
         <div
           class="result-item"
-          (click)="this.openPlaylist(playlist._id)"
-          *ngFor="let playlist of this.playlists | async"
+          *ngFor="let playlist of this.playlists"
         >
-          <img class="logo no-img" src="./assets/musical-notes.svg" />
-          <div class="item-info">
+          <img (click)="this.openPlaylist(playlist._id)" class="logo no-img" src="./assets/musical-notes.svg" />
+          <div (click)="this.openPlaylist(playlist._id)" class="item-info">
             <div class="info-top">{{ playlist.name }}</div>
             <!-- <div class="info-bottom">{{ item.artists[0].name }}</div> -->
           </div>
+          <img (click)="deletePlaylist(playlist._id)" src="./assets/trash-white.svg" class="logo no-img">
         </div>
       </div>
-      <div *ngIf="this.rooms | async" class="title-category">Rooms</div>
-      <div class="rooms" *ngIf="this.rooms | async">
+      <div *ngIf="this.rooms" class="title-category">Rooms</div>
+      <div class="rooms" *ngIf="this.rooms">
         <div
           class="result-item"
-          (click)="this.openRoom(room._id)"
-          *ngFor="let room of this.rooms | async"
+          *ngFor="let room of this.rooms"
         >
-          <img class="logo no-img" src="./assets/musical-notes.svg" />
-          <div class="item-info">
+          <img (click)="this.openRoom(room._id)" class="logo no-img" src="./assets/musical-notes.svg" />
+          <div (click)="this.openRoom(room._id)" class="item-info">
             <div class="info-top">{{ room.name }}</div>
             <!-- <div class="info-bottom">{{ item.artists[0].name }}</div> -->
           </div>
+          <img (click)="deleteRoom(room._id)" src="./assets/trash-white.svg" class="logo no-img">
         </div>
       </div>
     </div>
@@ -65,9 +66,9 @@ import { AlertController, ModalController } from '@ionic/angular';
   styleUrls: ['./profile.component.scss'],
 })
 export class ProfileComponent implements OnInit {
-  public user: Partial<User>;
-  public playlists: Observable<Playlist[]>;
-  public rooms: Observable<Room[]>;
+  public user: User;
+  public playlists: Playlist[];
+  public rooms: Room[];
 
   constructor(
     private authService: AuthService,
@@ -88,12 +89,35 @@ export class ProfileComponent implements OnInit {
       .listenToServer(`user update ${user?.id}`)
       .subscribe((data) => {
         this.user = data;
-        console.log('ici bg');
         if (typeof this.user.picture !== 'string' && this.user.picture) {
           this.user.picture = 'data:image/jpeg;base64,' + data.picture.buffer;
         } else {
           this.user.picture = data.picture;
         }
+        this.cd.detectChanges();
+      });
+
+    this.socketService
+      .listenToServer(`playlist create`)
+      .subscribe((data) => {
+        this.playlists = data.filter((playlist: Playlist) => {
+          if (playlist.created_by === this.user.id)
+            return true;
+          else
+            return false;
+        });
+        this.cd.detectChanges();
+      });
+
+    this.socketService
+      .listenToServer(`room create`)
+      .subscribe((data) => {
+        this.rooms = data.filter((room: Room) => {
+          if (room.created_by === this.user.id)
+            return true;
+          else
+            return false;
+        });
         this.cd.detectChanges();
       });
   }
@@ -113,8 +137,27 @@ export class ProfileComponent implements OnInit {
       this.cd.detectChanges();
     });
 
-    this.playlists = this.playlistService.getAllPlaylist(this.user?.id);
-    this.rooms = this.roomService.getAllRoom(this.user?.id);
+    forkJoin([
+      this.roomService.getAllRoom(),
+      this.playlistService.getAllPlaylist(),
+    ]).subscribe(([rooms, playlists]) => {
+      this.rooms = rooms.filter((room: Room) => {
+        if (room.created_by === this.user.id)
+          return true;
+        else
+          return false;
+      });
+      this.playlists = playlists.filter((playlist: Playlist) => {
+        if (playlist.created_by === this.user.id)
+          return true;
+        else
+          return false;
+      });
+      this.cd.detectChanges();
+    });
+
+    // this.playlists = this.playlistService.getAllPlaylist(this.user?.id);
+    // this.rooms = this.roomService.getAllRoom(this.user?.id);
     this.cd.detectChanges();
   }
 
@@ -188,6 +231,20 @@ export class ProfileComponent implements OnInit {
       this.cd.detectChanges();
     });
     return await modal.present();
+  }
+
+  deleteRoom(id: string) {
+    this.socketService.emitToServer('room delete', {
+      userId: this.user.id,
+      roomId: id
+    });
+  }
+
+  deletePlaylist(id: string) {
+    this.socketService.emitToServer('playlist delete', {
+      userId: this.user.id,
+      playlistId: id
+    });
   }
 
   logOut() {

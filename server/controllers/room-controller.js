@@ -225,6 +225,26 @@ exports.delRoom = async (req, res) => {
   });
 };
 
+exports.delRoomSocket = async (userId, roomId) => {
+  return Room.findOne({
+    $and: [{ _id: roomId }, { created_by: userId }],
+  }).then((room) => {
+    if (!room) {
+      return {
+        status: false,
+        message: "this room doesn't exist or you dont have the good right",
+      };
+    } else {
+      return Room.deleteOne({ _id: roomId }).then(() => {
+        return {
+          status: true,
+          message: "Room was delete",
+        };
+      });
+    }
+  });
+};
+
 exports.inviteToRoom = async (req, res) => {
   const { roomId, friendId } = req.params;
   const { userId } = req.body;
