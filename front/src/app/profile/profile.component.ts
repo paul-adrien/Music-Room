@@ -29,8 +29,13 @@ import { forkJoin } from 'rxjs';
       <div class="primary-button" (click)="this.presentModalEdit()">
         Modifier le profil
       </div>
-      <div class="primary-button" (click)="this.presentModalEdit()">
-        Passer premium
+      <div class="item-container">
+      <div class="item-name">Free / Premium</div>
+        <ion-toggle
+          [(ngModel)]="this.toggle"
+          [checked]="this.user.type === 'premium'"
+          (click)="this.upgradeAccount($event)"
+        ></ion-toggle>
       </div>
     </div>
     <div class="bottom-container">
@@ -72,6 +77,8 @@ export class ProfileComponent implements OnInit {
   public user: User;
   public playlists: Playlist[];
   public rooms: Room[];
+
+  public toggle = false;
 
   constructor(
     private authService: AuthService,
@@ -258,7 +265,20 @@ export class ProfileComponent implements OnInit {
     );
   }
 
-  upgradeAccount() {
-    this.userService.updateUserAccount().subscribe();
+  upgradeAccount(event: any) {
+    this.userService
+      .updateUserAccount(
+        this.user.id,
+        !this.toggle ? 'premium' : 'free'
+      )
+      .subscribe((res) => {
+        if (res.status) {
+          this.user.type = event?.detail?.checked;
+        } else {
+          this.toggle = !this.toggle;
+        }
+        this.cd.detectChanges();
+      });
+    this.cd.detectChanges();
   }
 }

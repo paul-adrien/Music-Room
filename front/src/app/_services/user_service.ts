@@ -58,7 +58,15 @@ export class UserService {
     );
   }
 
-  updateUserAccount(userId: string) {
-
+  updateUserAccount(userId: string, type: 'free' | 'premium') {
+    console.log("updateUserAccount called");
+    return this.http.post<any>(
+      environment.AUTH_API + `user/${userId}/premium`,
+      {
+        userId: userId,
+        type: type,
+      },
+      httpOptions
+    );
   }
 }

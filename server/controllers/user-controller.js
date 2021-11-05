@@ -214,14 +214,15 @@ exports.forgotPass_change = async (req, res) => {
 };
 
 exports.userUpdateAccount = async (req, res) => {
-  const id = req.body.id;
-  const user = await getUser({ userId: id });
+  console.log("userUpdateAccount called !");
+  const { userId, type } = req.body;
+  const user = await getUser({ id: userId });
   if (user) {
-    user.type = "premium";
+    user.type = type;
     if (await updateUser(user.id, user)) {
       res.json({
         status: true,
-        message: "Account was upgraded",
+        message: "Account plan was changed",
       });
     } else {
       res.json({
