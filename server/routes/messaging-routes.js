@@ -9,9 +9,9 @@ module.exports = function (app) {
         next();
     });
 
-    app.post("/user/:userId/conversation", controller.createConversation);
+    // app.post("/user/:userId/conversation", controller.createConversation);
     app.get("/user/:userId/conversation", controller.getConversationList);
     app.get("/user/:userId/conversation/:conversationId", controller.getConversationDetail);
-    app.patch("/user/:userId/conversation/:conversationId", controller.updateConversation);
-    app.delete("/user/:userId/conversation/:conversationId", controller.deleteConversation);
+    // app.patch("/user/:userId/conversation/:conversationId", controller.updateConversation);
+    // app.delete("/user/:userId/conversation/:conversationId", controller.deleteConversation);
 };

@@ -41,7 +41,6 @@ require(appRoot + "/routes/Oauth-routes")(app);
 require(appRoot + "/routes/friends-routes")(app);
 require(appRoot + "/routes/playlist-routes")(app);
 require(appRoot + "/routes/room-routes")(app);
-require(appRoot + "/routes/event-routes")(app);
 require(appRoot + "/routes/messaging-routes")(app);
 
 module.exports = app;

@@ -67,9 +67,9 @@ module.exports = function (app) {
     controller.voteMusicRoom
   );
 
-  app.post(
-    "/room/:roomId/change-type",
-    [authJwt.verifyToken],
-    controller.changeType
-  );
+  // app.post(
+  //   "/room/:roomId/change-type",
+  //   [authJwt.verifyToken],
+  //   controller.changeType
+  // );
 };

@@ -2,92 +2,369 @@
 <html>
 
 <head>
-    <title>Socket.IO chat</title>
+    <title>Socket documentation</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
     <style>
-        body {
-            margin: 0;
-            padding-bottom: 3rem;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        .main {
+            margin: 5%;
         }
 
-        #form {
-            background: rgba(0, 0, 0, 0.15);
-            padding: 0.25rem;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            display: flex;
-            height: 3rem;
-            box-sizing: border-box;
-            backdrop-filter: blur(10px);
+        .p {
+            padding: 0%;
+            margin-bottom: 0% !important;
         }
 
-        #input {
-            border: none;
-            padding: 0 1rem;
-            flex-grow: 1;
-            border-radius: 2rem;
-            margin: 0.25rem;
+        .row {
+            padding: 1%;
+            border-radius: 4px;
+            margin-bottom: 2%;
         }
 
-        #input:focus {
-            outline: none;
+        .user {
+            background-color: #D8FF8E;
+            border: 0.1rem solid #6FF723;
         }
 
-        #form>button {
-            background: #333;
-            border: none;
-            padding: 0 1rem;
-            margin: 0.25rem;
-            border-radius: 3px;
-            outline: none;
-            color: #fff;
+        .chat {
+            background-color: #FFEFBE;
+            border: 0.1rem solid #F1BC18;
         }
 
-        #messages {
-            list-style-type: none;
-            margin: 0;
-            padding: 0;
+        .room {
+            background-color: #B0E9FF;
+            border: 0.1rem solid #18B4F1;
         }
 
-        #messages>li {
-            padding: 0.5rem 1rem;
-        }
-
-        #messages>li:nth-child(odd) {
-            background: #efefef;
+        .playlist {
+            background-color: #E0D9FF;
+            border: 0.1rem solid #6E4FF6;
         }
     </style>
 </head>
 
 <body>
-    <ul id="messages"></ul>
-    <form id="form" action="">
-        <input id="input" autocomplete="off" /><button>Send</button>
-    </form>
+    <nav class="navbar navbar-dark bg-dark">
+        <a class="navbar-brand font-weight-bold" href="http://localhost:8080/explorer_socket/">Socket API
+            Documentation</a>
+    </nav>
+    <div class="main">
+        <h2 class="font-weight-bold">Music-Room socket API</h2>
+        <p>server: http://localhost:8080</p>
+        <h4 class="font-weight-bold">Socket operation</h4>
+        <h5 class="font-weight-bold" style="margin: 3%;">User:</h5>
+        <div class="row user">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "user edit"</p>
+                <p class="font-italic text-secondary">Edit user profile</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>userId: string</p>
+                <p>user: object</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "user update ${userId}"</p>
+                <p class="font-italic text-secondary">Send user data updated</p>
+            </div>
+        </div>
+        <h5 class="font-weight-bold" style="margin: 3%;">Chat:</h5>
+        <div class="row chat">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "chat message"</p>
+                <p class="font-italic text-secondary">send message</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>userId: string</p>
+                <p>convId: string</p>
+                <p>message: string</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "chat message ${data.convId}"</p>
+                <p class="font-italic text-secondary">Send message</p>
+                <p>EMIT: "chat convs ${user.userId}"</p>
+                <p class="font-italic text-secondary">Send updated conversation for each user in conversation</p>
+            </div>
+        </div>
+        <div class="row chat">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "chat create conv"</p>
+                <p class="font-italic text-secondary">Create new conversation</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>name: string</p>
+                <p>users: [{ name: String, userId: String }]</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "chat convs ${user.userId}"</p>
+                <p class="font-italic text-secondary">Send conversation informations for each user in the conversation
+                </p>
+            </div>
+        </div>
+        <h5 class="font-weight-bold" style="margin: 3%;">Room:</h5>
+        <div class="row room">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "room create"</p>
+                <p class="font-italic text-secondary">Create a new room</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>userId: string</p>
+                <p>name: string</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "room create"</p>
+                <p class="font-italic text-secondary">Send new room informations</p>
+            </div>
+        </div>
+        <div class="row room">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "room enter"</p>
+                <p class="font-italic text-secondary">Join a room</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>userId: string</p>
+                <p>roomId: string</p>
+                <p>deviceId: string</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "room update ${data.roomId}"</p>
+                <p class="font-italic text-secondary">Send updated room informations</p>
+            </div>
+        </div>
+        <div class="row room">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "room add music"</p>
+                <p class="font-italic text-secondary">Add a music in a room</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>userId: string</p>
+                <p>roomId: string</p>
+                <p>trackId: string</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "room update ${data.roomId}"</p>
+                <p class="font-italic text-secondary">Send updated room informations</p>
+            </div>
+        </div>
+        <div class="row room">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "room del music"</p>
+                <p class="font-italic text-secondary">Delete a music in a room</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>roomId: string</p>
+                <p>trackId: string</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "room update ${data.roomId}"</p>
+                <p class="font-italic text-secondary">Send updated room informations</p>
+            </div>
+        </div>
+        <div class="row room">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "room invite"</p>
+                <p class="font-italic text-secondary">Invite a friend to a room</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>roomId: string</p>
+                <p>userId: string</p>
+                <p>friendId: string</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "user update ${data.friendId}"</p>
+                <p class="font-italic text-secondary">Send user informations updated</p>
+            </div>
+        </div>
+        <div class="row room">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "room change type"</p>
+                <p class="font-italic text-secondary">Change the type of a room to 'public' or 'private'</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>roomId: string</p>
+                <p>userId: string</p>
+                <p>type: string</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "room update ${data.roomId}"</p>
+                <p class="font-italic text-secondary">send room informations updated</p>
+            </div>
+        </div>
+        <div class="row room">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "room delete"</p>
+                <p class="font-italic text-secondary">Delete a room</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>roomId: string</p>
+                <p>userId: string</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "room create"</p>
+                <p class="font-italic text-secondary">send room list without the room delete</p>
+            </div>
+        </div>
+        <h5 class="font-weight-bold" style="margin: 3%;">playlist:</h5>
+        <div class="row playlist">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "playlist create"</p>
+                <p class="font-italic text-secondary">Create a new playlist</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>userId: string</p>
+                <p>name: string</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "playlist create"</p>
+                <p class="font-italic text-secondary">Send new playlist informations</p>
+            </div>
+        </div>
+        <div class="row playlist">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "playlist add music"</p>
+                <p class="font-italic text-secondary">Add a music in a playlist</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>userId: string</p>
+                <p>playlistId: string</p>
+                <p>trackId: string</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "playlist update ${data.playlistId}"</p>
+                <p class="font-italic text-secondary">Send updated playlist informations</p>
+            </div>
+        </div>
+        <div class="row playlist">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "playlist del music"</p>
+                <p class="font-italic text-secondary">Delete a music in a playlist</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>playlistId: string</p>
+                <p>trackId: string</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "playlist update ${data.playlistId}"</p>
+                <p class="font-italic text-secondary">Send updated playlist informations</p>
+            </div>
+        </div>
+        <div class="row playlist">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "playlist invite"</p>
+                <p class="font-italic text-secondary">Invite a friend to a playlist</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>playlistId: string</p>
+                <p>userId: string</p>
+                <p>friendId: string</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "user update ${data.friendId}"</p>
+                <p class="font-italic text-secondary">Send user informations updated</p>
+            </div>
+        </div>
+        <div class="row playlist">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "playlist accept invite"</p>
+                <p class="font-italic text-secondary">Invite a friend to a playlist</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>playlistId: string</p>
+                <p>userId: string</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "playlist update ${data.playlistId}"</p>
+                <p class="font-italic text-secondary">Send playlist informations updated</p>
+            </div>
+        </div>
+        <div class="row playlist">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "playlist edit"</p>
+                <p class="font-italic text-secondary">Edit playlist informations</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>playlistId: string</p>
+                <p>playlistBody: object</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "playlist update ${data.playlistId}"</p>
+                <p class="font-italic text-secondary">send playlist informations updated</p>
+            </div>
+        </div>
+        <div class="row playlist">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "playlist change type"</p>
+                <p class="font-italic text-secondary">Change the type of a playlist to 'public' or 'private'</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>playlistId: string</p>
+                <p>userId: string</p>
+                <p>type: string</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "playlist update ${data.playlistId}"</p>
+                <p class="font-italic text-secondary">send playlist informations updated</p>
+            </div>
+        </div>
+        <div class="row playlist">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "playlist delete"</p>
+                <p class="font-italic text-secondary">Delete a playlist</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>playlistId: string</p>
+                <p>userId: string</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "playlist create"</p>
+                <p class="font-italic text-secondary">send playlist list without the playlist delete</p>
+            </div>
+        </div>
+    </div>
 </body>
-<script src="http://localhost:8080/socket.io/socket.io.js"></script>
-<script>
-    var socket = io();
-
-    var form = document.getElementById('form');
-    var input = document.getElementById('input');
-
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
-        if (input.value) {
-            socket.emit('chat message', input.value);
-            input.value = '';
-        }
-    });
-
-    socket.on('chat message', function (msg) {
-        var item = document.createElement('li');
-        item.textContent = msg;
-        messages.appendChild(item);
-        window.scrollTo(0, document.body.scrollHeight);
-    });
-</script>
 
 </html>

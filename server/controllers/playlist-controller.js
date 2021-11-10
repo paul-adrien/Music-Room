@@ -117,7 +117,7 @@ exports.checkName = (req, res) => {
 };
 
 exports.getPlaylist = (req, res, next) => {
-  const { userId, playlistId } = req.params;
+  const { playlistId } = req.params;
 
   Playlist.findOne({ _id: playlistId }).exec((err, playlist) => {
     if (err) {
@@ -234,7 +234,7 @@ exports.delPlaylistSocket = async (userId, playlistId) => {
 };
 
 exports.editPlaylist = async (req, res, next) => {
-  const { userId, playlistId } = req.params;
+  const { playlistId } = req.params;
   const playlistBody = req.body.playlist;
 
   Playlist.findOne({ _id: playlistId }).exec(async (err, playlist) => {

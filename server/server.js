@@ -27,7 +27,7 @@ server.on("listening", () => {
   console.log("Listening on " + bind);
 });
 
-app.get("/test-socket", (req, res) => {
+app.get("/explorer_socket", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
 

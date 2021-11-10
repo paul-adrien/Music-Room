@@ -59,24 +59,24 @@ module.exports = function (app) {
     controller.acceptInvitePlaylist,
     logs
   );
-  app.delete(
-    "/playlist/:playlistId/refuseInvite",
-    [authJwt.verifyToken],
-    controller.refuseInviteToPlaylist,
-    logs
-  );
-  app.delete(
-    "/playlist/:playlistId/quitPlaylist",
-    [authJwt.verifyToken],
-    controller.quitPlaylist,
-    logs
-  );
+  // app.delete(
+  //   "/playlist/:playlistId/refuseInvite",
+  //   [authJwt.verifyToken],
+  //   controller.refuseInviteToPlaylist,
+  //   logs
+  // );
+  // app.delete(
+  //   "/playlist/:playlistId/quitPlaylist",
+  //   [authJwt.verifyToken],
+  //   controller.quitPlaylist,
+  //   logs
+  // );
 
-  app.post(
-    "/playlist/:playlistId/change-type",
-    [authJwt.verifyToken],
-    controller.changeType
-  );
+  // app.post(
+  //   "/playlist/:playlistId/change-type",
+  //   [authJwt.verifyToken],
+  //   controller.changeType
+  // );
 
   //app.put("/playlist/:playlistId/friends/:friendId", [authJwt.verifyToken], controller.editUserPlaylist)
 };
