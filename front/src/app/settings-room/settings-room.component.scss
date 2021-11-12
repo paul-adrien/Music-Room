@@ -10,11 +10,51 @@
     align-items: center;
   }
 
+  .time-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .time {
+    border: 1px solid var(--light-grey-color);
+    padding: 0.2rem;
+    border-radius: 4px;
+  }
+
+  .form-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+  }
+
+  .form-label {
+    margin-bottom: 0.5rem;
+  }
+
   ion-toggle {
     --background: #fff;
     --background-checked: var(--green-color);
 
     // --handle-background: #7a49a5;
     // --handle-background-checked: #000;
+  }
+  #map {
+    height: 15rem;
+    width: 100%;
+    margin-bottom: 0.5rem;
+  }
+
+  input {
+    height: 2.5rem;
+    width: 100%;
+    padding: 6px 12px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    margin-bottom: 1rem;
+    background-color: grey;
+    color: var(--color-text);
+    border: none;
   }
 }

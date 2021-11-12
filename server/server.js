@@ -1,10 +1,12 @@
-var path = require('path');
+var path = require("path");
 global.appRoot = path.resolve(__dirname);
 const http = require("http");
 const app = require(appRoot + "/app");
-const messaging_controller = require(appRoot + "/controllers/messaging-controller");
+const messaging_controller = require(appRoot +
+  "/controllers/messaging-controller");
 const room_controller = require(appRoot + "/controllers/room-controller");
-const playlist_controller = require(appRoot + "/controllers/playlist-controller");
+const playlist_controller = require(appRoot +
+  "/controllers/playlist-controller");
 const user_controller = require(appRoot + "/controllers/user-controller");
 const { getUser } = require(appRoot + "/models/lib-user.model");
 
@@ -175,30 +177,39 @@ io.on("connection", (socket) => {
       .changeTypeSocket(data.userId, data.roomId, data.type)
       .then(() =>
         room_controller.getRoomSocket(data.roomId).then((res) => {
-          console.log(res)
+          console.log(res);
           if (res.status) {
             io.emit(`room update ${data.roomId}`, res.room);
             room_controller.getAllRoomSocket().then((res) => {
               if (res.status) {
                 io.emit("room create", res.rooms);
               }
-            })
+            });
           }
         })
       );
   });
 
   socket.on("room delete", (data) => {
-    room_controller
-      .delRoomSocket(data.userId, data.roomId)
-      .then(() => {
-        io.emit(`room delete ${data.roomId}`);
-        room_controller.getAllRoomSocket().then((res) => {
-          if (res.status) {
-            io.emit("room create", res.rooms);
-          }
-        })
+    room_controller.delRoomSocket(data.userId, data.roomId).then(() => {
+      io.emit(`room delete ${data.roomId}`);
+      room_controller.getAllRoomSocket().then((res) => {
+        if (res.status) {
+          io.emit("room create", res.rooms);
+        }
       });
+    });
+  });
+
+  socket.on("add geo/hours limit", (data) => {
+    room_controller.addGeoHours(data).then((res) => {
+      room_controller.getRoomSocket(data.roomId).then((res) => {
+        console.log("wesh ici connard");
+        if (res.status) {
+          io.emit(`room update ${data.roomId}`, res.room);
+        }
+      });
+    });
   });
 
   // PLAYLIST ////////////////////////////////////////////////////////////////////
@@ -285,7 +296,7 @@ io.on("connection", (socket) => {
               if (res.status) {
                 io.emit("playlist create", res.playlists);
               }
-            })
+            });
           }
         })
       );
@@ -300,7 +311,7 @@ io.on("connection", (socket) => {
           if (res.status) {
             io.emit("playlist create", res.playlists);
           }
-        })
+        });
       });
   });
 });

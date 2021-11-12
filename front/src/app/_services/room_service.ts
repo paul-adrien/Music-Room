@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 import { mapUserBackToUserFront, User } from 'libs/user';
 import { map, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
+import { WebsocketService } from './websocketService';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
@@ -18,7 +19,8 @@ export class RoomService {
   constructor(
     private http: HttpClient,
     private route: Router,
-    public navCtrl: NavController
+    public navCtrl: NavController,
+    private socketService: WebsocketService
   ) {}
 
   createRoom(user: Partial<User>, name: string): Observable<any> {
@@ -140,6 +142,25 @@ export class RoomService {
         userId: userId,
         type: type,
       },
+      httpOptions
+    );
+  }
+
+  addGeoAndHoursLimit(form, circleData, roomId, userId) {
+    this.socketService.emitToServer('add geo/hours limit', {
+      roomId,
+      userId,
+      radius: circleData.radius,
+      center: circleData.center,
+      start: form.start,
+      end: form.end,
+    });
+  }
+
+  checkLimit(roomId: string, lat, long) {
+    return this.http.get<any>(
+      environment.AUTH_API +
+        `room/${roomId}/check-limit?lat=${lat}&long=${long}`,
       httpOptions
     );
   }
