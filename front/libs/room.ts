@@ -16,6 +16,7 @@ export interface Room {
   }[];
   progress_ms: number;
   type: 'public' | 'private';
+  onlyInvited: boolean;
   limits: {
     radius: number;
     center: {

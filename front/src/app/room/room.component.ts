@@ -35,7 +35,7 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
     />
     <div class="room-container" *ngIf="this.room">
       <div class="title">
-        {{ this.room.name }}
+        {{ this.room?.name }}
       </div>
       <div *ngIf="this.trackPlaying" class="player-container">
         <div class="player-info">
@@ -46,12 +46,12 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
           <div class="player-text">
             <div class="player-name">{{ this.trackPlaying?.name }}</div>
             <div class="player-artist">
-              {{ this.trackPlaying.artists[0].name }}
+              {{ this.trackPlaying?.artists[0]?.name }}
             </div>
           </div>
         </div>
         <div
-          *ngIf="this.room.created_by === this.user.id"
+          *ngIf="this.room?.created_by === this.user?.id"
           class="buttons-controller"
         >
           <div class="circle">
@@ -80,7 +80,7 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
           mode="determinate"
           [value]="
             (this.playerInfo?.progress_ms * 100) /
-            this.playerInfo?.item.duration_ms
+            this.playerInfo?.item?.duration_ms
           "
           [color]="'warn'"
         ></mat-progress-bar>
@@ -97,7 +97,9 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
       <div class="buttons-middle">
         <div
           *ngIf="
-            this.isInvited || this.room.created_by === this.user.id || this.zone
+            this.isInvited ||
+            this.room?.created_by === this.user?.id ||
+            this.zone
           "
           class="primary-button suggestion"
           (click)="this.presentModalSuggestion()"
@@ -112,7 +114,7 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
             src="./assets/person-add-outline.svg"
           />
           <img
-            *ngIf="this.room.created_by === this.user.id"
+            *ngIf="this.room?.created_by === this.user?.id"
             class="add"
             (click)="this.presentPopoverSettings($event)"
             src="./assets/settings-white.svg"
@@ -122,10 +124,10 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
       <div class="sub-title">Prochains titres</div>
       <div *ngFor="let track of this.tracks; let isFirst = first">
         <div class="tracks-container">
-          <img class="logo" [src]="track.album.images[0].url" />
+          <img class="logo" [src]="track?.album?.images[0]?.url" />
           <div class="track-info">
-            <div class="info-top">{{ track.name }}</div>
-            <div class="info-bottom">{{ track.artists[0].name }}</div>
+            <div class="info-top">{{ track?.name }}</div>
+            <div class="info-bottom">{{ track?.artists[0]?.name }}</div>
           </div>
           <div class="buttons-vote">
             <!-- <img
@@ -140,13 +142,13 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
             <img
               *ngIf="
                 !!this.isInvited ||
-                this.room.created_by === this.user.id ||
+                this.room?.created_by === this.user?.id ||
                 this.zone
               "
               class="up"
-              (click)="this.voteTrack(track.id)"
+              (click)="this.voteTrack(track?.id)"
               [src]="
-                this.isVoteTrack(track.id)
+                this.isVoteTrack(track?.id)
                   ? './assets/thumbs-up-green.svg'
                   : './assets/thumbs-up.svg'
               "
@@ -299,12 +301,13 @@ export class RoomComponent implements OnInit, OnDestroy {
           if (
             res.progress_ms === 0 &&
             !res.is_playing &&
-            this.tracks.length > 0
+            this.tracks.length >= 0 &&
+            this.trackPlaying
           ) {
+            console.log('wesh');
             if (
               this.room.created_by === this.user.id ||
-              this.room.users[0].id === this.user.id ||
-              true
+              this.room.users[0].id === this.user.id
             ) {
               this.socketService.emitToServer('room del music', {
                 roomId: this.roomId,
@@ -382,8 +385,8 @@ export class RoomComponent implements OnInit, OnDestroy {
           });
 
           if (this.trackPlaying === undefined) {
-            this.trackPlaying = track;
             this.spotifyService.playTrack(track.uri).subscribe();
+            this.trackPlaying = track;
           }
 
           // this.roomService

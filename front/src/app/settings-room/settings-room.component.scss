@@ -8,6 +8,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin-bottom: 1rem;
   }
 
   .time-container {
@@ -56,5 +57,13 @@
     background-color: grey;
     color: var(--color-text);
     border: none;
+  }
+
+  .hidden {
+    height: 0;
+  }
+
+  .visible {
+    height: fit-content;
   }
 }

@@ -125,10 +125,10 @@ export class PlayerComponent {
   public interval;
 
   public playerInfo: {
+    device: any;
     is_playing: boolean;
     item: any;
     progress_ms: number;
-    deviceName: string;
   } = undefined;
 
   constructor(
@@ -168,7 +168,7 @@ export class PlayerComponent {
             is_playing: res.is_playing,
             item: res.item as any,
             progress_ms: res.progress_ms,
-            deviceName: res?.device?.name,
+            device: res?.device,
           };
         }
         this.cd.detectChanges();
@@ -207,8 +207,21 @@ export class PlayerComponent {
       cssClass: ['my-custom-class', 'my-custom-modal'],
       swipeToClose: true,
       componentProps: {
-        deviceName: this.playerInfo.deviceName,
+        deviceId: this.playerInfo?.device?.id,
+        deviceName: this.playerInfo?.device?.name,
       },
+    });
+
+    modal.onWillDismiss().then((res: any) => {
+      console.log(res);
+      if (res?.data?.deviceId) {
+        this.spotifyService
+          .changeDevice(res?.data?.deviceId)
+          .subscribe((data) => {
+            this.playerInfo.is_playing = true;
+            this.cd.detectChanges();
+          });
+      }
     });
     return await modal.present();
   }
@@ -236,7 +249,6 @@ export class PlayerComponent {
     // if (!this.isModal) {
     //   this.pause();
     // }
-    if (this.interval)
-      clearInterval(this.interval);
+    if (this.interval) clearInterval(this.interval);
   }
 }

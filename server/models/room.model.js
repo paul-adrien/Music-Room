@@ -25,12 +25,13 @@ const Room = mongoose.model(
       radius: Number,
       center: {
         latitude: Number,
-        longitude: Number
+        longitude: Number,
       },
       start: String,
-      end: String
+      end: String,
     },
     type: "public" | "private",
+    onlyInvited: Boolean,
     progress_ms: Number,
   })
 );

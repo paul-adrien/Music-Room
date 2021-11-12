@@ -31,7 +31,7 @@ export class SpotifyService {
     private iab: InAppBrowser,
     private ngZone: NgZone,
     private device: Device
-  ) { }
+  ) {}
 
   searchMusic(search: string) {
     return this.http
@@ -78,8 +78,8 @@ export class SpotifyService {
       .put<any>(
         deviceId
           ? `https://api.spotify.com/v1/me/player/play?device_id=${encodeURI(
-            deviceId
-          )}`
+              deviceId
+            )}`
           : `https://api.spotify.com/v1/me/player/play`,
         { uris: [uri], position_ms },
         httpApiSpotifyOptions
@@ -284,8 +284,8 @@ export class SpotifyService {
       .put<any>(
         deviceId
           ? `https://api.spotify.com/v1/me/player/play?device_id=${encodeURI(
-            deviceId
-          )}`
+              deviceId
+            )}`
           : `https://api.spotify.com/v1/me/player/play`,
         {},
         httpApiSpotifyOptions
@@ -306,8 +306,8 @@ export class SpotifyService {
       .put<any>(
         deviceId
           ? `https://api.spotify.com/v1/me/player/pause?device_id=${encodeURI(
-            deviceId
-          )}`
+              deviceId
+            )}`
           : `https://api.spotify.com/v1/me/player/pause`,
         {},
         httpApiSpotifyOptions
@@ -328,7 +328,7 @@ export class SpotifyService {
     return this.http
       .put<any>(
         `https://api.spotify.com/v1/me/player`,
-        { device_ids: [deviceId] },
+        { device_ids: [deviceId], play: true },
         httpApiSpotifyOptions
       )
       .pipe(

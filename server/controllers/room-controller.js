@@ -1090,6 +1090,29 @@ exports.changeTypeSocket = async (userId, roomId, type) => {
   });
 };
 
+exports.changeTypeInvitedSocket = async (userId, roomId, type) => {
+  return Room.findOne({ _id: roomId, created_by: userId }).then((room) => {
+    if (!room) {
+      return {
+        status: false,
+        message: "this room doesn't exist or you dont have the good right",
+      };
+    } else {
+      return Room.updateOne(
+        { _id: roomId },
+        {
+          onlyInvited: type,
+        }
+      ).then((room) => {
+        return {
+          status: true,
+          message: "this room change type onlyInvited",
+        };
+      });
+    }
+  });
+};
+
 async function isInCirc(latitude, longitude, radius, center) {
   console.log(latitude, longitude, radius, center);
   return new Promise((res, rej) => {

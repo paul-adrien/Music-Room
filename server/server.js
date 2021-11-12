@@ -190,6 +190,19 @@ io.on("connection", (socket) => {
       );
   });
 
+  socket.on("room change type invited", (data) => {
+    room_controller
+      .changeTypeInvitedSocket(data.userId, data.roomId, data.type)
+      .then(() =>
+        room_controller.getRoomSocket(data.roomId).then((res) => {
+          console.log(res);
+          if (res.status) {
+            io.emit(`room update ${data.roomId}`, res.room);
+          }
+        })
+      );
+  });
+
   socket.on("room delete", (data) => {
     room_controller.delRoomSocket(data.userId, data.roomId).then(() => {
       io.emit(`room delete ${data.roomId}`);

@@ -36,8 +36,19 @@ declare var google: any;
         (click)="this.changeType($event)"
       ></ion-toggle>
     </div>
+    <div *ngIf="this.type === 'room'" class="item-container">
+      <div class="item-name">Seul les invités peuvent voter</div>
+      <ion-toggle
+        [(ngModel)]="this.invited"
+        [checked]="this.room.onlyInvited"
+        (click)="this.changeTypeInvited($event)"
+      ></ion-toggle>
+    </div>
+    <div class="item-container">
+      <div class="item-name">Plage horaire de la room:</div>
+      <ion-toggle [(ngModel)]="this.zone" [checked]="this.zone"></ion-toggle>
+    </div>
     <div>
-      <p>Plage horaire de la room:</p>
       <div class="time-container">
         <div>Début</div>
         <ion-datetime
@@ -152,7 +163,8 @@ export class SettingsRoomComponent implements OnInit {
   public circlesData: object;
 
   public toggle = false;
-  public test = false;
+  public zone = true;
+  public invited = false;
 
   constructor(
     private popoverCtrl: PopoverController,
@@ -172,25 +184,22 @@ export class SettingsRoomComponent implements OnInit {
         if (data.status === false) this.toggle = !this.toggle;
         this.cd.detectChanges();
       });
-    this.socketService
-      .listenToServer('room update limits')
-      .subscribe((data) => {
-        console.log(data);
-      });
   }
 
   ngOnInit(): void {
     if (this.type === 'room') {
       this.toggle = this.room.type === 'private' ? true : false;
+      this.invited = this.room.onlyInvited;
     } else if (this.type === 'playlist') {
       this.toggle = this.playlist.type === 'private' ? true : false;
     }
     this.cd.detectChanges();
+
     this.mapInitializer();
     $('#pac-input3').on('input', function (e) {
       $('.pac-container').append(`<style>.pac-container {
         z-index: 10000 !important;
-    }</style>`);
+      }</style>`);
     });
   }
 
@@ -279,6 +288,18 @@ export class SettingsRoomComponent implements OnInit {
         type: !this.toggle ? 'private' : 'public',
       });
     }
+    // this.cd.detectChanges();
+  }
+
+  changeTypeInvited(event: any) {
+    if (this.type === 'room') {
+      this.socketService.emitToServer('room change type invited', {
+        userId: this.userId,
+        roomId: this.room?._id,
+        type: !this.invited,
+      });
+    }
+
     // this.cd.detectChanges();
   }
 
