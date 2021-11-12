@@ -38,36 +38,39 @@ declare var google: any;
     </div>
     <div>
       <p>Plage horaire de la room:</p>
-      <ion-item>
-        <ion-label>début</ion-label>
+      <div class="time-container">
+        <div>Début</div>
         <ion-datetime
+          class="time"
           name="start"
           display-format="HH:mm"
           minute-values="0,15,30,45"
           [(ngModel)]="this.form.start"
         >
         </ion-datetime>
-      </ion-item>
-      <ion-item>
-        <ion-label>fin</ion-label>
+      </div>
+      <div class="time-container">
+        <div>Fin</div>
         <ion-datetime
+          class="time"
           name="end"
           display-format="HH:mm"
           minute-values="0,15,30,45"
           [(ngModel)]="this.form.end"
         >
         </ion-datetime>
-      </ion-item>
+      </div>
       <p>Créez une zone pour délimiter votre room:</p>
       <form
         name="form"
         (ngSubmit)="f.form.valid && SubmitCirc()"
         #f="ngForm"
         novalidate
+        class="form-container"
       >
         <div class="form-group">
           <div class="mb-3">
-            <label for="radiusCirc" class="form-label">Radius (meters)</label>
+            <div for="radiusCirc" class="form-label">Radius (mètres)</div>
             <input
               name="radiusCirc"
               type="text"
@@ -80,7 +83,7 @@ declare var google: any;
             />
           </div>
           <div class="mb-3">
-            <label for="pac-input3" class="form-label">Location</label>
+            <div for="pac-input3" class="form-label">Localisation</div>
             <div>
               <input
                 #searchCirc
@@ -98,14 +101,20 @@ declare var google: any;
             a circle
           </p>
         </div>
-        <ion-button type="submit" class="btn btn-primary">Create</ion-button>
+        <ion-button type="submit" size="small" class="btn btn-primary"
+          >Créer le rayon</ion-button
+        >
       </form>
       <div>
         <div #mapContainer id="map"></div>
         <div id="mapError"></div>
       </div>
-      <ion-button (click)="submitForm()" [disabled]="!formReady" expand="block"
-        >sauvegarder</ion-button
+      <ion-button
+        (click)="submitForm()"
+        [disabled]="!formReady"
+        expand="block"
+        size="small"
+        >Sauvegarder</ion-button
       >
     </div>
   `,

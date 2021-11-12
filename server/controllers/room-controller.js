@@ -1108,6 +1108,42 @@ async function isInCirc(latitude, longitude, radius, center) {
   });
 }
 
+exports.checkLimitRoom = async (req, res) => {
+  const { lat, long } = req.query;
+  const { roomId } = req.params;
+
+  Room.findOne({ _id: roomId }).exec(async (err, room) => {
+    if (err) {
+      return res.json({
+        status: false,
+        message: err,
+      });
+    } else if (!room) {
+      return res.json({
+        status: false,
+        message: "this room doesn't exist or you dont have the good right",
+      });
+    } else {
+      if (room?.limits) {
+        const isIn = await checkLimits(lat, long, room.limits);
+        if (isIn) {
+          return res.json({
+            status: true,
+            isIn: isIn,
+            message: "The user is in limit",
+          });
+        } else {
+          return res.json({
+            status: true,
+            isIn: isIn,
+            message: "The user isn't in limit",
+          });
+        }
+      }
+    }
+  });
+};
+
 async function checkLimits(lat, lng, limits) {
   return new Promise(async (res, rej) => {
     var date = new Date();
@@ -1119,12 +1155,7 @@ async function checkLimits(lat, lng, limits) {
     if (
       start < current &&
       current < end &&
-      (await isInCirc(
-        48.821600006101455,
-        2.3128229145919192,
-        limits.radius,
-        limits.center
-      )) === true
+      (await isInCirc(lat, lng, limits.radius, limits.center)) === true
     )
       res(true);
     else res(false);

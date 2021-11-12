@@ -16,4 +16,13 @@ export interface Room {
   }[];
   progress_ms: number;
   type: 'public' | 'private';
+  limits: {
+    radius: number;
+    center: {
+      latitude: number;
+      longitude: number;
+    };
+    start: string;
+    end: string;
+  };
 }

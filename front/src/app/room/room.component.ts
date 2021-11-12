@@ -23,6 +23,7 @@ import { Location } from '@angular/common';
 import { forkJoin } from 'rxjs';
 import { SettingsRoomComponent } from '../settings-room/settings-room.component';
 import { WebsocketService } from '../_services/websocketService';
+import { Geolocation } from '@ionic-native/geolocation/ngx';
 
 @Component({
   selector: 'app-room',
@@ -95,7 +96,9 @@ import { WebsocketService } from '../_services/websocketService';
       </div>
       <div class="buttons-middle">
         <div
-          *ngIf="this.isInvited || this.room.created_by === this.user.id"
+          *ngIf="
+            this.isInvited || this.room.created_by === this.user.id || this.zone
+          "
           class="primary-button suggestion"
           (click)="this.presentModalSuggestion()"
         >
@@ -135,7 +138,11 @@ import { WebsocketService } from '../_services/websocketService';
             /> -->
             <div>{{ this.getNbVoteTrack(track.id) }}</div>
             <img
-              *ngIf="!!this.isInvited || this.room.created_by === this.user.id"
+              *ngIf="
+                !!this.isInvited ||
+                this.room.created_by === this.user.id ||
+                this.zone
+              "
               class="up"
               (click)="this.voteTrack(track.id)"
               [src]="
@@ -162,8 +169,10 @@ export class RoomComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     public modalController: ModalController,
     private popoverCtrl: PopoverController,
-    private socketService: WebsocketService
+    private socketService: WebsocketService,
+    private geolocation: Geolocation
   ) {
+    console.log(`room update ${this.roomId}`);
     this.socketService
       .listenToServer(`room update ${this.roomId}`)
       .subscribe((data) => {
@@ -178,6 +187,29 @@ export class RoomComponent implements OnInit, OnDestroy {
               : false;
           if (this.isInvited === false && this.room.type === 'private')
             this.quitRoom();
+        }
+
+        if (this.room?.limits) {
+          this.geolocation
+            .getCurrentPosition()
+            .then((resp) => {
+              this.roomService
+                .checkLimit(
+                  this.room._id,
+                  resp.coords.latitude,
+                  resp.coords.longitude
+                )
+                .subscribe((res) => {
+                  if (res.status) {
+                    this.zone = res.isIn;
+                  }
+                });
+            })
+            .catch((error) => {
+              console.log('Error getting location', error);
+            });
+        } else {
+          this.zone = undefined;
         }
 
         this.room.musics = this.room.musics.filter(
@@ -203,6 +235,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   public tracks = [];
   public trackPlaying: any;
   public isInvited = false;
+  public zone = undefined;
 
   public playerInfo: { is_playing: boolean; item: any; progress_ms: number } =
     undefined;
@@ -347,6 +380,11 @@ export class RoomComponent implements OnInit, OnDestroy {
             roomId: this.roomId,
             trackId: track.id,
           });
+
+          if (this.trackPlaying === undefined) {
+            this.trackPlaying = track;
+            this.spotifyService.playTrack(track.uri).subscribe();
+          }
 
           // this.roomService
           //   .addTrack(track.id, this.roomId, this.user.id)

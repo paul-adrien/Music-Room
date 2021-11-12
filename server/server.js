@@ -203,7 +203,12 @@ io.on("connection", (socket) => {
 
   socket.on("add geo/hours limit", (data) => {
     room_controller.addGeoHours(data).then((res) => {
-      io.emit("room update limits", res);
+      room_controller.getRoomSocket(data.roomId).then((res) => {
+        console.log("wesh ici connard");
+        if (res.status) {
+          io.emit(`room update ${data.roomId}`, res.room);
+        }
+      });
     });
   });
 

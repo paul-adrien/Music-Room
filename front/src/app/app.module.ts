@@ -1,3 +1,4 @@
+import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { Camera } from '@ionic-native/camera/ngx';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 import { Device } from '@ionic-native/device/ngx';
@@ -69,7 +70,8 @@ const config: SocketIoConfig = { url: environment.AUTH_API, options: {} };
     WebsocketService,
     InAppBrowser,
     Camera,
+    Geolocation,
   ],
   bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}

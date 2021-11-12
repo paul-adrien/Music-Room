@@ -19,7 +19,11 @@ module.exports = function (app) {
   app.post("/room", [authJwt.verifyToken], controller.CreateRoom);
 
   app.get("/room/:roomId", [authJwt.verifyToken], controller.getRoom);
-  app.delete("/room/:roomId/user/:userId", [authJwt.verifyToken], controller.delRoom);
+  app.delete(
+    "/room/:roomId/user/:userId",
+    [authJwt.verifyToken],
+    controller.delRoom
+  );
 
   app.post(
     "/room/:roomId/music/:trackId",
@@ -65,6 +69,12 @@ module.exports = function (app) {
     "/room/:roomId/music/:trackId/vote",
     [authJwt.verifyToken],
     controller.voteMusicRoom
+  );
+
+  app.get(
+    "/room/:roomId/check-limit",
+    [authJwt.verifyToken],
+    controller.checkLimitRoom
   );
 
   // app.post(
