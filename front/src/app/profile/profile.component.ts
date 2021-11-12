@@ -12,7 +12,7 @@ import { Playlist } from 'libs/playlist';
 import { Observable } from 'rxjs-compat/Observable';
 import { Device } from '@ionic-native/device/ngx';
 import { Router } from '@angular/router';
-import { AlertController, ModalController } from '@ionic/angular';
+import { AlertController, ModalController, NavController } from '@ionic/angular';
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { SearchComponent } from './../search/search.component';
@@ -289,9 +289,7 @@ export class ProfileComponent implements OnInit {
       if (res?.data?.user) {
         const user = res.data.user;
         console.log(user);
-        this.socketService.emitToServer('user profile', {
-          userId: this.user.id,
-        });
+        this.router.navigate([`tabs/user-profile/${user.id}`]);
       }
     });
     return await modal.present();

@@ -3,7 +3,6 @@ import { UserService } from './../_services/user_service';
 import { RoomService } from './../_services/room_service';
 import { Room } from './../../../libs/room';
 import { SpotifyService } from './../_services/spotify_service';
-import { AuthService } from './../_services/auth_service';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { User } from 'libs/user';
 import { PlaylistService } from '../_services/playlist_service';
@@ -14,6 +13,7 @@ import { Router } from '@angular/router';
 import { AlertController, ModalController } from '@ionic/angular';
 import { forkJoin } from 'rxjs';
 import { Location } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-user-profile',
@@ -56,9 +56,9 @@ export class UserProfileComponent implements OnInit {
   public user: User;
   public playlists: Playlist[];
   public rooms: Room[];
+  public friends: boolean;
 
   constructor(
-    private authService: AuthService,
     private userService: UserService,
     private spotifyService: SpotifyService,
     private playlistService: PlaylistService,
@@ -69,12 +69,18 @@ export class UserProfileComponent implements OnInit {
     private modalController: ModalController,
     private socketService: WebsocketService,
     private cd: ChangeDetectorRef,
-    private location: Location
+    private location: Location,
+    private route: ActivatedRoute,
   ) {
-    const user = this.authService.getUser();
+    const userId = this.route.snapshot.params.id;
+    console.log("user id ==> ", userId);
+    const user = this.userService.getUser(userId);
+    //console.log("this.friends 1==> ", this.friends, userId, this.user.email);
+    //this.friends = this.user.friends.indexOf(userId) >= 0 ? true : false;
+    //console.log("this.friends 2==> ", this.friends);
 
     this.socketService
-      .listenToServer(`user update ${user?.id}`)
+      .listenToServer(`user update ${userId}`)
       .subscribe((data) => {
         this.user = data;
         if (typeof this.user.picture !== 'string' && this.user.picture) {
@@ -90,7 +96,10 @@ export class UserProfileComponent implements OnInit {
       .subscribe((data) => {
         this.playlists = data.filter((playlist: Playlist) => {
           if (playlist.created_by === this.user.id)
-            return true;
+            if (this.friends == false && playlist.type == "private")
+              return false;
+            else
+              return true;
           else
             return false;
         });
@@ -113,8 +122,8 @@ export class UserProfileComponent implements OnInit {
   public base64data: string;
 
   ngOnInit() {
-    this.user = this.authService.getUser();
-    this.userService.getUser(this.user?.id).subscribe(async (res) => {
+    const userId = this.route.snapshot.params.id
+    this.userService.getUser(userId).subscribe(async (res) => {
       this.user = res;
       console.log(res);
       if (typeof this.user?.picture !== 'string' && this.user?.picture) {
@@ -124,6 +133,7 @@ export class UserProfileComponent implements OnInit {
       }
       this.cd.detectChanges();
     });
+    this.friends = this.user.friends.indexOf(userId) >= 0 ? true : false;
 
     forkJoin([
       this.roomService.getAllRoom(),
@@ -150,11 +160,13 @@ export class UserProfileComponent implements OnInit {
   }
 
   addFriend() {
-    console.log("addFriend called !")
+    console.log("addFriend called !");
+    this.friends = true;
   }
 
   removeFriend() {
-    console.log("removeFriend called !")
+    console.log("removeFriend called !");
+    this.friends = false;
   }
 
   openPlaylist(playlistId: string) {
