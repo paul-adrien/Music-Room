@@ -1,4 +1,5 @@
-const { updateUser, getUser, getUsers } = require(appRoot + "/models/lib-user.model");
+const { updateUser, getUser, getUsers } = require(appRoot +
+  "/models/lib-user.model");
 var nodemailer = require("nodemailer");
 const User = require(appRoot + "/models/users.model");
 var bcrypt = require("bcryptjs");
@@ -92,9 +93,9 @@ exports.getSearchProfile = async (req, res, next) => {
   const { search } = req.query;
   const users = await getUsers({
     $or: [
-      { userName: { $regex: search.toString() } },
-      { lastName: { $regex: search.toString() } },
-      { firstName: { $regex: search.toString() } },
+      { userName: { $regex: search.toString(), $options: "i" } },
+      { lastName: { $regex: search.toString(), $options: "i" } },
+      { firstName: { $regex: search.toString(), $options: "i" } },
     ],
   });
   if (users) {

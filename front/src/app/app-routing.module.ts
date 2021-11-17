@@ -13,8 +13,6 @@ const routes: Routes = [
       import('./tabs/tabs.module').then((m) => m.TabsPageModule),
   },
   { path: 'login', component: LoginComponent },
-  { path: 'messages', component: MessagesComponent },
-  { path: 'conversation/:convId', component: ConversationComponent },
   // { path: 'search', component: SearchComponent },
   // {
   //   path: '',
@@ -29,4 +27,4 @@ const routes: Routes = [
   ],
   exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

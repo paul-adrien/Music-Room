@@ -45,7 +45,7 @@ import { Location } from '@angular/common';
             {{ conv.name }}
           </div>
           <div class="last-message">
-            {{ conv?.messages[0] || 'Envoyez un message !' }}
+            {{ conv?.messages[0].message || 'Envoyez un message !' }}
           </div>
         </div>
       </div>
@@ -131,6 +131,6 @@ export class MessagesComponent implements OnInit {
   }
 
   openConversation(id: string) {
-    this.router.navigate(['conversation/' + id]);
+    this.router.navigate([`tabs/tab-home/conversation/${id}`]);
   }
 }

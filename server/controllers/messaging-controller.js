@@ -1,6 +1,7 @@
 const { conversation } = require(appRoot + "/models");
 const db = require(appRoot + "/models");
 const Conversation = db.conversation;
+var datefns = require("date-fns");
 
 exports.getConversationList = (req, res, next) => {
   const { userId } = req.params;
@@ -37,7 +38,7 @@ exports.getConversationList = (req, res, next) => {
 exports.getConversationDetail = (req, res) => {
   const { userId, conversationId } = req.params;
 
-  Conversation.find({
+  Conversation.findOne({
     $and: [{ "users.userId": userId }, { _id: conversationId }],
   }).exec((err, conversation) => {
     if (err) {
@@ -55,18 +56,28 @@ exports.getConversationDetail = (req, res) => {
         conversation: null,
       });
     } else {
+      let conv = conversation;
+      conv.messages = conversation?.messages?.sort((a, b) => {
+        if (datefns.isBefore(new Date(a.date), new Date(b.date))) {
+          return -1;
+        } else if (datefns.isAfter(new Date(a.date), new Date(b.date))) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
       res.message = "conversation detail";
       res.status(200).json({
         status: true,
         message: "conversation detail",
-        conversation: conversation,
+        conversation: conv,
       });
     }
   });
 };
 
 exports.getConversationDetailSocket = (userId, conversationId) => {
-  return Conversation.find({
+  return Conversation.findOne({
     $and: [{ "users.userId": userId }, { _id: conversationId }],
   }).then((conversation) => {
     console.log("Conversation: ", conversation);
@@ -87,7 +98,7 @@ exports.getConversationDetailSocket = (userId, conversationId) => {
 };
 
 exports.getConversationByNameSocket = async (userId, name) => {
-  return Conversation.find({
+  return Conversation.findOne({
     $and: [{ "users.userId": userId }, { name: name }],
   }).then((conversation) => {
     if (!conversation) {
@@ -240,9 +251,11 @@ exports.sendMessage = async (userId, conversationId, message) => {
     },
     {
       $push: {
-        userId: userId,
-        message: message,
-        date: Date.now(),
+        messages: {
+          userId: userId,
+          message: message,
+          date: Date.now(),
+        },
       },
       $set: {
         last_updated: Date.now(),

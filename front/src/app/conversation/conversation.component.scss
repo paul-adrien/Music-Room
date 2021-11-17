@@ -17,15 +17,60 @@
   }
 
   .conv-container {
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    height: 50%;
+    flex-grow: 1;
+  }
+
+  .messages {
+    overflow-y: scroll;
+    flex-grow: 1;
+    width: 100%;
   }
 
   .message-container {
+    display: flex;
+    justify-content: flex-start;
+    margin: 0 1rem;
+    margin-bottom: 1rem;
+
+    &.me {
+      justify-content: flex-end;
+    }
+  }
+
+  .message-bulb {
+    width: fit-content;
+    max-width: 15rem;
     display: flex;
     background-color: var(--background-color-light-grey);
     border-radius: 4px;
     box-sizing: content-box;
     flex-direction: column;
-    overflow-y: auto;
+    padding: 0.5rem;
+
+    &.me {
+      background-color: var(--green-color);
+    }
+  }
+
+  .bottom-container {
+    height: 4rem;
+    min-height: 4rem;
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+  }
+
+  .search-container {
+    padding: 0 0.5rem;
+  }
+
+  .img-send {
+    height: 1.7rem;
+    margin-left: 1rem;
+    object-fit: contain;
   }
 }

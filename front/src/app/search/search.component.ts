@@ -1,3 +1,4 @@
+import { User } from 'libs/user';
 import { AuthService } from './../_services/auth_service';
 import { UserService } from './../_services/user_service';
 import { SpotifyService } from './../_services/spotify_service';
@@ -41,7 +42,9 @@ import { ModalController } from '@ionic/angular';
         >
           <img
             class="logo round"
-            [src]="item.picture || './assets/test-profile.jpg'"
+            [src]="
+              item?.picture ? this.getPicture(item) : './assets/person.svg'
+            "
           />
           <div class="item-info">
             <div class="info-top">{{ item.userName }}</div>
@@ -90,6 +93,14 @@ export class SearchComponent {
         this.searchRes = data.filter((el) => el.id !== user.id);
         this.cd.detectChanges();
       });
+    }
+  }
+
+  getPicture(user: User) {
+    if (typeof user?.picture !== 'string' && user?.picture) {
+      return 'data:image/jpeg;base64,' + user.picture.buffer;
+    } else {
+      return user.picture;
     }
   }
 

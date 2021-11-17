@@ -9,6 +9,7 @@ const playlist_controller = require(appRoot +
   "/controllers/playlist-controller");
 const user_controller = require(appRoot + "/controllers/user-controller");
 const { getUser } = require(appRoot + "/models/lib-user.model");
+var datefns = require("date-fns");
 
 app.set("port", 8080);
 
@@ -64,10 +65,21 @@ io.on("connection", (socket) => {
         )
       )
       .then((res) => {
+        console.log(res);
         if (res.status) {
-          io.emit(`chat message ${data.convId}`, data.message);
+          let conv = res.conversation;
+          conv.messages = res.conversation?.messages?.sort((a, b) => {
+            if (datefns.isBefore(new Date(a.date), new Date(b.date))) {
+              return -1;
+            } else if (datefns.isAfter(new Date(a.date), new Date(b.date))) {
+              return 1;
+            } else {
+              return 0;
+            }
+          });
+          io.emit(`chat message ${data.convId}`, conv);
           res?.conversation?.users?.map((user) => {
-            io.emit(`chat convs ${user.userId}`, res.conversation);
+            io.emit(`chat convs ${user.userId}`, conv);
           });
         }
       });
