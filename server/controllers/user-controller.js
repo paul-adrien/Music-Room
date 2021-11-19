@@ -237,3 +237,30 @@ exports.userUpdateAccount = async (req, res) => {
     });
   }
 };
+
+exports.userUpdateAccountSocket = async (userId, type) => {
+  console.log("userUpdateAccount called !");
+  const user = await getUser({ id: userId });
+  if (user) {
+    user.type = type;
+    if (await updateUser(user.id, user)) {
+      const tmp = await getUser({ id: userId });
+      return {
+        status: true,
+        message: "Account plan was changed",
+        user: tmp,
+      };
+    } else {
+      return {
+        status: true,
+        message: "user doesn't exist",
+        user: user,
+      };
+    }
+  } else {
+    return {
+      status: false,
+      message: "user doesn't exist",
+    };
+  }
+};

@@ -1,7 +1,7 @@
 import { forkJoin } from 'rxjs';
 import { UserService } from './../_services/user_service';
 import { User } from 'libs/user';
-import { ModalController, Platform } from '@ionic/angular';
+import { ModalController, Platform, AlertController } from '@ionic/angular';
 import {
   Component,
   OnInit,
@@ -51,7 +51,11 @@ function ValidatorEmail(control: FormControl) {
       <div class="title">Modifier le profil</div>
       <div (click)="this.saveProfile()">Enregistrer</div>
     </div>
-    <form [formGroup]="this.userForm" class="form-container">
+    <form
+      *ngIf="this.userForm"
+      [formGroup]="this.userForm"
+      class="form-container"
+    >
       <img
         class="picture"
         [src]="this.user?.picture ? this.user.picture : './assets/person.svg'"
@@ -102,6 +106,15 @@ function ValidatorEmail(control: FormControl) {
         <div class="name-input">Email</div>
       </div> -->
     </form>
+
+    <div class="premium-container">
+      <div class="premium-name">Free / Premium</div>
+      <ion-toggle
+        [(ngModel)]="this.toggle"
+        [checked]="this.user.type === 'premium'"
+        (click)="this.upgradeAccount($event)"
+      ></ion-toggle>
+    </div>
   `,
   styleUrls: ['./edit-profile.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -120,6 +133,13 @@ export class EditProfileComponent implements OnInit {
     private socketService: WebsocketService
   ) {
     this.user = this.authSercive.getUser();
+
+    this.socketService
+      .listenToServer(`user update ${this.user?.id}`)
+      .subscribe((data) => {
+        this.toggle = data.type === 'premium' ? true : false;
+        this.cd.detectChanges();
+      });
   }
 
   public userForm = new FormGroup({
@@ -133,8 +153,13 @@ export class EditProfileComponent implements OnInit {
 
   public uploadPicture = new FormData();
 
+  public toggle = false;
+
   ngOnInit() {
     this.user = this.authSercive.getUser();
+    if (this.user.type === 'premium') {
+      this.toggle = true;
+    }
     this.userService.getUser(this.user?.id).subscribe(async (res) => {
       this.user = res;
 
@@ -241,5 +266,13 @@ export class EditProfileComponent implements OnInit {
         picture: this.user?.picture,
       });
     }
+  }
+
+  upgradeAccount(event: any) {
+    this.socketService.emitToServer('user update type', {
+      userId: this.user.id,
+      type: !this.toggle ? 'premium' : 'free',
+    });
+    // this.cd.detectChanges();
   }
 }
