@@ -32,7 +32,7 @@ playlistData = {
     musicId: ""
 };
 
-describe("action with rooms in socket", function () {
+describe("action with playlist in socket", function () {
 
     var socket;
 

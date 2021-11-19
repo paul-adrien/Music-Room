@@ -39,6 +39,10 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("user disconnected");
   });
+  socket.on("test", (data) => {
+    console.log(data);
+    io.emit("test", data);
+  });
 
   // USER /////////////////////////////////////////////////////////////////////////////
 
@@ -106,6 +110,7 @@ io.on("connection", (socket) => {
   // ROOM ///////////////////////////////////////////////////////////////////////////////
 
   socket.on("room create", (data) => {
+    console.log("room create" + data.name)
     room_controller.CreateRoomSocket(data.name, data.userId).then(() =>
       room_controller.getAllRoomSocket().then((res) => {
         if (res.status) {
