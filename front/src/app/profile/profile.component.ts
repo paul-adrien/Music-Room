@@ -31,34 +31,55 @@ import { forkJoin } from 'rxjs';
       </div>
     </div>
     <div class="bottom-container">
-      <div *ngIf="(this.playlists)?.length > 0" class="title-category">
+      <div *ngIf="this.playlists?.length > 0" class="title-category">
         Playlists
       </div>
       <div class="playlists" *ngIf="this.playlists">
-        <div
-          class="result-item"
-          *ngFor="let playlist of this.playlists"
-        >
-          <img (click)="this.openPlaylist(playlist._id)" class="logo no-img" src="./assets/musical-notes.svg" />
-          <div (click)="this.openPlaylist(playlist._id)" class="item-info">
+        <div class="result-item" *ngFor="let playlist of this.playlists">
+          <img
+            (click)="
+              this.user.type == 'premium'
+                ? this.openPlaylist(playlist._id)
+                : premiumAlert()
+            "
+            class="logo no-img"
+            src="./assets/musical-notes.svg"
+          />
+          <div
+            (click)="
+              this.user.type == 'premium'
+                ? this.openPlaylist(playlist._id)
+                : premiumAlert()
+            "
+            class="item-info"
+          >
             <div class="info-top">{{ playlist.name }}</div>
             <!-- <div class="info-bottom">{{ item.artists[0].name }}</div> -->
           </div>
-          <img (click)="deletePlaylist(playlist._id)" src="./assets/trash-white.svg" class="logo no-img">
+          <img
+            (click)="deletePlaylist(playlist._id)"
+            src="./assets/trash-white.svg"
+            class="logo no-img"
+          />
         </div>
       </div>
       <div *ngIf="this.rooms" class="title-category">Rooms</div>
       <div class="rooms" *ngIf="this.rooms">
-        <div
-          class="result-item"
-          *ngFor="let room of this.rooms"
-        >
-          <img (click)="this.openRoom(room._id)" class="logo no-img" src="./assets/musical-notes.svg" />
+        <div class="result-item" *ngFor="let room of this.rooms">
+          <img
+            (click)="this.openRoom(room._id)"
+            class="logo no-img"
+            src="./assets/musical-notes.svg"
+          />
           <div (click)="this.openRoom(room._id)" class="item-info">
             <div class="info-top">{{ room.name }}</div>
             <!-- <div class="info-bottom">{{ item.artists[0].name }}</div> -->
           </div>
-          <img (click)="deleteRoom(room._id)" src="./assets/trash-white.svg" class="logo no-img">
+          <img
+            (click)="deleteRoom(room._id)"
+            src="./assets/trash-white.svg"
+            class="logo no-img"
+          />
         </div>
       </div>
     </div>
@@ -89,6 +110,7 @@ export class ProfileComponent implements OnInit {
       .listenToServer(`user update ${user?.id}`)
       .subscribe((data) => {
         this.user = data;
+
         if (typeof this.user.picture !== 'string' && this.user.picture) {
           this.user.picture = 'data:image/jpeg;base64,' + data.picture.buffer;
         } else {
@@ -97,29 +119,21 @@ export class ProfileComponent implements OnInit {
         this.cd.detectChanges();
       });
 
-    this.socketService
-      .listenToServer(`playlist create`)
-      .subscribe((data) => {
-        this.playlists = data.filter((playlist: Playlist) => {
-          if (playlist.created_by === this.user.id)
-            return true;
-          else
-            return false;
-        });
-        this.cd.detectChanges();
+    this.socketService.listenToServer(`playlist create`).subscribe((data) => {
+      this.playlists = data.filter((playlist: Playlist) => {
+        if (playlist.created_by === this.user.id) return true;
+        else return false;
       });
+      this.cd.detectChanges();
+    });
 
-    this.socketService
-      .listenToServer(`room create`)
-      .subscribe((data) => {
-        this.rooms = data.filter((room: Room) => {
-          if (room.created_by === this.user.id)
-            return true;
-          else
-            return false;
-        });
-        this.cd.detectChanges();
+    this.socketService.listenToServer(`room create`).subscribe((data) => {
+      this.rooms = data.filter((room: Room) => {
+        if (room.created_by === this.user.id) return true;
+        else return false;
       });
+      this.cd.detectChanges();
+    });
   }
 
   public base64data: string;
@@ -142,16 +156,12 @@ export class ProfileComponent implements OnInit {
       this.playlistService.getAllPlaylist(),
     ]).subscribe(([rooms, playlists]) => {
       this.rooms = rooms.filter((room: Room) => {
-        if (room.created_by === this.user.id)
-          return true;
-        else
-          return false;
+        if (room.created_by === this.user.id) return true;
+        else return false;
       });
       this.playlists = playlists.filter((playlist: Playlist) => {
-        if (playlist.created_by === this.user.id)
-          return true;
-        else
-          return false;
+        if (playlist.created_by === this.user.id) return true;
+        else return false;
       });
       this.cd.detectChanges();
     });
@@ -236,22 +246,37 @@ export class ProfileComponent implements OnInit {
   deleteRoom(id: string) {
     this.socketService.emitToServer('room delete', {
       userId: this.user.id,
-      roomId: id
+      roomId: id,
     });
   }
 
   deletePlaylist(id: string) {
     this.socketService.emitToServer('playlist delete', {
       userId: this.user.id,
-      playlistId: id
+      playlistId: id,
     });
   }
 
   logOut() {
     this.spotifyService.pause().subscribe(
-      (res) => { },
+      (res) => {},
       () => this.authService.logOut(),
       () => this.authService.logOut()
     );
+  }
+
+  async premiumAlert() {
+    console.log('premiumAlert trigered', this.user.type);
+    const alert = await this.alertController.create({
+      header: 'Attention',
+      message:
+        'Vous devez passer premium pour avoir accès à cette fonctionnalité.',
+      buttons: ['OK'],
+    });
+
+    await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+    console.log('onDidDismiss resolved with role', role);
   }
 }

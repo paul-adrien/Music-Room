@@ -56,6 +56,18 @@ io.on("connection", (socket) => {
     });
   });
 
+  socket.on("user update type", (data) => {
+    console.log(data);
+    user_controller
+      .userUpdateAccountSocket(data.userId, data.type)
+      .then((res) => {
+        console.log(res);
+        if (res?.status) {
+          io.emit(`user update ${data.userId}`, res?.user);
+        }
+      });
+  });
+
   // CHAT //////////////////////////////////////////////////////////////////////////////
 
   socket.on("chat message", (data) => {

@@ -65,7 +65,9 @@ import { Playlist } from 'libs/playlist';
       <div>Playlists</div>
       <div class="buttons">
         <img
-          (click)="this.createPlaylist()"
+          (click)="
+            this.user.type == 'premium' ? this.createPlaylist() : premiumAlert()
+          "
           class="img"
           src="./assets/add-outline.svg"
         />
@@ -74,7 +76,11 @@ import { Playlist } from 'libs/playlist';
     <div class="rooms" *ngIf="this.playlists">
       <div
         class="room-container"
-        (click)="this.openPlaylist(playlist._id)"
+        (click)="
+          this.user.type == 'premium'
+            ? this.openPlaylist(playlist._id)
+            : premiumAlert()
+        "
         *ngFor="let playlist of this.playlists"
       >
         <img class="logo-room no-img" src="./assets/radio-outline.svg" />
@@ -306,7 +312,7 @@ export class HomeComponent implements OnInit {
   async presentAlert() {
     const alert = await this.alertController.create({
       header: 'Attention',
-      message: 'Ouvre spotify avant, fdp.',
+      message: 'Ouvrez Spotify avant et lancez une musique.',
       buttons: ['OK'],
     });
 
@@ -318,5 +324,20 @@ export class HomeComponent implements OnInit {
 
   ngOnDestroy() {
     clearInterval(this.interval);
+  }
+
+  async premiumAlert() {
+    console.log('premiumAlert trigered', this.user.type);
+    const alert = await this.alertController.create({
+      header: 'Attention',
+      message:
+        'Vous devez passer premium pour avoir accès à cette fonctionnalité.',
+      buttons: ['OK'],
+    });
+
+    await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+    console.log('onDidDismiss resolved with role', role);
   }
 }

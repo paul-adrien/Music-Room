@@ -69,4 +69,23 @@
   .error {
     color: red;
   }
+
+  .premium-container {
+    display: flex;
+    align-items: center;
+    margin-top: 1rem;
+    justify-content: center;
+
+    .premium-name {
+      margin-right: 1rem;
+    }
+  }
+
+  ion-toggle {
+    --background: #fff;
+    --background-checked: var(--green-color);
+
+    // --handle-background: #7a49a5;
+    // --handle-background-checked: #000;
+  }
 }
