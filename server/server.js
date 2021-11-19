@@ -39,10 +39,10 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("user disconnected");
   });
-  socket.on("test", (data) => {
-    console.log(data);
-    io.emit("test", data);
-  });
+  // socket.on("test", (data) => {
+  //   console.log(data);
+  //   io.emit("test", data);
+  // });
 
   // USER /////////////////////////////////////////////////////////////////////////////
 
@@ -59,7 +59,6 @@ io.on("connection", (socket) => {
   // CHAT //////////////////////////////////////////////////////////////////////////////
 
   socket.on("chat message", (data) => {
-    console.log(data);
     messaging_controller
       .sendMessage(data.userId, data.convId, data.message)
       .then((res) =>
@@ -69,7 +68,6 @@ io.on("connection", (socket) => {
         )
       )
       .then((res) => {
-        console.log(res);
         if (res.status) {
           let conv = res.conversation;
           conv.messages = res.conversation?.messages?.sort((a, b) => {
@@ -90,7 +88,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("chat create conv", async (data) => {
-    console.log(data);
     messaging_controller
       .createConversationSocket(data.name, data.users)
       .then(async (res) => {
@@ -98,7 +95,6 @@ io.on("connection", (socket) => {
           data.users[0].userId,
           data.name
         );
-        console.log(conv);
         if (res.status) {
           data?.users?.map((user) => {
             io.emit(`chat convs ${user.userId}`, conv);
@@ -110,7 +106,6 @@ io.on("connection", (socket) => {
   // ROOM ///////////////////////////////////////////////////////////////////////////////
 
   socket.on("room create", (data) => {
-    console.log("room create" + data.name)
     room_controller.CreateRoomSocket(data.name, data.userId).then(() =>
       room_controller.getAllRoomSocket().then((res) => {
         if (res.status) {
@@ -133,7 +128,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("room add music", (data) => {
-    console.log(io);
     room_controller
       .addMusicRoomSocket(data.roomId, data.userId, data.trackId)
       .then(() =>
@@ -194,7 +188,6 @@ io.on("connection", (socket) => {
       .changeTypeSocket(data.userId, data.roomId, data.type)
       .then(() =>
         room_controller.getRoomSocket(data.roomId).then((res) => {
-          console.log(res);
           if (res.status) {
             io.emit(`room update ${data.roomId}`, res.room);
             room_controller.getAllRoomSocket().then((res) => {
@@ -212,7 +205,6 @@ io.on("connection", (socket) => {
       .changeTypeInvitedSocket(data.userId, data.roomId, data.type)
       .then(() =>
         room_controller.getRoomSocket(data.roomId).then((res) => {
-          console.log(res);
           if (res.status) {
             io.emit(`room update ${data.roomId}`, res.room);
           }
@@ -255,7 +247,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("playlist add music", (data) => {
-    console.log(io);
     playlist_controller
       .addMusicPlaylistSocket(data.playlistId, data.userId, data.trackId)
       .then(() =>

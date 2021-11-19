@@ -110,31 +110,32 @@ scenarios:
       - emit: ["room add music", { roomId: "{{ room._id }}", userId: "{{ id }}", trackId: 'test' }]
         response:
           on: "room update {{room._id}}"
-      - emit: ["room vote music", { roomId: "{{ room._id }}", userId: "{{ id }}", trackId: 'test' }]
-        response:
-          on: "room update {{room._id}}"
-      - emit: ["room enter", { roomId: "{{ room._id }}", userId: "{{ id }}", deviceId: 'test' }]
-        response:
-          on: "room update {{room._id}}"
-      - emit: ["room change type", { roomId: "{{ room._id }}", userId: "{{ id }}", type: 'private' }]
-        response:
-          on: "room update {{room._id}}"
-      - get:
-          url: "/playlist"
-          qs:
-            userId: "{{ id }}"
-          headers:
-              x-access-token: '{{ accessToken }}'
-      - emit: ["playlist add music", { playlistId: "{{ playlist._id }}", userId: "{{ id }}", trackId: 'test' }]
-        response:
-          on: "playlist update {{playlist._id}}"
-      #     capture:
-      #       json: "$"
-      #       as: "data"
-      # - log: "Emitting captured values: {{ data }}"
-      - emit: ["playlist change type", { playlistId: "{{ playlist._id }}", userId: "{{ id }}", type: 'private' }]
-        response:
-          on: "playlist update {{playlist._id}}"
+      # - emit: ["room vote music", { roomId: "{{ room._id }}", userId: "{{ id }}", trackId: 'test' }]
+      #   response:
+      #     on: "room update {{room._id}}"
+      # - emit: ["room enter", { roomId: "{{ room._id }}", userId: "{{ id }}", deviceId: 'test' }]
+      #   response:
+      #     on: "room update {{room._id}}"
+      # - emit: ["room change type", { roomId: "{{ room._id }}", userId: "{{ id }}", type: 'private' }]
+      #   response:
+      #     on: "room update {{room._id}}"
+      # - get:
+      #     url: "/playlist"
+      #     qs:
+      #       userId: "{{ id }}"
+      #     headers:
+      #         x-access-token: '{{ accessToken }}'
+      # - emit: ["playlist add music", { playlistId: "{{ playlist._id }}", userId: "{{ id }}", trackId: 'test' }]
+      #   response:
+      #     on: "playlist update {{playlist._id}}"
+      # #     capture:
+      # #       json: "$"
+      # #       as: "data"
+      # # - log: "Emitting captured values: {{ data }}"
+      # - emit: ["playlist change type", { playlistId: "{{ playlist._id }}", userId: "{{ id }}", type: 'private' }]
+      #   response:
+      #     on: "playlist update {{playlist._id}}"
+      - think: 5
       #     capture:
       #       json: "$"
       #       as: "data"
