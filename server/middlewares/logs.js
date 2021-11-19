@@ -21,5 +21,5 @@ module.exports = (req, res) => {
             // console.log("correctly written logs!")
         }
     })
-    console.log(log)
+    // console.log(log)
 }

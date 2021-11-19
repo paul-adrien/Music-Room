@@ -33,8 +33,6 @@ exports.getAllRoom = (req, res) => {
 };
 
 exports.getAllRoomSocket = async () => {
-  console.log(
-    "socket",
     Room.find({}).then((err, rooms) => {
       if (err) {
         return {
@@ -56,7 +54,6 @@ exports.getAllRoomSocket = async () => {
         };
       }
     })
-  );
   return Room.find({}).then((rooms) => {
     if (!rooms) {
       return {
@@ -192,7 +189,7 @@ exports.getRoomSocket = async (roomId) => {
 
 exports.delRoom = async (req, res) => {
   const { userId, roomId } = req.params;
-  console.log(userId, roomId);
+
   Room.findOne({
     $and: [{ _id: roomId }, { created_by: userId }],
   }).exec((err, room) => {
@@ -246,7 +243,6 @@ exports.delRoomSocket = async (userId, roomId) => {
 exports.inviteToRoom = async (req, res) => {
   const { roomId, friendId } = req.params;
   const { userId } = req.body;
-  console.log(friendId);
 
   Room.findOne({
     _id: roomId,
@@ -556,7 +552,7 @@ exports.enterRoom = async (req, res) => {
 
 exports.enterRoomSocket = async (userId, roomId, deviceId) => {
   const user = await getUser({ id: userId });
-  console.log(roomId);
+  // console.log(roomId);
 
   return Room.findOne({ _id: roomId }).then((room) => {
     if (!room) {
@@ -1187,7 +1183,7 @@ async function checkLimits(lat, lng, limits) {
 
 exports.addGeoHours = async (data) => {
   return new Promise((res, rej) => {
-    console.log(data);
+    // console.log(data);
     if (data && data.roomId && data.userId) {
       Room.findOne({ _id: data.roomId, created_by: data.userId }).exec(
         (err, room) => {
@@ -1221,7 +1217,7 @@ exports.addGeoHours = async (data) => {
                   message: err,
                 });
               } else {
-                console.log(await checkLimits(0, 0, limits));
+                // console.log(await checkLimits(0, 0, limits));
                 return res({
                   status: true,
                   message: "this room change limits",

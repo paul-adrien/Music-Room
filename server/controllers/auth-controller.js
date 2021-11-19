@@ -78,7 +78,7 @@ exports.signin = (req, res) => {
       });
     }
 
-    console.log(user);
+    // console.log(user);
 
     if (user === null) {
       return res.json({

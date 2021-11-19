@@ -11,9 +11,14 @@ config:
       arrivalRate: 40
       rampTo: 10
       name: "Phase 2"
-    # - duration: 20
-    #   arrivalRate: 80
-    #   name: "Phase 3"
+    - duration: 20
+      arrivalRate: 80
+      name: "Phase 3"
+  http:
+    pool: 10
+    maxSockets: 5
+  socketio:
+    transports: ["websocket"]
   engines:
    socketio-v3: {}
   processor: "./artillery_func.js"
@@ -60,6 +65,7 @@ before:
             as: room
         expect:
           - status: true
+    - think: 1
     # - log: "Emitting captured values: {{ room }}"
     - post:
         url: "/playlist"
@@ -73,6 +79,7 @@ before:
             as: playlist
         expect:
           - status: true
+    - think: 1
     # - log: "Emitting captured values: {{ playlist }}"
 after:
   flow:
@@ -110,32 +117,31 @@ scenarios:
       - emit: ["room add music", { roomId: "{{ room._id }}", userId: "{{ id }}", trackId: 'test' }]
         response:
           on: "room update {{room._id}}"
-      # - emit: ["room vote music", { roomId: "{{ room._id }}", userId: "{{ id }}", trackId: 'test' }]
-      #   response:
-      #     on: "room update {{room._id}}"
-      # - emit: ["room enter", { roomId: "{{ room._id }}", userId: "{{ id }}", deviceId: 'test' }]
-      #   response:
-      #     on: "room update {{room._id}}"
-      # - emit: ["room change type", { roomId: "{{ room._id }}", userId: "{{ id }}", type: 'private' }]
-      #   response:
-      #     on: "room update {{room._id}}"
-      # - get:
-      #     url: "/playlist"
-      #     qs:
-      #       userId: "{{ id }}"
-      #     headers:
-      #         x-access-token: '{{ accessToken }}'
-      # - emit: ["playlist add music", { playlistId: "{{ playlist._id }}", userId: "{{ id }}", trackId: 'test' }]
-      #   response:
-      #     on: "playlist update {{playlist._id}}"
-      # #     capture:
-      # #       json: "$"
-      # #       as: "data"
-      # # - log: "Emitting captured values: {{ data }}"
-      # - emit: ["playlist change type", { playlistId: "{{ playlist._id }}", userId: "{{ id }}", type: 'private' }]
-      #   response:
-      #     on: "playlist update {{playlist._id}}"
-      - think: 5
+      - emit: ["room vote music", { roomId: "{{ room._id }}", userId: "{{ id }}", trackId: 'test' }]
+        response:
+          on: "room update {{room._id}}"
+      - emit: ["room enter", { roomId: "{{ room._id }}", userId: "{{ id }}", deviceId: 'test' }]
+        response:
+          on: "room update {{room._id}}"
+      - emit: ["room change type", { roomId: "{{ room._id }}", userId: "{{ id }}", type: 'private' }]
+        response:
+          on: "room update {{room._id}}"
+      - get:
+          url: "/playlist"
+          qs:
+            userId: "{{ id }}"
+          headers:
+              x-access-token: '{{ accessToken }}'
+      - emit: ["playlist add music", { playlistId: "{{ playlist._id }}", userId: "{{ id }}", trackId: 'test' }]
+        response:
+          on: "playlist update {{playlist._id}}"
+      #     capture:
+      #       json: "$"
+      #       as: "data"
+      # - log: "Emitting captured values: {{ data }}"
+      - emit: ["playlist change type", { playlistId: "{{ playlist._id }}", userId: "{{ id }}", type: 'private' }]
+        response:
+          on: "playlist update {{playlist._id}}"
       #     capture:
       #       json: "$"
       #       as: "data"

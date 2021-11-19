@@ -6,7 +6,7 @@ const Playlist = db.playlist;
 
 exports.getAllPlaylist = (req, res) => {
   const { userId } = req.query;
-  console.log("negro", userId);
+  // console.log("negro", userId);
   Playlist.find(userId !== "undefined" ? { created_by: userId } : {}).exec(
     (err, playlists) => {
       if (err) {
@@ -257,7 +257,7 @@ exports.editPlaylist = async (req, res, next) => {
       Playlist.updateOne({ _id: playlistId }, { $set: playlistBody }).exec(
         async (err, playlist) => {
           if (err) {
-            console.log();
+            // console.log();
             res.message = err;
             return res.status(400).json({
               status: false,
@@ -304,7 +304,7 @@ exports.editPlaylistSocket = async (playlistId, playlistBody) => {
 exports.inviteToPlaylist = async (req, res, next) => {
   const { playlistId, friendId } = req.params;
   const { userId, right } = req.body;
-  console.log(friendId);
+  // console.log(friendId);
 
   Playlist.findOne({
     _id: playlistId,
@@ -504,7 +504,7 @@ exports.refuseInviteToPlaylist = async (req, res, next) => {
         } else {
           let notifIndex = user.notifs.playlist
             .map(function (u) {
-              console.log(u);
+              // console.log(u);
               return u.id;
             })
             .indexOf(playlistId);
