@@ -1,4 +1,4 @@
-const { authJwt } = require(appRoot + "/middlewares");
+const { authJwt, logs } = require(appRoot + "/middlewares");
 const controller = require(appRoot + "/controllers/room-controller");
 
 module.exports = function (app) {
@@ -10,71 +10,71 @@ module.exports = function (app) {
     next();
   });
 
-  app.get("/room", [authJwt.verifyToken], controller.getAllRoom);
+  app.get("/room", [authJwt.verifyToken], controller.getAllRoom, logs.logsHTTP);
   app.get(
     "/room/:roomName/check-name",
     [authJwt.verifyToken],
-    controller.checkName
+    controller.checkName, logs.logsHTTP
   );
-  app.post("/room", [authJwt.verifyToken], controller.CreateRoom);
+  app.post("/room", [authJwt.verifyToken], controller.CreateRoom, logs.logsHTTP);
 
-  app.get("/room/:roomId", [authJwt.verifyToken], controller.getRoom);
+  app.get("/room/:roomId", [authJwt.verifyToken], controller.getRoom, logs.logsHTTP);
   app.delete(
     "/room/:roomId/user/:userId",
     [authJwt.verifyToken],
-    controller.delRoom
+    controller.delRoom, logs.logsHTTP
   );
 
   app.post(
     "/room/:roomId/music/:trackId",
     [authJwt.verifyToken],
-    controller.addMusicRoom
+    controller.addMusicRoom, logs.logsHTTP
   );
   app.delete(
     "/room/:roomId/music/:trackId",
     [authJwt.verifyToken],
-    controller.delMusicRoom
+    controller.delMusicRoom, logs.logsHTTP
   );
 
   app.post(
     "/room/:roomId/invite/:friendId",
     [authJwt.verifyToken],
-    controller.inviteToRoom
+    controller.inviteToRoom, logs.logsHTTP
   );
   app.post(
     "/room/:roomId/acceptInvite",
     [authJwt.verifyToken],
-    controller.acceptInviteRoom
+    controller.acceptInviteRoom, logs.logsHTTP
   );
 
   app.post(
     "/room/:roomId/enterRoom",
     [authJwt.verifyToken],
-    controller.enterRoom
+    controller.enterRoom, logs.logsHTTP
   );
 
   app.post(
     "/room/:roomId/progress-track",
     [authJwt.verifyToken],
-    controller.stockPositionTrack
+    controller.stockPositionTrack, logs.logsHTTP
   );
 
   app.delete(
     "/room/:roomId/quitRoom",
     [authJwt.verifyToken],
-    controller.quitRoom
+    controller.quitRoom, logs.logsHTTP
   );
 
   app.post(
     "/room/:roomId/music/:trackId/vote",
     [authJwt.verifyToken],
-    controller.voteMusicRoom
+    controller.voteMusicRoom, logs.logsHTTP
   );
 
   app.get(
     "/room/:roomId/check-limit",
     [authJwt.verifyToken],
-    controller.checkLimitRoom
+    controller.checkLimitRoom, logs.logsHTTP
   );
 
   // app.post(

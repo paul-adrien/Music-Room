@@ -35,7 +35,7 @@ exports.getConversationList = (req, res, next) => {
     });
 };
 
-exports.getConversationDetail = (req, res) => {
+exports.getConversationDetail = (req, res, next) => {
   const { userId, conversationId } = req.params;
 
   Conversation.findOne({
@@ -73,6 +73,7 @@ exports.getConversationDetail = (req, res) => {
         conversation: conv,
       });
     }
+    next();
   });
 };
 
@@ -113,11 +114,10 @@ exports.getConversationByNameSocket = async (userId, name) => {
   });
 };
 
-exports.createConversation = (req, res) => {
+exports.createConversation = (req, res, next) => {
   const { userId } = req.params;
   const { name, users } = req.body;
 
-  console.log("test");
   var conv = new Conversation({
     name: name,
     users: users,
@@ -139,6 +139,7 @@ exports.createConversation = (req, res) => {
         Conv: conv,
       });
     }
+    next();
   });
 };
 
@@ -165,7 +166,7 @@ exports.createConversationSocket = async (name, users) => {
   });
 };
 
-exports.updateConversation = (req, res) => {
+exports.updateConversation = (req, res, next) => {
   const { userId, conversationId } = req.params;
   const { name, users } = req.body;
 
@@ -206,10 +207,11 @@ exports.updateConversation = (req, res) => {
         message: "conversation was changed",
       });
     }
+    next();
   });
 };
 
-exports.deleteConversation = (req, res) => {
+exports.deleteConversation = (req, res, next) => {
   const { userId, conversationId } = req.params;
 
   Conversation.findOne({
@@ -230,17 +232,20 @@ exports.deleteConversation = (req, res) => {
     } else {
       Conversation.deleteOne({ _id: conversation._id }).exec((err) => {
         if (err) {
-          return res.json({
+          res.message = err;
+          res.status(400).json({
             status: false,
             message: err,
           });
         }
       });
-      return res.json({
+      res.message = "conversation was delete";
+      res.status(200).json({
         status: true,
         message: "conversation was delete",
       });
     }
+    next();
   });
 };
 
@@ -264,6 +269,7 @@ exports.sendMessage = async (userId, conversationId, message) => {
   ).then(async (conversation) => {
     if (!conversation) {
       return {
+        
         status: false,
         message: "message not send",
       };

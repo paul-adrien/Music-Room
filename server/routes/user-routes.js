@@ -1,6 +1,5 @@
-const { authJwt } = require(appRoot + "/middlewares");
+const { authJwt, logs } = require(appRoot + "/middlewares");
 const controller = require(appRoot + "/controllers/user-controller");
-const logs = require(appRoot + "/middlewares/logs");
 let multer = require("multer");
 
 module.exports = function (app) {
@@ -18,21 +17,21 @@ module.exports = function (app) {
   app.use(multer().any());
 
   app.get("/token", [authJwt.verifyToken], controller.userBoard);
-  app.get("/user/:id", [authJwt.verifyToken], controller.getProfile, logs);
+  app.get("/user/:id", [authJwt.verifyToken], controller.getProfile, logs.logsHTTP);
   app.get(
     "/user/:id/check-username",
     [authJwt.verifyToken],
     controller.checkUsername,
-    logs
+    logs.logsHTTP
   );
 
-  app.get("/user", [authJwt.verifyToken], controller.getSearchProfile, logs);
-  app.put("/user/:id", [authJwt.verifyToken], controller.userUpdate, logs);
+  app.get("/user", [authJwt.verifyToken], controller.getSearchProfile, logs.logsHTTP);
+  app.put("/user/:id", [authJwt.verifyToken], controller.userUpdate, logs.logsHTTP);
   app.post(
     "/user/:id/update-picture",
     [authJwt.verifyToken],
     controller.userUpdatePicture,
-    logs
+    logs.logsHTTP
   );
-  app.post("/user/:id/premium", [authJwt.verifyToken], controller.userUpdateAccount, logs);
+  app.post("/user/:id/premium", [authJwt.verifyToken], controller.userUpdateAccount, logs.logsHTTP);
 };

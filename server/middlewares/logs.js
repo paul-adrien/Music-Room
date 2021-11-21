@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-module.exports = (req, res) => {
+logsHTTP = (req, res) => {
     let log = "";
 
     let fileName = "/logs/" + req.headers["x-access-token"] + ".logs"
@@ -12,7 +12,6 @@ module.exports = (req, res) => {
     log += "status=" + res.statusCode.toString() + ";"
     if (res.message)
         log += "message=" + res.message + "\r\n";
-    console.log(__dirname + fileName)
     fs.appendFile(__dirname + fileName, log, (err) => {
         if (err) {
             console.log(err)
@@ -22,4 +21,33 @@ module.exports = (req, res) => {
         }
     })
     // console.log(log)
-}
+};
+
+logsSOCKS = (message, status, token) => {
+    let log = "";
+
+    let fileName = "/logs/" + token + ".logs"
+    log = "date=" + new Date().toISOString() + ";"
+    // log += "deviceModel=" + req.headers.devicemodel + ";"
+    // log += "deviceOSVersion=" + req.headers.deviceosversion + ";"
+    // log += "musicRoomVersion=" + req.headers.musicroomversion + ";"
+    log += "root=" + "socket.io;"
+    log += "status=" + status + ";"
+    log += "message=" + message + "\r\n";
+    fs.appendFile(__dirname + fileName, log, (err) => {
+        if (err) {
+            console.log(err)
+            console.log("Error when trying to write log!")
+        } else {
+            // console.log("correctly written logs!")
+        }
+    })
+    // console.log(log)
+};
+
+const logs = {
+    logsHTTP,
+    logsSOCKS
+};
+
+module.exports = logs

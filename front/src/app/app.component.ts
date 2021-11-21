@@ -2,6 +2,8 @@ import { Device } from '@ionic-native/device/ngx';
 import { Component, OnInit } from '@angular/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { Platform } from '@ionic/angular';
+import { AuthService } from './_services/auth_service';
+import { WebsocketService } from './_services/websocketService';
 
 @Component({
   selector: 'app-root',
@@ -9,7 +11,9 @@ import { Platform } from '@ionic/angular';
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent implements OnInit {
-  constructor(private device: Device, private platform: Platform) {}
+  constructor(private device: Device, private platform: Platform,
+    private socketService: WebsocketService,
+    private authService: AuthService) {}
 
   ngOnInit() {
     let scheme;
@@ -24,5 +28,20 @@ export class AppComponent implements OnInit {
         StatusBar.setStyle({ style: Style.Dark });
       }
     });
+
+    // this.authService.checkIfUserCo()
+    // .toPromise()
+    // .then(
+    //   (data) => {
+    //     if (
+    //       JSON.parse(data)['status'] === true &&
+    //       this.authService.getUser()
+    //     ) {
+    //       this.socketService.setupSocketConnection();
+    //     }
+    //   },
+    //   (err) => {
+    //   }
+    // );
   }
 }

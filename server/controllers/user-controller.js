@@ -58,18 +58,21 @@ exports.userUpdatePicture = async (req, res, next) => {
     }
   ).exec((err, user) => {
     if (err) {
-      return res.status(400).json({
+      res.message = err;
+      res.status(400).json({
         status: false,
         message: err,
         user: null,
       });
+    } else {
+      res.message = "user picture success";
+      res.status(200).json({
+        status: true,
+        message: "user picture success",
+        user: user,
+      });
     }
-    // console.log(user);
-    return res.status(200).json({
-      status: true,
-      message: "user picture success",
-      user: user,
-    });
+    next();
   });
 };
 
@@ -99,7 +102,7 @@ exports.getSearchProfile = async (req, res, next) => {
     ],
   });
   if (users) {
-    ///res.message = "get users search";
+    res.message = "get users search";
     res.status(200).json(users);
   } else {
     res.message = "user doesn't exist";
@@ -119,20 +122,22 @@ exports.checkUsername = async (req, res, next) => {
     userName: userName.toString(),
   });
   if (user) {
-    ///res.message = "get user search";
+    res.message = "userName already exist";
     res.status(200).json({
       status: false,
       message: "userName already exist",
     });
   } else {
+    res.message = "userName doesn't exist";
     res.status(200).json({
       status: true,
       message: "userName doesn't exist",
     });
   }
+  next();
 };
 
-exports.forgotPass_send = async (req, res) => {
+exports.forgotPass_send = async (req, res, next) => {
   const email = req.body.email;
   var user = new User();
 
@@ -164,74 +169,86 @@ exports.forgotPass_send = async (req, res) => {
     });
     user.rand = rand;
     if (await updateUser(user.id, user)) {
+      res.message = "email was send";
       res.json({
         status: true,
         message: "email was send",
       });
     } else {
+      res.message = "error with mongodb update";
       res.json({
         status: false,
         message: "error with mongodb update",
       });
     }
   } else {
+    res.message = "they are no account with this email";
     res.json({
       status: false,
       message: "they are no account with this email",
     });
   }
+  next();
 };
 
-exports.forgotPass_change = async (req, res) => {
+exports.forgotPass_change = async (req, res, next) => {
   const { email, password, id } = req.body;
   const user = await getUser({ email: email });
   if (user) {
     user.password = bcrypt.hashSync(password, 8);
     if (user.rand == id) {
       if (await updateUser(user.id, user)) {
-        res.json({
+        res.message = "Password was changed";
+        res.status(200).json({
           status: true,
           message: "Password was changed",
         });
       } else {
-        res.json({
+        res.message = "user doesn't exist";
+        res.status(200).json({
           status: false,
           message: "user doesn't exist",
         });
       }
     } else {
-      res.json({
+      res.message = "wrong link";
+      res.status(200).json({
         status: false,
         message: "wrong link",
       });
     }
   } else {
-    res.json({
+    res.message = "user doesn't exist";
+    res.status(200).json({
       status: false,
       message: "user doesn't exist",
     });
   }
+  next();
 };
 
-exports.userUpdateAccount = async (req, res) => {
+exports.userUpdateAccount = async (req, res, next) => {
   console.log("userUpdateAccount called !");
   const { userId, type } = req.body;
   const user = await getUser({ id: userId });
   if (user) {
     user.type = type;
     if (await updateUser(user.id, user)) {
-      res.json({
+      res.message = "Account plan was changed";
+      res.status(200).json({
         status: true,
         message: "Account plan was changed",
       });
     } else {
-      res.json({
+      res.message = "user doesn't exist";
+      res.status(200).json({
         status: false,
         message: "user doesn't exist",
       });
     }
   } else {
-    res.json({
+    res.message = "user doesn't exist";
+    res.status(200).json({
       status: false,
       message: "user doesn't exist",
     });

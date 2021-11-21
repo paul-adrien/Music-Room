@@ -4,30 +4,34 @@ const { getUser } = require(appRoot + "/models/lib-user.model");
 const User = db.user;
 const Playlist = db.playlist;
 
-exports.getAllPlaylist = (req, res) => {
+exports.getAllPlaylist = (req, res, next) => {
   const { userId } = req.query;
   // console.log("negro", userId);
   Playlist.find(userId !== "undefined" ? { created_by: userId } : {}).exec(
     (err, playlists) => {
       if (err) {
-        return res.status(400).json({
+        res.message = err;
+        res.status(400).json({
           status: false,
           message: err,
           playlists: null,
         });
       } else if (!playlists) {
-        return res.status(201).json({
+        res.message = "no playlist";
+        res.status(201).json({
           status: true,
           message: "no playlist",
           playlists: null,
         });
       } else {
-        return res.status(200).json({
+        res.message = "playlists success";
+        res.status(200).json({
           status: true,
           message: "playlists success",
           playlists: playlists,
         });
       }
+      next();
     }
   );
 };
@@ -50,7 +54,7 @@ exports.getAllPlaylistSocket = async () => {
   });
 };
 
-exports.CreatePlaylist = async (req, res) => {
+exports.CreatePlaylist = async (req, res, next) => {
   const { name, userId } = req.body;
   const user = await getUser({ id: userId });
 
@@ -63,16 +67,20 @@ exports.CreatePlaylist = async (req, res) => {
   });
   playlist.save((err, playlist) => {
     if (err) {
-      return res.json({
+      res.message = err;
+      res.status(400).json({
         status: false,
         message: err,
       });
+    } else {
+      res.message = "playlist created";
+      res.status(200).json({
+        status: true,
+        message: "playlist created",
+        playlist: playlist,
+      });
     }
-    res.json({
-      status: true,
-      message: "playlist created",
-      playlist: playlist,
-    });
+    next();
   });
 };
 
@@ -90,29 +98,33 @@ exports.CreatePlaylistSocket = async (name, userId) => {
   ]);
 };
 
-exports.checkName = (req, res) => {
+exports.checkName = (req, res, next) => {
   const { playlistName } = req.params;
 
   Playlist.findOne({ name: playlistName }).exec((err, playlist) => {
     if (err) {
-      return res.json({
+      res.message = err;
+      res.status(400).json({
         status: false,
         message: err,
         playlist: null,
       });
     } else if (!playlist) {
-      return res.json({
+      res.message = "no playlist";
+      res.status(200).json({
         status: true,
         message: "no playlist",
         playlist: null,
       });
     } else {
-      return res.json({
+      res.message = "playlist name exist";
+      res.status(200).json({
         status: true,
         message: "playlist name exist",
         playlist: playlist,
       });
     }
+    next();
   });
 };
 
@@ -201,12 +213,13 @@ exports.delPlaylist = async (req, res, next) => {
             status: false,
             message: err,
           });
+        } else {
+          res.message = "playlist was delete";
+          res.status(200).json({
+            status: true,
+            message: "playlist was delete",
+          });
         }
-      });
-      res.message = "playlist was delete";
-      res.status(200).json({
-        status: true,
-        message: "playlist was delete",
       });
     }
     next();
@@ -257,16 +270,15 @@ exports.editPlaylist = async (req, res, next) => {
       Playlist.updateOne({ _id: playlistId }, { $set: playlistBody }).exec(
         async (err, playlist) => {
           if (err) {
-            // console.log();
             res.message = err;
-            return res.status(400).json({
+            res.status(400).json({
               status: false,
               message: err,
               playlist: null,
             });
           } else {
             res.message = "playlist was changed";
-            return res.status(200).json({
+            res.status(200).json({
               status: true,
               playlist: playlist,
               message: "playlist was changed",
@@ -275,6 +287,7 @@ exports.editPlaylist = async (req, res, next) => {
         }
       );
     }
+    next();
   });
 };
 
@@ -310,13 +323,15 @@ exports.inviteToPlaylist = async (req, res, next) => {
     _id: playlistId,
   }).exec((err, playlist) => {
     if (err) {
-      return res.json({
+      res.message = err;
+      res.status(400).json({
         status: false,
         message: err,
         playlist: null,
       });
     } else if (!playlist) {
-      return res.json({
+      res.message = "this playlist doesn't exist or you dont have the good right";
+      res.status(200).json({
         status: true,
         message: "this playlist doesn't exist or you dont have the good right",
         playlist: null,
@@ -324,24 +339,28 @@ exports.inviteToPlaylist = async (req, res, next) => {
     } else {
       User.findOne({ id: userId }).exec(async (err, user) => {
         if (err) {
-          return res.json({
+          res.message = err;
+          res.status(400).json({
             status: false,
             message: err,
           });
         } else if (!user) {
-          return res.json({
+          res.message = "this user doesn't exist";
+          res.status(200).json({
             status: false,
             message: "this user doesn't exist",
           });
         } else {
           User.findOne({ id: friendId }).exec(async (err, friend) => {
             if (err) {
-              return res.json({
+              res.message = err;
+              res.status(400).json({
                 status: false,
                 message: err,
               });
             } else if (!friend) {
-              return res.json({
+              res.message = "this friend doesn't exist";
+              res.status(200).json({
                 status: false,
                 message: "this friend doesn't exist",
               });
@@ -350,7 +369,8 @@ exports.inviteToPlaylist = async (req, res, next) => {
                 playlist.invited?.length > 0 &&
                 playlist.invited.find((el) => el === friendId)
               ) {
-                return res.json({
+                res.message = "this user is already invited";
+                res.status(200).json({
                   status: false,
                   message: "this user is already invited",
                 });
@@ -361,7 +381,8 @@ exports.inviteToPlaylist = async (req, res, next) => {
                   (playlist) => playlist.id === playlistId
                 )
               ) {
-                return res.json({
+                res.message =  "this user is already invited";
+                res.status(200).json({
                   status: false,
                   message: "this user is already invited",
                 });
@@ -379,12 +400,14 @@ exports.inviteToPlaylist = async (req, res, next) => {
                   }
                 ).exec((err, user) => {
                   if (err) {
-                    return res.json({
+                    res.message = err;
+                    res.status(400).json({
                       status: false,
                       message: err,
                     });
                   } else {
-                    return res.json({
+                    res.message = "invite send";
+                    res.status(200).json({
                       status: true,
                       message: "invite send",
                     });
@@ -396,6 +419,7 @@ exports.inviteToPlaylist = async (req, res, next) => {
         }
       });
     }
+    next();
   });
 };
 
@@ -540,18 +564,20 @@ exports.refuseInviteToPlaylist = async (req, res, next) => {
   });
 };
 
-exports.acceptInvitePlaylist = async (req, res) => {
+exports.acceptInvitePlaylist = async (req, res, next) => {
   const { playlistId } = req.params;
   const { userId } = req.body;
 
   Playlist.findOne({ _id: playlistId }).exec((err, playlist) => {
     if (err) {
-      return res.json({
+      res.message = err;
+      res.status(400).json({
         status: false,
         message: err,
       });
     } else if (!playlist) {
-      return res.json({
+      res.message = "this playlist doesn't exist or you dont have the good right";
+      res.status(200).json({
         status: true,
         message: "this playlist doesn't exist or you dont have the good right",
       });
@@ -561,12 +587,14 @@ exports.acceptInvitePlaylist = async (req, res) => {
         { $push: { invited: userId } }
       ).exec((err, playlist) => {
         if (err) {
-          return res.json({
+          res.message = err;
+          res.status(400).json({
             status: false,
             message: err,
           });
         } else {
-          return res.json({
+          res.message = "you accept to enter this playlist";
+          res.status(200).json({
             status: true,
             message: "you accept to enter this playlist",
           });
@@ -648,12 +676,14 @@ exports.addMusicPlaylist = async (req, res, next) => {
 
   Playlist.findOne({ _id: playlistId }).exec((err, playlist) => {
     if (err) {
-      return res.json({
+      res.message = err;
+      res.status(400).json({
         status: false,
         message: err,
       });
     } else if (!playlist) {
-      return res.json({
+      res.message = "this playlist doesn't exist or you dont have the good right";
+      res.status(200).json({
         status: true,
         message: "this playlist doesn't exist or you dont have the good right",
       });
@@ -670,12 +700,14 @@ exports.addMusicPlaylist = async (req, res, next) => {
         }
       ).exec((err, playlist) => {
         if (err) {
-          return res.json({
+          res.message = err;
+          res.status(400).json({
             status: false,
             message: err,
           });
         } else {
-          return res.json({
+          res.message = "music add to the list";
+          res.status(200).json({
             status: true,
             message: "music add to the list",
           });
@@ -719,12 +751,14 @@ exports.delMusicPlaylist = async (req, res, next) => {
 
   Playlist.findOne({ _id: playlistId }).exec((err, playlist) => {
     if (err) {
-      return res.status(400).json({
+      res.message = err;
+      res.status(400).json({
         status: false,
         message: err,
       });
     } else if (!playlist) {
-      return res.json({
+      res.message = "this playlist doesn't exist or you dont have the good right";
+      res.status(200).json({
         status: true,
         message: "this playlist doesn't exist or you dont have the good right",
       });
@@ -740,12 +774,14 @@ exports.delMusicPlaylist = async (req, res, next) => {
         }
       ).exec((err, playlist) => {
         if (err) {
-          return res.status(400).json({
+          res.message = err;
+          res.status(400).json({
             status: false,
             message: err,
           });
         } else {
-          return res.status(200).json({
+          res.message = "music remove to the list";
+          res.status(200).json({
             status: true,
             playlist: playlist,
             message: "music remove to the list",
@@ -753,6 +789,7 @@ exports.delMusicPlaylist = async (req, res, next) => {
         }
       });
     }
+    next();
   });
 };
 
@@ -784,19 +821,21 @@ exports.delMusicPlaylistSocket = async (playlistId, trackId) => {
   });
 };
 
-exports.changeType = async (req, res) => {
+exports.changeType = async (req, res, next) => {
   const { playlistId } = req.params;
   const { type, userId } = req.body;
 
   Playlist.findOne({ _id: playlistId, created_by: userId }).exec(
     (err, playlist) => {
       if (err) {
-        return res.json({
+        res.message = err;
+        res.status(400).json({
           status: false,
           message: err,
         });
       } else if (!playlist) {
-        return res.json({
+        res.message = "this playlist doesn't exist or you dont have the good right";
+        res.status(200).json({
           status: true,
           message:
             "this playlist doesn't exist or you dont have the good right",
@@ -809,18 +848,21 @@ exports.changeType = async (req, res) => {
           }
         ).exec((err, playlist) => {
           if (err) {
-            return res.json({
+            res.message = err;
+            res.status(400).json({
               status: false,
               message: err,
             });
           } else {
-            return res.json({
+            res.message = "this playlist change type";
+            res.status(200).json({
               status: true,
               message: "this playlist change type",
             });
           }
         });
       }
+      next();
     }
   );
 };

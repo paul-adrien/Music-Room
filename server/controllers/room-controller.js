@@ -4,30 +4,34 @@ const User = db.user;
 const Room = db.room;
 const geolib = require("geolib");
 
-exports.getAllRoom = (req, res) => {
+exports.getAllRoom = (req, res, next) => {
   const { userId } = req.query;
 
   Room.find(userId !== "undefined" ? { created_by: userId } : {}).exec(
     (err, rooms) => {
       if (err) {
-        return res.status(400).json({
+        res.message = err;
+        res.status(400).json({
           status: false,
           message: err,
           rooms: null,
         });
       } else if (!rooms) {
-        return res.status(201).json({
+        res.message = "no room";
+        res.status(201).json({
           status: true,
           message: "no room",
           rooms: null,
         });
       } else {
-        return res.status(200).json({
+        res.message = "rooms success";
+        res.status(200).json({
           status: true,
           message: "rooms success",
           rooms: rooms,
         });
       }
+      next();
     }
   );
 };
@@ -71,7 +75,7 @@ exports.getAllRoomSocket = async () => {
   });
 };
 
-exports.CreateRoom = async (req, res) => {
+exports.CreateRoom = async (req, res, next) => {
   const { name, userId } = req.body;
   const user = await getUser({ id: userId });
 
@@ -84,16 +88,20 @@ exports.CreateRoom = async (req, res) => {
   });
   room.save((err, room) => {
     if (err) {
-      return res.json({
+      res.message = err;
+      res.status(400).json({
         status: false,
         message: err,
       });
+    } else {
+      res.message = "room created";
+      res.status(200).json({
+        status: true,
+        message: "room created",
+        room: room,
+      });
     }
-    res.json({
-      status: true,
-      message: "room created",
-      room: room,
-    });
+    next();
   });
 };
 
@@ -111,44 +119,50 @@ exports.CreateRoomSocket = async (name, userId) => {
   ]);
 };
 
-exports.checkName = (req, res) => {
+exports.checkName = (req, res, next) => {
   const { roomName } = req.params;
 
   Room.findOne({ name: roomName }).exec((err, room) => {
     if (err) {
-      return res.json({
+      res.message = err;
+      res.status(400).json({
         status: false,
         message: err,
         room: null,
       });
     } else if (!room) {
-      return res.json({
+      res.message = "no room";
+      res.status(200).json({
         status: true,
         message: "no room",
         room: null,
       });
     } else {
-      return res.json({
+      res.message = "room name exist";
+      res.status(200).json({
         status: true,
         message: "room name exist",
         room: room,
       });
     }
+    next();
   });
 };
 
-exports.getRoom = (req, res) => {
+exports.getRoom = (req, res, next) => {
   const { roomId } = req.params;
 
   Room.findOne({ _id: roomId }).exec((err, room) => {
     if (err) {
-      return res.json({
+      res.message = err;
+      res.status(400).json({
         status: false,
         message: err,
         room: null,
       });
     } else if (!room) {
-      return res.json({
+      res.message = "no room";
+      res.status(200).json({
         status: true,
         message: "no room",
         room: null,
@@ -157,12 +171,14 @@ exports.getRoom = (req, res) => {
       if (room.musics.length > 1) {
         room.musics = room?.musics?.sort((a, b) => b.nb_vote - a.nb_vote);
       }
-      return res.json({
+      res.message = "detail of room";
+      res.status(200).json({
         status: true,
         message: "detail of room",
         room: room,
       });
     }
+    next();
   });
 };
 
@@ -187,36 +203,42 @@ exports.getRoomSocket = async (roomId) => {
   });
 };
 
-exports.delRoom = async (req, res) => {
+exports.delRoom = async (req, res, next) => {
   const { userId, roomId } = req.params;
 
   Room.findOne({
     $and: [{ _id: roomId }, { created_by: userId }],
   }).exec((err, room) => {
     if (err) {
-      return res.json({
+      res.message = err;
+      res.status(400).json({
         status: false,
         message: err,
       });
     } else if (!room) {
-      return res.json({
+      res.message = "this room doesn't exist or you dont have the good right";
+      res.status(200).json({
         status: true,
         message: "this room doesn't exist or you dont have the good right",
       });
     } else {
       Room.deleteOne({ _id: roomId }).exec((err) => {
         if (err) {
-          return res.json({
+          res.message = err;
+          res.status(400).json({
             status: false,
             message: err,
           });
+        } else {
+          res.message = "Room was delete";
+          res.status(400).json({
+            status: true,
+            message: "Room was delete",
+          });
         }
       });
-      return res.json({
-        status: true,
-        message: "Room was delete",
-      });
     }
+    next();
   });
 };
 
@@ -240,7 +262,7 @@ exports.delRoomSocket = async (userId, roomId) => {
   });
 };
 
-exports.inviteToRoom = async (req, res) => {
+exports.inviteToRoom = async (req, res, next) => {
   const { roomId, friendId } = req.params;
   const { userId } = req.body;
 
@@ -248,13 +270,15 @@ exports.inviteToRoom = async (req, res) => {
     _id: roomId,
   }).exec((err, room) => {
     if (err) {
-      return res.json({
+      res.message = err;
+      res.status(400).json({
         status: false,
         message: err,
         room: null,
       });
     } else if (!room) {
-      return res.json({
+      res.message = "this room doesn't exist or you dont have the good right";
+      res.status(200).json({
         status: true,
         message: "this room doesn't exist or you dont have the good right",
         room: null,
@@ -262,24 +286,28 @@ exports.inviteToRoom = async (req, res) => {
     } else {
       User.findOne({ id: userId }).exec(async (err, user) => {
         if (err) {
-          return res.json({
+          res.message = err;
+          res.status(400).json({
             status: false,
             message: err,
           });
         } else if (!user) {
-          return res.json({
+          res.message = "this user doesn't exist";
+          res.status(200).json({
             status: false,
             message: "this user doesn't exist",
           });
         } else {
           User.findOne({ id: friendId }).exec(async (err, friend) => {
             if (err) {
-              return res.json({
+              res.message = err;
+              res.status(400).json({
                 status: false,
                 message: err,
               });
             } else if (!friend) {
-              return res.json({
+              res.message = "this friend doesn't exist";
+              res.status(400).json({
                 status: false,
                 message: "this friend doesn't exist",
               });
@@ -288,7 +316,8 @@ exports.inviteToRoom = async (req, res) => {
                 room.invited?.length > 0 &&
                 room.invited.find((el) => el.id === friendId)
               ) {
-                return res.json({
+                res.message = "this user is already in this room or invited";
+                res.status(200).json({
                   status: false,
                   message: "this user is already in this room or invited",
                 });
@@ -297,7 +326,8 @@ exports.inviteToRoom = async (req, res) => {
                 friend.notifs.room !== undefined &&
                 friend.notifs.room.find((room) => room.id === roomId)
               ) {
-                return res.json({
+                res.message = "this user already invite you";
+                res.status(200).json({
                   status: false,
                   message: "this user already invite you",
                 });
@@ -315,12 +345,14 @@ exports.inviteToRoom = async (req, res) => {
                   }
                 ).exec((err, user) => {
                   if (err) {
-                    return res.json({
+                    res.message = err;
+                    res.status(400).json({
                       status: false,
                       message: err,
                     });
                   } else {
-                    return res.json({
+                    res.message = "invite send";
+                    res.status(200).json({
                       status: true,
                       message: "invite send",
                     });
@@ -330,6 +362,7 @@ exports.inviteToRoom = async (req, res) => {
             }
           });
         }
+        next();
       });
     }
   });
@@ -404,18 +437,20 @@ exports.inviteToRoomSocket = async (roomId, userId, friendId) => {
   });
 };
 
-exports.acceptInviteRoom = async (req, res) => {
+exports.acceptInviteRoom = async (req, res, next) => {
   const { roomId } = req.params;
   const { userId } = req.body;
 
   Room.findOne({ _id: roomId }).exec((err, room) => {
     if (err) {
-      return res.json({
+      res.message = err;
+      res.status(400).json({
         status: false,
         message: err,
       });
     } else if (!room) {
-      return res.json({
+      res.message = "this room doesn't exist or you dont have the good right";
+      res.status(200).json({
         status: true,
         message: "this room doesn't exist or you dont have the good right",
       });
@@ -423,7 +458,8 @@ exports.acceptInviteRoom = async (req, res) => {
       Room.updateOne({ _id: roomId }, { $push: { invited: userId } }).exec(
         (err, room) => {
           if (err) {
-            return res.json({
+            res.message = err;
+            res.status(400).json({
               status: false,
               message: err,
             });
@@ -441,12 +477,14 @@ exports.acceptInviteRoom = async (req, res) => {
               }
             ).exec((err, user) => {
               if (err) {
-                return res.json({
+                res.message = err;
+                res.status(400).json({
                   status: false,
                   message: err,
                 });
               } else {
-                return res.json({
+                res.message = "you accept to enter in the room";
+                res.status(200).json({
                   status: true,
                   message: "you accept to enter in the room",
                 });
@@ -456,6 +494,7 @@ exports.acceptInviteRoom = async (req, res) => {
         }
       );
     }
+    next();
   });
 };
 
@@ -492,7 +531,7 @@ exports.acceptInviteRoomSocket = async (userId, roomId) => {
   });
 };
 
-exports.enterRoom = async (req, res) => {
+exports.enterRoom = async (req, res, next) => {
   const { roomId } = req.params;
   const { userId, deviceId } = req.body;
 
@@ -500,12 +539,14 @@ exports.enterRoom = async (req, res) => {
 
   Room.findOne({ _id: roomId }).exec((err, room) => {
     if (err) {
-      return res.json({
+      res.message = err;
+      res.status(400).json({
         status: false,
         message: err,
       });
     } else if (!room) {
-      return res.json({
+      res.message = "this room doesn't exist or you dont have the good right";
+      res.status(200).json({
         status: true,
         message: "this room doesn't exist or you dont have the good right",
       });
@@ -515,7 +556,8 @@ exports.enterRoom = async (req, res) => {
         { $pull: { users: { id: userId } } }
       ).exec((err, room) => {
         if (err) {
-          return res.json({
+          res.message = err;
+          res.status(400).json({
             status: false,
             message: err,
           });
@@ -533,12 +575,14 @@ exports.enterRoom = async (req, res) => {
             }
           ).exec((err, room) => {
             if (err) {
-              return res.json({
+              res.message = err;
+              res.status(400).json({
                 status: false,
                 message: err,
               });
             } else {
-              return res.json({
+              res.message = "you have enter this room";
+              res.status(400).json({
                 status: true,
                 message: "you have enter this room",
               });
@@ -547,6 +591,7 @@ exports.enterRoom = async (req, res) => {
         }
       });
     }
+    next();
   });
 };
 
@@ -587,18 +632,20 @@ exports.enterRoomSocket = async (userId, roomId, deviceId) => {
   });
 };
 
-exports.stockPositionTrack = async (req, res) => {
+exports.stockPositionTrack = async (req, res, next) => {
   const { roomId } = req.params;
   const { progress_ms } = req.body;
 
   Room.findOne({ _id: roomId }).exec((err, room) => {
     if (err) {
-      return res.json({
+      res.message = err;
+      res.status(400).json({
         status: false,
         message: err,
       });
     } else if (!room) {
-      return res.json({
+      res.message = "this room doesn't exist or you dont have the good right";
+      res.status(200).json({
         status: true,
         message: "this room doesn't exist or you dont have the good right",
       });
@@ -612,33 +659,38 @@ exports.stockPositionTrack = async (req, res) => {
         }
       ).exec((err, room) => {
         if (err) {
-          return res.json({
+          res.message = err;
+          res.status(400).json({
             status: false,
             message: err,
           });
         } else {
-          return res.json({
+          res.message = "you have stock the track's position in this room";
+          res.status(400).json({
             status: true,
             message: "you have stock the track's position in this room",
           });
         }
       });
     }
+    next();
   });
 };
 
-exports.quitRoom = async (req, res) => {
+exports.quitRoom = async (req, res, next) => {
   const { roomId } = req.params;
   const { userId } = req.query;
 
   Room.findOne({ _id: roomId }).exec((err, room) => {
     if (err) {
-      return res.json({
+      res.message = err;
+      res.status(400).json({
         status: false,
         message: err,
       });
     } else if (!room) {
-      return res.json({
+      res.message = "this room doesn't exist or you dont have the good right";
+      res.status(200).json({
         status: true,
         message: "this room doesn't exist or you dont have the good right",
       });
@@ -666,12 +718,14 @@ exports.quitRoom = async (req, res) => {
           { $pull: { users: { id: userId } } }
         ).exec((err, room) => {
           if (err) {
-            return res.json({
+            res.message = err;
+            res.status(400).json({
               status: false,
               message: err,
             });
           } else {
-            return res.json({
+            res.message = "you have quit this room";
+            res.status(200).json({
               status: true,
               message: "you have quit this room",
             });
@@ -683,24 +737,28 @@ exports.quitRoom = async (req, res) => {
           { $pull: { users: { id: userId } } }
         ).exec((err, room) => {
           if (err) {
-            return res.json({
+            res.message = err;
+            res.status(400).json({
               status: false,
               message: err,
             });
           } else {
-            return res.json({
+            res.message = "you have quit this room";
+            res.status(200).json({
               status: true,
               message: "you have quit this room",
             });
           }
         });
       } else {
-        return res.json({
+        res.message = "this user is not in this room";
+        res.status(200).json({
           status: false,
           message: "this user is not in this room",
         });
       }
     }
+    next();
   });
 };
 
@@ -759,19 +817,21 @@ exports.quitRoomSocket = async (userId, roomId) => {
   });
 };
 
-exports.addMusicRoom = async (req, res) => {
+exports.addMusicRoom = async (req, res, next) => {
   const { roomId } = req.params;
   const { trackId, userId } = req.body;
   const duration = req.body.duration;
 
   Room.findOne({ _id: roomId }).exec((err, room) => {
     if (err) {
-      return res.json({
+      res.message = err;
+      res.status(400).json({
         status: false,
         message: err,
       });
     } else if (!room) {
-      return res.json({
+      res.message = "this room doesn't exist or you dont have the good right";
+      res.status(200).json({
         status: true,
         message: "this room doesn't exist or you dont have the good right",
       });
@@ -790,18 +850,21 @@ exports.addMusicRoom = async (req, res) => {
         }
       ).exec((err, room) => {
         if (err) {
-          return res.json({
+          res.message = err;
+          res.status(400).json({
             status: false,
             message: err,
           });
         } else {
-          return res.json({
+          res.message = "music add to the list";
+          res.status(400).json({
             status: true,
             message: "music add to the list",
           });
         }
       });
     }
+    next();
   });
 };
 
@@ -835,18 +898,20 @@ exports.addMusicRoomSocket = async (roomId, userId, trackId) => {
   });
 };
 
-exports.delMusicRoom = async (req, res) => {
+exports.delMusicRoom = async (req, res, next) => {
   const { roomId, trackId } = req.params;
   const duration = req.body.duration;
 
   Room.findOne({ _id: roomId }).exec((err, room) => {
     if (err) {
-      return res.status(400).json({
+      res.message = err;
+      res.status(400).json({
         status: false,
         message: err,
       });
     } else if (!room) {
-      return res.json({
+      res.message = "this room doesn't exist or you dont have the good right";
+      res.status(200).json({
         status: true,
         message: "this room doesn't exist or you dont have the good right",
       });
@@ -862,12 +927,14 @@ exports.delMusicRoom = async (req, res) => {
         }
       ).exec((err, room) => {
         if (err) {
-          return res.status(400).json({
+          res.message = err;
+          res.status(400).json({
             status: false,
             message: err,
           });
         } else {
-          return res.status(200).json({
+          res.message = "music remove to the list";
+          res.status(200).json({
             status: true,
             room: room,
             message: "music remove to the list",
@@ -875,6 +942,7 @@ exports.delMusicRoom = async (req, res) => {
         }
       });
     }
+    next();
   });
 };
 
@@ -906,7 +974,7 @@ exports.delMusicRoomSocket = async (roomId, trackId) => {
   });
 };
 
-exports.voteMusicRoom = async (req, res) => {
+exports.voteMusicRoom = async (req, res, next) => {
   const { roomId, trackId } = req.params;
   const { userId } = req.body;
 
@@ -923,12 +991,14 @@ exports.voteMusicRoom = async (req, res) => {
     ],
   }).exec(async (err, room) => {
     if (err) {
-      return res.json({
+      res.message = err;
+      res.status(400).json({
         status: false,
         message: err,
       });
     } else if (!room) {
-      return res.json({
+      res.message = "this room doesn't exist or you dont have the good right";
+      res.status(200).json({
         status: true,
         message: "this room doesn't exist or you dont have the good right",
       });
@@ -948,28 +1018,34 @@ exports.voteMusicRoom = async (req, res) => {
           }
         ).exec(async (err, room) => {
           if (err) {
-            return res.json({
+            res.message = err;
+            res.status(400).json({
               status: false,
               message: err,
             });
           } else {
-            return res.json({
+            res.message = "this music is vote";
+            res.status(200).json({
               status: true,
               message: "this music is vote",
             });
           }
         });
       } else if (room.musics.find((music) => music.trackId === trackId)) {
-        return res.json({
+        res.message = "this music already vote by you";
+        res.status(200).json({
           status: false,
           message: "this music already vote by you",
         });
-      } else
-        return res.json({
+      } else {
+        res.message = "this music does not exist in this event";
+        res.status(200).json({
           status: false,
           message: "this music does not exist in this event",
         });
+      }
     }
+    next();
   });
 };
 
@@ -1025,18 +1101,20 @@ exports.voteMusicRoomSocket = async (roomId, userId, trackId) => {
   });
 };
 
-exports.changeType = async (req, res) => {
+exports.changeType = async (req, res, next) => {
   const { roomId } = req.params;
   const { type, userId } = req.body;
 
   Room.findOne({ _id: roomId, created_by: userId }).exec((err, room) => {
     if (err) {
-      return res.json({
+      res.message = err;
+      res.status(400).json({
         status: false,
         message: err,
       });
     } else if (!room) {
-      return res.json({
+      res.message = "this room doesn't exist or you dont have the good right";
+      res.status(200).json({
         status: false,
         message: "this room doesn't exist or you dont have the good right",
       });
@@ -1048,18 +1126,21 @@ exports.changeType = async (req, res) => {
         }
       ).exec((err, room) => {
         if (err) {
-          return res.json({
+          res.message = err;
+          res.status(400).json({
             status: false,
             message: err,
           });
         } else {
-          return res.json({
+          res.message = "this room change type";
+          res.status(200).json({
             status: true,
             message: "this room change type",
           });
         }
       });
     }
+    next();
   });
 };
 
@@ -1127,18 +1208,20 @@ async function isInCirc(latitude, longitude, radius, center) {
   });
 }
 
-exports.checkLimitRoom = async (req, res) => {
+exports.checkLimitRoom = async (req, res, next) => {
   const { lat, long } = req.query;
   const { roomId } = req.params;
 
   Room.findOne({ _id: roomId }).exec(async (err, room) => {
     if (err) {
-      return res.json({
+      res.message = err;
+      res.status(400).json({
         status: false,
         message: err,
       });
     } else if (!room) {
-      return res.json({
+      res.message = "this room doesn't exist or you dont have the good right";
+      res.status(200).json({
         status: false,
         message: "this room doesn't exist or you dont have the good right",
       });
@@ -1146,13 +1229,15 @@ exports.checkLimitRoom = async (req, res) => {
       if (room?.limits) {
         const isIn = await checkLimits(lat, long, room.limits);
         if (isIn) {
-          return res.json({
+          res.message = "The user is in limit";
+          res.status(200).json({
             status: true,
             isIn: isIn,
             message: "The user is in limit",
           });
         } else {
-          return res.json({
+          res.message = "The user isn't in limit";
+          res.status(200).json({
             status: true,
             isIn: isIn,
             message: "The user isn't in limit",

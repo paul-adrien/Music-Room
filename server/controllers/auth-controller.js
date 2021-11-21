@@ -46,7 +46,7 @@ exports.signup = (req, res) => {
       expiresIn: 86400, // 24 hours
     });
 
-    res.json({
+    return res.json({
       status: true,
       id: user.id,
       userName: user.userName,

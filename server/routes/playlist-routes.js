@@ -1,6 +1,5 @@
-const { authJwt } = require(appRoot + "/middlewares");
+const { authJwt, logs } = require(appRoot + "/middlewares");
 const controller = require(appRoot + "/controllers/playlist-controller");
-const logs = require(appRoot + "/middlewares/logs");
 
 module.exports = function (app) {
   app.use(function (req, res, next) {
@@ -11,39 +10,39 @@ module.exports = function (app) {
     next();
   });
 
-  app.get("/playlist", [authJwt.verifyToken], controller.getAllPlaylist, logs);
-  app.post("/playlist", [authJwt.verifyToken], controller.CreatePlaylist, logs);
+  app.get("/playlist", [authJwt.verifyToken], controller.getAllPlaylist, logs.logsHTTP);
+  app.post("/playlist", [authJwt.verifyToken], controller.CreatePlaylist, logs.logsHTTP);
 
   app.get(
     "/playlist/:playlistId",
     [authJwt.verifyToken],
     controller.getPlaylist,
-    logs
+    logs.logsHTTP
   );
   app.delete(
     "/playlist/:playlistId/:userId",
     [authJwt.verifyToken],
     controller.delPlaylist,
-    logs
+    logs.logsHTTP
   );
   app.put(
     "/playlist/:playlistId",
     [authJwt.verifyToken],
     controller.editPlaylist,
-    logs
+    logs.logsHTTP
   );
 
   app.post(
     "/playlist/:playlistId/music/:trackId",
     [authJwt.verifyToken],
     controller.addMusicPlaylist,
-    logs
+    logs.logsHTTP
   );
   app.delete(
     "/playlist/:playlistId/music/:trackId",
     [authJwt.verifyToken],
     controller.delMusicPlaylist,
-    logs
+    logs.logsHTTP
   );
   // app.put("/playlist/:playlistId/music/:trackId", [authJwt.verifyToken], controller.chageOrderPlaylist);
 
@@ -51,13 +50,13 @@ module.exports = function (app) {
     "/playlist/:playlistId/invite/:friendId",
     [authJwt.verifyToken],
     controller.inviteToPlaylist,
-    logs
+    logs.logsHTTP
   );
   app.post(
     "/playlist/:playlistId/acceptInvite",
     [authJwt.verifyToken],
     controller.acceptInvitePlaylist,
-    logs
+    logs.logsHTTP
   );
   // app.delete(
   //   "/playlist/:playlistId/refuseInvite",

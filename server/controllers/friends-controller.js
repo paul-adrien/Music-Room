@@ -4,17 +4,19 @@ const User = db.user;
 async function getUserInfo(user) {
 }
 
-exports.getFriendsList = (req, res) => {
+exports.getFriendsList = (req, res, next) => {
     const { userId } = req.params;
 
     User.findOne({ id: userId }).exec(async (err, user) => {
         if (err) {
-            return res.json({
+            res.message = "error Mongodb";
+            res.status(400).json({
                 status: false,
                 message: err
             });
         } else if (!user) {
-            return res.json({
+            res.message = "this user doesn't exist";
+            res.status(400).json({
                 status: false,
                 message: "this user doesn't exist"
             });
@@ -26,60 +28,70 @@ exports.getFriendsList = (req, res) => {
                 user.friends.map((friend) => {
                     User.findOne({ id: friend.id }).exec((err, friendInfo) => {
                         if (err) {
-                            return res.json({
+                            res.message = "error Mongodb";
+                            res.status(400).json({
                                 status: false,
                                 message: err
                             });
                         } else if (!friendInfo) {
-                            return res.json({
-                                status: false,
-                                message: "this friend doesn't exist"
-                            });
+                            // res.message = "this friend doesn't exist";
+                            // res.status(400).json({
+                            //     status: false,
+                            //     message: "this friend doesn't exist"
+                            // });
+                            // next();
                         } else {
                             i++;
                             friends.push({ id: friendInfo.id, userName: friendInfo.userName });
                         }
-                        console.log(friends)
-                        if (i == l)
-                            return res.json({
+                        if (i == l){
+                            res.message = "Friends list";
+                            res.status(200).json({
                                 status: true,
                                 friends: friends
                             });
+                        }
                     })
                 })
             } else {
-                return res.json({
+                res.message = "Friends list";
+                res.status(200).json({
                     status: true,
                     friends: null
                 });
             }
-        }
+        };
+        next();
     })
 }
 
-exports.deleteFriend = (req, res) => {
+exports.deleteFriend = (req, res, next) => {
     const { userId, friendId } = req.params;
 
     User.findOne({ id: userId }).exec(async (err, user) => {
         if (err) {
-            return res.json({
+            res.message = "error Mongodb";
+            res.status(400).json({
                 status: false,
                 message: err
             });
         } else if (!user) {
-            return res.json({
+            res.message = "this user doesn't exist";
+            res.status(400).json({
                 status: false,
                 message: "this user doesn't exist"
             });
         } else {
             User.findOne({ id: friendId }).exec(async (err, friend) => {
                 if (err) {
-                    return res.json({
+                    res.message = "error Mongodb";
+                    res.status(400).json({
                         status: false,
                         message: err
                     });
-                } else if (!user) {
-                    return res.json({
+                } else if (!friend) {
+                    res.message = "this friend doesn't exist";
+                    res.status(400).json({
                         status: false,
                         message: "this friend doesn't exist"
                     });
@@ -93,58 +105,69 @@ exports.deleteFriend = (req, res) => {
                         friend.friends.splice(indexFriend, 1);
                         const finalFriend = new User(friend);
                         finalFriend.save();
-                        return res.json({
+                        res.message = "friend was delete";
+                        res.status(200).json({
                             status: true
                         });
                     } else {
-                        return res.json({
+                        res.message = "this user is not your friend";
+                        res.status(200).json({
                             status: false,
                             message: "this user is not your friend"
                         });
                     }
                 }
             })
-        }
+        };
+        next();
     })
 }
 
-exports.inviteFriend = (req, res) => {
+exports.inviteFriend = (req, res, next) => {
     const { userId, friendId } = req.params;
 
     User.findOne({ id: userId }).exec(async (err, user) => {
         if (err) {
-            return res.json({
+            res.message = "error Mongodb";
+            res.status(400).json({
                 status: false,
                 message: err
             });
         } else if (!user) {
-            return res.json({
+            res.message = "this user doesn't exist";
+            res.status(400).json({
                 status: false,
                 message: "this user doesn't exist"
             });
         } else {
             User.findOne({ id: friendId }).exec(async (err, friend) => {
                 if (err) {
-                    return res.json({
+                    res.message = "error Mongodb";
+                    res.status(400).json({
                         status: false,
                         message: err
                     });
                 } else if (!friend) {
-                    return res.json({
+                    res.message = "this friend doesn't exist";
+                    res.status(400).json({
                         status: false,
                         message: "this friend doesn't exist"
                     });
                 } else {
-                    if (user.notifs !== undefined && user.notifs.friends !== undefined && user.notifs.friends.map((f) => { return f.id }).indexOf(friendId) != -1)
-                        return res.json({
+                    if (user.notifs !== undefined && user.notifs.friends !== undefined && user.notifs.friends.map((f) => { return f.id }).indexOf(friendId) != -1){
+                        res.message = "already sending invite";
+                        res.status(400).json({
                             status: false,
                             message: "already sending invite"
                         });
-                    if (friend.notifs !== undefined && friend.notifs.friends !== undefined && friend.notifs.friends.map((f) => { return f.id }).indexOf(userId) != -1)
-                        return res.json({
+                    }
+                    if (friend.notifs !== undefined && friend.notifs.friends !== undefined && friend.notifs.friends.map((f) => { return f.id }).indexOf(userId) != -1){
+                        res.message = "this user already invite you";
+                        res.status(400).json({
                             status: false,
                             message: "this user already invite you"
                         });
+                    }
                     if (friend.notifs.friends === undefined || friend.notifs.friends.length == 0) {
                         friend.notifs.friends = {
                             id: userId,
@@ -160,12 +183,14 @@ exports.inviteFriend = (req, res) => {
                     const finalFriend = new User(friend);
                     finalFriend.save((err, friend) => {
                         if (err) {
-                            return res.json({
+                            res.message = "error Mongodb";
+                            res.status(400).json({
                                 status: false,
                                 message: err,
                             });
                         } else {
-                            return res.json({
+                            res.message = "invitation was send";
+                            res.status(200).json({
                                 status: true,
                                 message: "invitation was send"
                             });
@@ -174,37 +199,41 @@ exports.inviteFriend = (req, res) => {
                 }
             })
         }
-    })
+        next();
+    });
 }
 
-exports.acceptInvitation = (req, res) => {
+exports.acceptInvitation = (req, res, next) => {
     const { userId, friendId } = req.params;
 
     User.findOne({ id: userId }).exec(async (err, user) => {
         if (err) {
-            return res.json({
+            res.message = "error Mongodb";
+            res.status(400).json({
                 status: false,
                 message: err
             });
         } else if (!user) {
-            return res.json({
+            res.message = "this user doesn't exist";
+            res.status(400).json({
                 status: false,
                 message: "this user doesn't exist"
             });
         } else {
             User.findOne({ id: friendId }).exec(async (err, friend) => {
                 if (err) {
-                    return res.json({
+                    res.message = "error Mongodb";
+                    res.status(400).json({
                         status: false,
                         message: err
                     });
                 } else if (!friend) {
-                    return res.json({
+                    res.message = "this friend doesn't exist";
+                    res.status(400).json({
                         status: false,
                         message: "this friend doesn't exist"
                     });
                 } else {
-                    console.log(user, friend);
                     let friendIndex = user.notifs.friends.map(function (u) { console.log(u); return u.id; }).indexOf(friendId);
                     if (friendIndex != -1) {
                         user.friends.push({
@@ -218,12 +247,14 @@ exports.acceptInvitation = (req, res) => {
                         finalFriend = new User(friend);
                         finalFriend.save();
                         finalUser.save();
-                        return res.json({
+                        res.message = "you have a new friend !";
+                        res.status(400).json({
                             status: true,
                             message: "you have a new friend !"
                         });
                     } else {
-                        return res.json({
+                        res.message = "you dont have invitation by this user";
+                        res.status(400).json({
                             status: false,
                             message: "you dont have invitation by this user"
                         });
@@ -231,32 +262,37 @@ exports.acceptInvitation = (req, res) => {
                 }
             })
         }
+        next();
     })
 }
 
-exports.refuseInvitation = (req, res) => {
+exports.refuseInvitation = (req, res, next) => {
     const { userId, friendId } = req.params;
 
     User.findOne({ id: userId }).exec(async (err, user) => {
         if (err) {
-            return res.json({
+            res.message = "error Mongodb";
+            res.status(400).json({
                 status: false,
                 message: err
             });
         } else if (!user) {
-            return res.json({
+            res.message = "this user doesn't exist";
+            res.status(400).json({
                 status: false,
                 message: "this user doesn't exist"
             });
         } else {
             User.findOne({ id: friendId }).exec(async (err, friend) => {
                 if (err) {
-                    return res.json({
+                    res.message = "error Mongodb";
+                    res.status(400).json({
                         status: false,
                         message: err
                     });
-                } else if (!user) {
-                    return res.json({
+                } else if (!friend) {
+                    res.message = "this friend doesn't exist";
+                    res.status(400).json({
                         status: false,
                         message: "this friend doesn't exist"
                     });
@@ -266,12 +302,14 @@ exports.refuseInvitation = (req, res) => {
                         user.notifs.friends.splice(notifIndex, 1);
                         finalUser = new User(user);
                         finalUser.save();
-                        return res.json({
+                        res.message = "invitation delete";
+                        res.status(200).json({
                             status: true,
                             message: "invitation delete"
                         });
                     } else {
-                        return res.json({
+                        res.message = "you dont have invitation by this user";
+                        res.status(400).json({
                             status: false,
                             message: "you dont have invitation by this user"
                         });
@@ -279,5 +317,6 @@ exports.refuseInvitation = (req, res) => {
                 }
             })
         }
+        next();
     })
 }

@@ -6,6 +6,7 @@ import {
 import { ModalController } from '@ionic/angular';
 import { PlayerComponent } from '../player/player.component';
 import { SpotifyService } from '../_services/spotify_service';
+import { WebsocketService } from '../_services/websocketService';
 
 @Component({
   selector: 'app-tabs',
@@ -42,10 +43,12 @@ export class TabsPage {
   constructor(
     private spotifyService: SpotifyService,
     private cd: ChangeDetectorRef,
+    private socketService: WebsocketService,
     public modalController: ModalController
   ) { }
 
   ngAfterContentInit() {
+    this.socketService.setupSocketConnection();
     // setInterval(() => this.getPlayerInfo(), 500);
   }
 
