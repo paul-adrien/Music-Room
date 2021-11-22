@@ -45,7 +45,10 @@ import { Location } from '@angular/common';
             {{ conv.name }}
           </div>
           <div class="last-message">
-            {{ conv?.messages[0].message || 'Envoyez un message !' }}
+            {{
+              conv?.messages[conv?.messages?.length - 1]?.message ||
+                'Envoyez un message !'
+            }}
           </div>
         </div>
       </div>
@@ -73,7 +76,12 @@ export class MessagesComponent implements OnInit {
       .listenToServer(`chat convs ${user.id}`)
       .subscribe((data) => {
         console.log(data);
-        this.convList.push(data);
+        let index = this.convList.findIndex((conv) => conv._id === data._id);
+        if (index >= 0) {
+          this.convList[index] = data;
+        } else {
+          this.convList.unshift(data);
+        }
 
         this.cd.detectChanges();
       });

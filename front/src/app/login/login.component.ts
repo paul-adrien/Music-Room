@@ -9,6 +9,7 @@ import {
   InAppBrowserOptions,
 } from '@ionic-native/in-app-browser/ngx';
 import { Device } from '@ionic-native/device/ngx';
+import { AlertController } from '@ionic/angular';
 
 function ValidatorUserNameLength(control: FormControl) {
   const test = /^(?=.{3,20}$)[a-zA-Z0-9]+(?:[-' ][a-zA-Z0-9]+)*$/;
@@ -57,7 +58,7 @@ function ValidatorPass(control: FormControl) {
   selector: 'app-login',
   template: `
     <div class="title">
-      {{ this.loginMode ? 'signUp' : 'signIn' }}
+      {{ this.loginMode ? 'Créer un compte' : 'Se connecter' }}
     </div>
     <form
       [formGroup]="this.registerForm"
@@ -180,7 +181,7 @@ function ValidatorPass(control: FormControl) {
       </div>
       <div class="error">{{ this.errorMessageReg }}</div>
       <button class="primary-button green">
-        {{ !this.loginMode ? 'signUp' : 'signIn' }}
+        {{ !this.loginMode ? 'Créer un compte' : 'Se connecter' }}
       </button>
     </form>
     <form
@@ -226,18 +227,17 @@ function ValidatorPass(control: FormControl) {
       </div>
       <div class="error">{{ this.errorMessageLog }}</div>
       <button class="primary-button green">
-        {{ !this.loginMode ? 'signUp' : 'signIn' }}
+        {{ !this.loginMode ? 'Créer un compte' : 'Se connecter' }}
       </button>
     </form>
     <a
       class="forgot-password"
       *ngIf="this.loginMode"
-      routerLink="/forgotPass"
-      routerLinkActive="active"
-      >{{ 'forgotPassword' }}
+      (click)="this.forgotPassword()"
+      >{{ 'Mot de passe oublié' }}
     </a>
     <div class="log-button" (click)="this.loginMode = !loginMode">
-      {{ this.loginMode ? 'signUp' : 'alreadyHaveAccount' }}
+      {{ this.loginMode ? "Je n'ai pas de compte" : "J'ai déjà un compte" }}
     </div>
     <div class="separator">
       <div class="bar"></div>
@@ -247,16 +247,16 @@ function ValidatorPass(control: FormControl) {
     <div class="buttons-auth">
       <div class="primary-button forty-two" (click)="this.Oauth42()">
         <img class="img-button" src="./assets/42.png" />
-        {{ 'signInWith' }} 42
+        Se connecter avec 42
       </div>
       <div class="primary-button google" (click)="this.OauthGoogle()">
         <img class="img-button" src="./assets/google.svg" />
 
-        {{ 'signInWith' }} Google
+        Se connecter avec Google
       </div>
       <div class="primary-button github" (click)="this.OauthGithub()">
         <img class="img-button" src="./assets/github.png" />
-        {{ 'signInWith' }} Github
+        Se connecter avec Github
       </div>
     </div>
   `,
@@ -292,6 +292,7 @@ export class LoginComponent implements OnInit {
     private iab: InAppBrowser,
     private device: Device,
     private ngZone: NgZone,
+    private alertController: AlertController,
     private cd: ChangeDetectorRef //public translate: TranslateService
   ) {}
 
@@ -372,6 +373,39 @@ export class LoginComponent implements OnInit {
         }
       );
     }
+  }
+
+  async forgotPassword() {
+    this.alertController
+      .create({
+        header: 'Mot passe oublié',
+        message: `Veuillez entrer votre adresse mail.
+        Vous allez recevoir un mail pour changer votre mot de passe.`,
+        inputs: [
+          {
+            name: 'email',
+            placeholder: 'music-room@email.com',
+          },
+        ],
+        buttons: [
+          {
+            text: 'Annuler',
+            handler: (data: any) => {
+              console.log('Canceled', data);
+            },
+          },
+          {
+            text: 'Confirmer',
+            handler: (data: any) => {
+              console.log('Saved Information', data);
+              this.authService.forgotPass_s(data?.email).subscribe();
+            },
+          },
+        ],
+      })
+      .then((res) => {
+        res.present();
+      });
   }
 
   public Oauth42() {

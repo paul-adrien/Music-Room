@@ -37,19 +37,21 @@ app.get("/explorer_socket", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
 
-io.use(function(socket, next){
-  if (socket.handshake.query && socket.handshake.query.token){
-    jwt.verify(socket.handshake.query.token, config.secret, function(err, decoded) {
-      if (err) return next(new Error('Authentication error'));
-      socket.decoded = decoded;
-      next();
-    });
+io.use(function (socket, next) {
+  if (socket.handshake.query && socket.handshake.query.token) {
+    jwt.verify(
+      socket.handshake.query.token,
+      config.secret,
+      function (err, decoded) {
+        if (err) return next(new Error("Authentication error"));
+        socket.decoded = decoded;
+        next();
+      }
+    );
+  } else {
+    next(new Error("Authentication error"));
   }
-  else {
-    next(new Error('Authentication error'));
-  }    
-})
-.on("connection", (socket) => {
+}).on("connection", (socket) => {
   console.log("a user connected");
   socket.on("disconnect", () => {
     console.log("user disconnected");
@@ -87,31 +89,41 @@ io.use(function(socket, next){
   socket.on("chat message", (data) => {
     messaging_controller
       .sendMessage(data.userId, data.convId, data.message)
-      .then((res) =>
-        messaging_controller.getConversationDetailSocket(
-          data.userId,
-          data.convId
-        )
-      )
       .then((res) => {
-        if (res.status) {
-          logs.logsSOCKS("a message was send", res.status, socket.handshake.query.token);
-          let conv = res.conversation;
-          conv.messages = res.conversation?.messages?.sort((a, b) => {
-            if (datefns.isBefore(new Date(a.date), new Date(b.date))) {
-              return -1;
-            } else if (datefns.isAfter(new Date(a.date), new Date(b.date))) {
-              return 1;
+        messaging_controller
+          .getConversationDetailSocket(data.userId, data.convId)
+          .then((res) => {
+            console.log(res);
+            if (res.status) {
+              logs.logsSOCKS(
+                "a message was send",
+                res.status,
+                socket.handshake.query.token
+              );
+              let conv = res.conversation;
+              conv.messages = res.conversation?.messages?.sort((a, b) => {
+                if (datefns.isBefore(new Date(a.date), new Date(b.date))) {
+                  return -1;
+                } else if (
+                  datefns.isAfter(new Date(a.date), new Date(b.date))
+                ) {
+                  return 1;
+                } else {
+                  return 0;
+                }
+              });
+              io.emit(`chat message ${data.convId}`, conv);
+              res?.conversation?.users?.map((user) => {
+                io.emit(`chat convs ${user.userId}`, conv);
+              });
             } else {
-              return 0;
+              logs.logsSOCKS(
+                "error when send message: no conversation",
+                res.status,
+                socket.handshake.query.token
+              );
             }
           });
-          io.emit(`chat message ${data.convId}`, conv);
-          res?.conversation?.users?.map((user) => {
-            io.emit(`chat convs ${user.userId}`, conv);
-          });
-        } else
-          logs.logsSOCKS("error when send message: no conversation", res.status, socket.handshake.query.token);
       });
   });
 
@@ -124,12 +136,20 @@ io.use(function(socket, next){
           data.name
         );
         if (res.status) {
-          logs.logsSOCKS("a conversation was created", res.status, socket.handshake.query.token);
+          logs.logsSOCKS(
+            "a conversation was created",
+            res.status,
+            socket.handshake.query.token
+          );
           data?.users?.map((user) => {
             io.emit(`chat convs ${user.userId}`, conv);
           });
         } else
-          logs.logsSOCKS("error when create conversation", res.status, socket.handshake.query.token);
+          logs.logsSOCKS(
+            "error when create conversation",
+            res.status,
+            socket.handshake.query.token
+          );
       });
   });
 
@@ -139,10 +159,18 @@ io.use(function(socket, next){
     room_controller.CreateRoomSocket(data.name, data.userId).then(() =>
       room_controller.getAllRoomSocket().then((res) => {
         if (res.status) {
-          logs.logsSOCKS("room create", res.status, socket.handshake.query.token);
+          logs.logsSOCKS(
+            "room create",
+            res.status,
+            socket.handshake.query.token
+          );
           io.emit("room create", res.rooms);
         } else {
-          logs.logsSOCKS("Error when create room", res.status, socket.handshake.query.token);
+          logs.logsSOCKS(
+            "Error when create room",
+            res.status,
+            socket.handshake.query.token
+          );
         }
       })
     );
@@ -154,10 +182,18 @@ io.use(function(socket, next){
       .then(() =>
         room_controller.getRoomSocket(data.roomId).then((res) => {
           if (res.status) {
-            logs.logsSOCKS(`room update ${data.roomId} enter room`, res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              `room update ${data.roomId} enter room`,
+              res.status,
+              socket.handshake.query.token
+            );
             io.emit(`room update ${data.roomId}`, res.room);
           } else {
-            logs.logsSOCKS("Error when enter in a room", res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              "Error when enter in a room",
+              res.status,
+              socket.handshake.query.token
+            );
           }
         })
       );
@@ -169,10 +205,18 @@ io.use(function(socket, next){
       .then(() =>
         room_controller.getRoomSocket(data.roomId).then((res) => {
           if (res.status) {
-            logs.logsSOCKS(`room update ${data.roomId} add music`, res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              `room update ${data.roomId} add music`,
+              res.status,
+              socket.handshake.query.token
+            );
             io.emit(`room update ${data.roomId}`, res.room);
           } else {
-            logs.logsSOCKS("Error when create room", res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              "Error when create room",
+              res.status,
+              socket.handshake.query.token
+            );
           }
         })
       );
@@ -182,10 +226,18 @@ io.use(function(socket, next){
     room_controller.delMusicRoomSocket(data.roomId, data.trackId).then(() =>
       room_controller.getRoomSocket(data.roomId).then((res) => {
         if (res.status) {
-          logs.logsSOCKS(`room update ${data.roomId} del music`, res.status, socket.handshake.query.token);
+          logs.logsSOCKS(
+            `room update ${data.roomId} del music`,
+            res.status,
+            socket.handshake.query.token
+          );
           io.emit(`room update ${data.roomId}`, res.room);
         } else {
-          logs.logsSOCKS("Error when del music in room", res.status, socket.handshake.query.token);
+          logs.logsSOCKS(
+            "Error when del music in room",
+            res.status,
+            socket.handshake.query.token
+          );
         }
       })
     );
@@ -199,7 +251,11 @@ io.use(function(socket, next){
           if (res.status) {
             io.emit(`room update ${data.roomId} vote music`, res.room);
           } else {
-            logs.logsSOCKS("Error when vote for a music in room", res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              "Error when vote for a music in room",
+              res.status,
+              socket.handshake.query.token
+            );
           }
         })
       );
@@ -211,10 +267,18 @@ io.use(function(socket, next){
       .then(() =>
         getUser({ id: data.friendId }).then((res) => {
           if (res !== null) {
-            logs.logsSOCKS(`user update ${data.friendId} invite room`, res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              `user update ${data.friendId} invite room`,
+              res.status,
+              socket.handshake.query.token
+            );
             io.emit(`user update ${data.friendId}`, res);
           } else {
-            logs.logsSOCKS("Error when invite in room", res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              "Error when invite in room",
+              res.status,
+              socket.handshake.query.token
+            );
           }
         })
       );
@@ -224,10 +288,18 @@ io.use(function(socket, next){
     room_controller.acceptInviteRoomSocket(data.userId, data.roomId).then(() =>
       room_controller.getRoomSocket(data.roomId).then((res) => {
         if (res.status) {
-          logs.logsSOCKS(`room update ${data.roomId} accepte invite`, res.status, socket.handshake.query.token);
+          logs.logsSOCKS(
+            `room update ${data.roomId} accepte invite`,
+            res.status,
+            socket.handshake.query.token
+          );
           io.emit(`room update ${data.roomId}`, res.room);
         } else {
-          logs.logsSOCKS("Error when accepte invite for a room", res.status, socket.handshake.query.token);
+          logs.logsSOCKS(
+            "Error when accepte invite for a room",
+            res.status,
+            socket.handshake.query.token
+          );
         }
       })
     );
@@ -239,7 +311,11 @@ io.use(function(socket, next){
       .then(() =>
         room_controller.getRoomSocket(data.roomId).then((res) => {
           if (res.status) {
-            logs.logsSOCKS(`room update ${data.roomId} change type`, res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              `room update ${data.roomId} change type`,
+              res.status,
+              socket.handshake.query.token
+            );
             io.emit(`room update ${data.roomId}`, res.room);
             room_controller.getAllRoomSocket().then((res) => {
               if (res.status) {
@@ -247,7 +323,11 @@ io.use(function(socket, next){
               }
             });
           } else {
-            logs.logsSOCKS("Error when change type of a room", res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              "Error when change type of a room",
+              res.status,
+              socket.handshake.query.token
+            );
           }
         })
       );
@@ -259,10 +339,18 @@ io.use(function(socket, next){
       .then(() =>
         room_controller.getRoomSocket(data.roomId).then((res) => {
           if (res.status) {
-            logs.logsSOCKS(`room update ${data.roomId} change type user invited`, res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              `room update ${data.roomId} change type user invited`,
+              res.status,
+              socket.handshake.query.token
+            );
             io.emit(`room update ${data.roomId}`, res.room);
           } else {
-            logs.logsSOCKS("Error when change type of a user in room", res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              "Error when change type of a user in room",
+              res.status,
+              socket.handshake.query.token
+            );
           }
         })
       );
@@ -273,10 +361,18 @@ io.use(function(socket, next){
       io.emit(`room delete ${data.roomId}`);
       room_controller.getAllRoomSocket().then((res) => {
         if (res.status) {
-          logs.logsSOCKS("delete room", res.status, socket.handshake.query.token);
+          logs.logsSOCKS(
+            "delete room",
+            res.status,
+            socket.handshake.query.token
+          );
           io.emit("room create", res.rooms);
         } else {
-          logs.logsSOCKS("Error when delete a room", res.status, socket.handshake.query.token);
+          logs.logsSOCKS(
+            "Error when delete a room",
+            res.status,
+            socket.handshake.query.token
+          );
         }
       });
     });
@@ -286,10 +382,18 @@ io.use(function(socket, next){
     room_controller.addGeoHours(data).then((res) => {
       room_controller.getRoomSocket(data.roomId).then((res) => {
         if (res.status) {
-          logs.logsSOCKS(`room update ${data.roomId} add deo/hours limit`, res.status, socket.handshake.query.token);
+          logs.logsSOCKS(
+            `room update ${data.roomId} add deo/hours limit`,
+            res.status,
+            socket.handshake.query.token
+          );
           io.emit(`room update ${data.roomId}`, res.room);
         } else {
-          logs.logsSOCKS("Error when add geo/hours limit in room", res.status, socket.handshake.query.token);
+          logs.logsSOCKS(
+            "Error when add geo/hours limit in room",
+            res.status,
+            socket.handshake.query.token
+          );
         }
       });
     });
@@ -301,10 +405,18 @@ io.use(function(socket, next){
     playlist_controller.CreatePlaylistSocket(data.name, data.userId).then(() =>
       playlist_controller.getAllPlaylistSocket().then((res) => {
         if (res.status) {
-          logs.logsSOCKS("playlist create", res.status, socket.handshake.query.token);
+          logs.logsSOCKS(
+            "playlist create",
+            res.status,
+            socket.handshake.query.token
+          );
           io.emit("playlist create", res.playlists);
         } else {
-          logs.logsSOCKS("Error when create playlist", res.status, socket.handshake.query.token);
+          logs.logsSOCKS(
+            "Error when create playlist",
+            res.status,
+            socket.handshake.query.token
+          );
         }
       })
     );
@@ -316,10 +428,18 @@ io.use(function(socket, next){
       .then(() =>
         playlist_controller.getPlaylistSocket(data.playlistId).then((res) => {
           if (res.status) {
-            logs.logsSOCKS(`playlist update ${data.playlistId} add music`, res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              `playlist update ${data.playlistId} add music`,
+              res.status,
+              socket.handshake.query.token
+            );
             io.emit(`playlist update ${data.playlistId}`, res.playlist);
           } else {
-            logs.logsSOCKS("Error when add music in playlist", res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              "Error when add music in playlist",
+              res.status,
+              socket.handshake.query.token
+            );
           }
         })
       );
@@ -331,10 +451,18 @@ io.use(function(socket, next){
       .then(() =>
         playlist_controller.getPlaylistSocket(data.playlistId).then((res) => {
           if (res.status) {
-            logs.logsSOCKS(`playlist update ${data.playlistId} del music`, res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              `playlist update ${data.playlistId} del music`,
+              res.status,
+              socket.handshake.query.token
+            );
             io.emit(`playlist update ${data.playlistId}`, res.playlist);
           } else {
-            logs.logsSOCKS("Error when del music in playlist", res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              "Error when del music in playlist",
+              res.status,
+              socket.handshake.query.token
+            );
           }
         })
       );
@@ -346,10 +474,18 @@ io.use(function(socket, next){
       .then(() => {
         playlist_controller.getPlaylistSocket(data.playlistId).then((res) => {
           if (res.status) {
-            logs.logsSOCKS(`playlist update ${data.playlistId} edit`, res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              `playlist update ${data.playlistId} edit`,
+              res.status,
+              socket.handshake.query.token
+            );
             io.emit(`playlist update ${data.playlistId}`, res.playlist);
           } else {
-            logs.logsSOCKS("Error when edit playlist", res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              "Error when edit playlist",
+              res.status,
+              socket.handshake.query.token
+            );
           }
         });
       });
@@ -361,10 +497,18 @@ io.use(function(socket, next){
       .then(() =>
         getUser({ id: data.friendId }).then((res) => {
           if (res !== null) {
-            logs.logsSOCKS(`user update ${data.friendId} invite`, res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              `user update ${data.friendId} invite`,
+              res.status,
+              socket.handshake.query.token
+            );
             io.emit(`user update ${data.friendId}`, res);
           } else {
-            logs.logsSOCKS("Error when invite to playlist", res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              "Error when invite to playlist",
+              res.status,
+              socket.handshake.query.token
+            );
           }
         })
       );
@@ -376,10 +520,18 @@ io.use(function(socket, next){
       .then(() =>
         playlist_controller.getPlaylistSocket(data.playlistId).then((res) => {
           if (res.status) {
-            logs.logsSOCKS(`playlist update ${data.playlistId} accepte invite`, res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              `playlist update ${data.playlistId} accepte invite`,
+              res.status,
+              socket.handshake.query.token
+            );
             io.emit(`playlist update ${data.playlistId}`, res.playlist);
           } else {
-            logs.logsSOCKS("Error when accepte invite to playlist", res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              "Error when accepte invite to playlist",
+              res.status,
+              socket.handshake.query.token
+            );
           }
         })
       );
@@ -391,7 +543,11 @@ io.use(function(socket, next){
       .then(() =>
         playlist_controller.getPlaylistSocket(data.playlistId).then((res) => {
           if (res.status) {
-            logs.logsSOCKS(`playlist update ${data.playlistId} change type`, res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              `playlist update ${data.playlistId} change type`,
+              res.status,
+              socket.handshake.query.token
+            );
             io.emit(`playlist update ${data.playlistId}`, res.playlist);
             playlist_controller.getAllPlaylistSocket().then((res) => {
               if (res.status) {
@@ -399,7 +555,11 @@ io.use(function(socket, next){
               }
             });
           } else {
-            logs.logsSOCKS("Error when change type of playlist", res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              "Error when change type of playlist",
+              res.status,
+              socket.handshake.query.token
+            );
           }
         })
       );
@@ -412,10 +572,18 @@ io.use(function(socket, next){
         io.emit(`playlist delete ${data.playlistId}`);
         playlist_controller.getAllPlaylistSocket().then((res) => {
           if (res.status) {
-            logs.logsSOCKS(`playlist update ${data.playlistId} delete`, res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              `playlist update ${data.playlistId} delete`,
+              res.status,
+              socket.handshake.query.token
+            );
             io.emit("playlist create", res.playlists);
           } else {
-            logs.logsSOCKS("Error when delete playlist", res.status, socket.handshake.query.token);
+            logs.logsSOCKS(
+              "Error when delete playlist",
+              res.status,
+              socket.handshake.query.token
+            );
           }
         });
       });

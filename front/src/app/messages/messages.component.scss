@@ -37,6 +37,11 @@
     display: flex;
     border-bottom: 1px solid var(--light-grey-color);
     padding-bottom: 1rem;
+    padding-top: 1rem;
+
+    &:first-child {
+      padding-top: 0;
+    }
   }
 
   .picture {

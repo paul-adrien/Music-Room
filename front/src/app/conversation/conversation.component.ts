@@ -48,7 +48,7 @@ import { AuthService } from '../_services/auth_service';
   styleUrls: ['./conversation.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ConversationComponent implements OnInit, OnDestroy {
+export class ConversationComponent implements OnInit {
   @ViewChild('input', { static: false }) input: ElementRef;
 
   public convId: string = this.route.snapshot.params.id;
@@ -100,9 +100,5 @@ export class ConversationComponent implements OnInit, OnDestroy {
         message: this.input.nativeElement.value,
       });
     }
-  }
-
-  ngOnDestroy() {
-    this.socketService.disconnect();
   }
 }

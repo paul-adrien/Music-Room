@@ -112,11 +112,11 @@ export class AuthService {
     });
   }
 
-  forgotPass_s(user): Observable<any> {
+  forgotPass_s(email: string): Observable<any> {
     return this.http.post(
       environment.AUTH_API + 'user/forgotPass',
       {
-        email: user.email,
+        email: email,
       },
       httpOptions
     );
