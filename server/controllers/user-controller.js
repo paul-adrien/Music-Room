@@ -137,20 +137,23 @@ exports.checkUsername = async (req, res, next) => {
   next();
 };
 
-exports.forgotPass_send = async (req, res, next) => {
+exports.forgotPass_send = async (req, res) => {
   const email = req.body.email;
   var user = new User();
 
   if ((user = await getUser({ email: email }))) {
     var rand = Math.floor(Math.random() * 100 + 54);
     var link = "http://localhost:8081/forgotPass/" + rand;
-    var transporter = nodemailer.createTransport({
+
+    const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "42.noreplymatcha@gmail.com",
-        pass: "GguyotPlaurent76",
-      },
-    });
+           type: "OAuth2",
+           user: "42.noreplymatcha@gmail.com", //your gmail account you used to set the project up in google cloud console"
+           clientId: "704787272588-v0aava438lpq06jbqkj3pkue0qv98os8.apps.googleusercontent.com",
+           clientSecret: "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",
+           refreshToken: "1//04XMjWIzKX6A0CgYIARAAGAQSNwF-L9Ir0I2GCKZ2rOsblkUNe9saUK7u7FkRYNbRTFJUYuPnmGY6g256cB31_wTnXv3WdhY763g"
+      }});
 
     var mailOptions = {
       from: "42.noreplymatcha@gmail.com",
@@ -165,6 +168,7 @@ exports.forgotPass_send = async (req, res, next) => {
     transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
       } else {
+        console.log('an email was send')
       }
     });
     user.rand = rand;
@@ -188,7 +192,6 @@ exports.forgotPass_send = async (req, res, next) => {
       message: "they are no account with this email",
     });
   }
-  next();
 };
 
 exports.forgotPass_change = async (req, res, next) => {

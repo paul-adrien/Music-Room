@@ -43,6 +43,14 @@ module.exports = function (app) {
     logs.logsHTTP
   );
   app.post(
+    "/user/forgotPass",
+    controller.forgotPass_send
+  );
+  app.put(
+    "/user/changePass",
+    controller.forgotPass_change
+  );
+  app.post(
     "/user/:id/update-picture",
     [authJwt.verifyToken],
     controller.userUpdatePicture,
