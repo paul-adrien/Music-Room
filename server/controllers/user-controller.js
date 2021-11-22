@@ -281,3 +281,34 @@ exports.userUpdateAccountSocket = async (userId, type) => {
     };
   }
 };
+
+exports.userUpdateMusicHistorySocket = async (userId, trackId) => {
+  const user = await getUser({ id: userId });
+  if (user) {
+    if (user?.musicHistory?.indexOf(trackId) >= 0) {
+      user.musicHistory = user?.musicHistory?.filter((el) => el !== trackId);
+    } else if (user?.musicHistory?.lenght >= 5) {
+      user?.musicHistory?.pop();
+    }
+    user.musicHistory.unshift(trackId);
+    if (await updateUser(user.id, user)) {
+      const tmp = await getUser({ id: userId });
+      return {
+        status: true,
+        message: "music add to history",
+        user: tmp,
+      };
+    } else {
+      return {
+        status: true,
+        message: "user doesn't exist",
+        user: user,
+      };
+    }
+  } else {
+    return {
+      status: false,
+      message: "user doesn't exist",
+    };
+  }
+};

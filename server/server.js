@@ -84,6 +84,18 @@ io.use(function (socket, next) {
       });
   });
 
+  socket.on("user update history", (data) => {
+    console.log(data);
+    user_controller
+      .userUpdateMusicHistorySocket(data.userId, data.trackId)
+      .then((res) => {
+        console.log(res);
+        if (res?.status) {
+          io.emit(`user update ${data.userId}`, res?.user);
+        }
+      });
+  });
+
   // CHAT //////////////////////////////////////////////////////////////////////////////
 
   socket.on("chat message", (data) => {

@@ -110,6 +110,7 @@ export class ProfileComponent implements OnInit {
       .listenToServer(`user update ${user?.id}`)
       .subscribe((data) => {
         this.user = data;
+        this.authService.saveUser(data);
 
         if (typeof this.user.picture !== 'string' && this.user.picture) {
           this.user.picture = 'data:image/jpeg;base64,' + data.picture.buffer;

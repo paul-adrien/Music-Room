@@ -17,7 +17,12 @@ module.exports = function (app) {
   app.use(multer().any());
 
   app.get("/token", [authJwt.verifyToken], controller.userBoard);
-  app.get("/user/:id", [authJwt.verifyToken], controller.getProfile, logs.logsHTTP);
+  app.get(
+    "/user/:id",
+    [authJwt.verifyToken],
+    controller.getProfile,
+    logs.logsHTTP
+  );
   app.get(
     "/user/:id/check-username",
     [authJwt.verifyToken],
@@ -25,13 +30,28 @@ module.exports = function (app) {
     logs.logsHTTP
   );
 
-  app.get("/user", [authJwt.verifyToken], controller.getSearchProfile, logs.logsHTTP);
-  app.put("/user/:id", [authJwt.verifyToken], controller.userUpdate, logs.logsHTTP);
+  app.get(
+    "/user",
+    [authJwt.verifyToken],
+    controller.getSearchProfile,
+    logs.logsHTTP
+  );
+  app.put(
+    "/user/:id",
+    [authJwt.verifyToken],
+    controller.userUpdate,
+    logs.logsHTTP
+  );
   app.post(
     "/user/:id/update-picture",
     [authJwt.verifyToken],
     controller.userUpdatePicture,
     logs.logsHTTP
   );
-  app.post("/user/:id/premium", [authJwt.verifyToken], controller.userUpdateAccount, logs.logsHTTP);
+  app.post(
+    "/user/:id/premium",
+    [authJwt.verifyToken],
+    controller.userUpdateAccount,
+    logs.logsHTTP
+  );
 };

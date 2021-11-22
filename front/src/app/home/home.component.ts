@@ -150,6 +150,7 @@ export class HomeComponent implements OnInit {
     this.socketService
       .listenToServer(`user update ${user?.id}`)
       .subscribe((data) => {
+        this.authService.saveUser(data);
         this.user = data;
 
         this.cd.detectChanges();
@@ -190,18 +191,6 @@ export class HomeComponent implements OnInit {
 
   ngAfterContentInit() {
     this.user = this.authService.getUser();
-    this.interval = setInterval(() => {
-      this.userService.getUser(this.user?.id).subscribe((res) => {
-        if (res) {
-          this.authService.saveUser(res);
-        }
-        this.user = this.authService.getUser();
-        // this.rooms = this.roomService.getAllRoom();
-        // this.playlists = this.playlistService.getAllPlaylist();
-
-        this.cd.detectChanges();
-      });
-    }, 10000);
   }
 
   async createRoom() {

@@ -273,6 +273,7 @@ export class RoomComponent implements OnInit, OnDestroy {
             this.spotifyService
               .playTrack(
                 this.trackPlaying?.uri,
+                this.trackPlaying?.id,
                 undefined,
                 this.room?.progress_ms
               )
@@ -317,7 +318,9 @@ export class RoomComponent implements OnInit, OnDestroy {
             }
             if (this.tracks[0]) {
               this.trackPlaying = this.tracks[0];
-              this.spotifyService.playTrack(this.tracks[0]?.uri).subscribe();
+              this.spotifyService
+                .playTrack(this.tracks[0]?.uri, this.tracks[0]?.id)
+                .subscribe();
             }
           } else if (
             res.progress_ms >= 0 &&
@@ -346,7 +349,9 @@ export class RoomComponent implements OnInit, OnDestroy {
         );
 
         if (this.trackPlaying === undefined && this.room?.musics?.length > 0) {
-          this.spotifyService.playTrack(this.tracks[0]?.uri).subscribe();
+          this.spotifyService
+            .playTrack(this.tracks[0]?.uri, this.tracks[0]?.id)
+            .subscribe();
         }
 
         this.cd.detectChanges();
@@ -385,7 +390,7 @@ export class RoomComponent implements OnInit, OnDestroy {
           });
 
           if (this.trackPlaying === undefined) {
-            this.spotifyService.playTrack(track.uri).subscribe();
+            this.spotifyService.playTrack(track.uri, track.id).subscribe();
             this.trackPlaying = track;
           }
 

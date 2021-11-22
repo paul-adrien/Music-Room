@@ -102,6 +102,7 @@ export class NotificationsComponent implements OnInit {
       .listenToServer(`user update ${user?.id}`)
       .subscribe((data) => {
         this.user = data;
+        this.authService.saveUser(data);
 
         const tmpRoom = this.user?.notifs?.rooms?.map((room) => ({
           ...room,
@@ -210,7 +211,8 @@ export class NotificationsComponent implements OnInit {
   removeNotif(notif: any, type: string) {
     let user = this.user;
     user.notifs[type] = user?.notifs[type].filter(
-      (el) => el?.id === notif?.id && new Date(el?.date) === new Date(notif?.date)
+      (el) =>
+        el?.id === notif?.id && new Date(el?.date) === new Date(notif?.date)
     );
     console.log(user);
     this.socketService.emitToServer('user edit', {

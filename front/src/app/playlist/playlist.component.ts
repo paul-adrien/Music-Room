@@ -133,7 +133,11 @@ export class PlaylistComponent implements OnInit {
         console.log(data);
         if (JSON.stringify(this.playlist) !== JSON.stringify(data)) {
           this.playlist = data;
-          this.isInvited = (this.playlist.invited.indexOf(this.user.id) >= 0 || this.playlist.created_by === this.user.id) ? true : false;
+          this.isInvited =
+            this.playlist.invited.indexOf(this.user.id) >= 0 ||
+            this.playlist.created_by === this.user.id
+              ? true
+              : false;
           if (this.isInvited === false && this.playlist.type === 'private')
             this.quitPlaylist();
         }
@@ -174,13 +178,17 @@ export class PlaylistComponent implements OnInit {
   public indexTrack = undefined;
 
   ngOnInit() {
-    console.log(this.playlistId)
+    console.log(this.playlistId);
     this.user = this.authService.getUser();
 
     this.playlistService.getPlaylist(this.playlistId).subscribe((res) => {
       this.playlist = res.playlist;
       this.isPublic = this.playlist.type === 'public' ? true : false;
-      this.isInvited = (this.playlist.invited.indexOf(this.user.id) >= 0 || this.playlist.created_by === this.user.id) ? true : false;
+      this.isInvited =
+        this.playlist.invited.indexOf(this.user.id) >= 0 ||
+        this.playlist.created_by === this.user.id
+          ? true
+          : false;
       if (this.isInvited === false && this.playlist.type === 'private')
         this.quitPlaylist();
       if (res.playlist.musics.length > 0) {
@@ -193,7 +201,7 @@ export class PlaylistComponent implements OnInit {
               this.playlist.users.length === 1 &&
               this.user.id === this.playlist.users[0].id
             ) {
-              //this.spotifyService.playTrack(this.tracks[0].uri).subscribe();
+              //this.spotifyService.playTrack(this.tracks[0].uri, this.tracks[0].id).subscribe();
             }
             this.cd.detectChanges();
           });
@@ -245,7 +253,10 @@ export class PlaylistComponent implements OnInit {
           ) {
             if (this.tracks[this.indexTrack + 1]) {
               this.spotifyService
-                .playTrack(this.tracks[this.indexTrack + 1]?.uri)
+                .playTrack(
+                  this.tracks[this.indexTrack + 1]?.uri,
+                  this.tracks[this.indexTrack + 1]?.id
+                )
                 .subscribe();
               this.indexTrack++;
             }
@@ -341,13 +352,15 @@ export class PlaylistComponent implements OnInit {
         type: 'playlist',
       },
     });
-    popover.onWillDismiss().then((res) => { });
+    popover.onWillDismiss().then((res) => {});
     return await popover.present();
   }
 
   play(index: number) {
     this.indexTrack = index;
-    this.spotifyService.playTrack(this.tracks[index]?.uri).subscribe();
+    this.spotifyService
+      .playTrack(this.tracks[index]?.uri, this.tracks[index]?.id)
+      .subscribe();
   }
 
   pause() {

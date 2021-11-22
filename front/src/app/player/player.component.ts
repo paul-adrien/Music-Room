@@ -147,6 +147,7 @@ export class PlayerComponent {
         if (
           JSON.stringify(data) !== JSON.stringify(this.authService.getUser())
         ) {
+          this.authService.saveUser(data);
           console.log("différent comme la musique d'Orelsan");
         }
         this.cd.detectChanges();

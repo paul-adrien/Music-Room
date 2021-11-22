@@ -1,3 +1,5 @@
+import { AuthService } from './auth_service';
+import { WebsocketService } from './websocketService';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 import { Injectable, NgZone } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -30,7 +32,9 @@ export class SpotifyService {
     private router: ActivatedRoute,
     private iab: InAppBrowser,
     private ngZone: NgZone,
-    private device: Device
+    private device: Device,
+    private socketService: WebsocketService,
+    private authService: AuthService
   ) {}
 
   searchMusic(search: string) {
@@ -73,7 +77,17 @@ export class SpotifyService {
       );
   }
 
-  playTrack(uri: string, deviceId?: string, position_ms?: number) {
+  playTrack(
+    uri: string,
+    trackId: string,
+    deviceId?: string,
+    position_ms?: number
+  ) {
+    const user = this.authService.getUser();
+    this.socketService.emitToServer('user update history', {
+      userId: user.id,
+      trackId: trackId,
+    });
     return this.http
       .put<any>(
         deviceId
@@ -93,7 +107,6 @@ export class SpotifyService {
           }
         })
       );
-    // this.spotifyApi.player.play({ uris: [uri] });
   }
 
   getCode() {

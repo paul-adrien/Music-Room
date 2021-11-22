@@ -254,10 +254,10 @@ function ValidatorPass(control: FormControl) {
 
         Se connecter avec Google
       </div>
-      <div class="primary-button github" (click)="this.OauthGithub()">
+      <!-- <div class="primary-button github" (click)="this.OauthGithub()">
         <img class="img-button" src="./assets/github.png" />
         Se connecter avec Github
-      </div>
+      </div> -->
     </div>
   `,
   styleUrls: ['./login.component.scss'],
@@ -492,12 +492,21 @@ export class LoginComponent implements OnInit {
       );
       browser.on('loadstart').subscribe((event) => {
         console.log('start', event);
+        if (event.url.includes('localhost:8100/login?data')) {
+          const data = event.url.slice(
+            event.url.indexOf('?data=') + '?data='.length
+          );
+          this.ngZone.run(() => {
+            this.route.navigate([`/login`], { queryParams: { data: data } });
+          });
+          browser.close();
+        }
       });
-      browser.on('exit').subscribe((event) => {
-        console.log('end', event);
+      // browser.on('exit').subscribe((event) => {
+      //   console.log('end', event);
 
-        browser.close();
-      });
+      //   browser.close();
+      // });
     }
   }
 }

@@ -24,7 +24,7 @@ import { ModalController } from '@ionic/angular';
       <div *ngIf="!this.isUser && this.searchRes?.items?.length > 0; else user">
         <div
           class="result-item"
-          (click)="this.isModal ? this.dismiss(item) : this.play(item?.uri)"
+          (click)="this.isModal ? this.dismiss(item) : this.play(item)"
           *ngFor="let item of this.searchRes.items"
         >
           <img class="logo" [src]="item.album.images[0].url" />
@@ -74,8 +74,8 @@ export class SearchComponent {
     private authService: AuthService
   ) {}
 
-  play(uri: string) {
-    this.spotifyService.playTrack(uri).subscribe();
+  play(track: any) {
+    this.spotifyService.playTrack(track.uri, track.id).subscribe();
   }
 
   search(event: any) {
