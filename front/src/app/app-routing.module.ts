@@ -1,3 +1,4 @@
+import { VerifyComponent } from './verify/verify.component';
 import { SearchComponent } from './search/search.component';
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
@@ -13,6 +14,7 @@ const routes: Routes = [
       import('./tabs/tabs.module').then((m) => m.TabsPageModule),
   },
   { path: 'login', component: LoginComponent },
+  { path: 'verify/:id', component: VerifyComponent },
   // { path: 'search', component: SearchComponent },
   // {
   //   path: '',

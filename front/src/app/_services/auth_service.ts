@@ -134,4 +134,16 @@ export class AuthService {
       httpOptions
     );
   }
+
+  verify(user, id): Observable<any> {
+    //ok
+    return this.http.post(
+      environment.AUTH_API + 'verify',
+      {
+        id: id,
+        email: user.email,
+      },
+      httpOptions
+    );
+  }
 }

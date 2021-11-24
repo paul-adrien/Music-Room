@@ -1,3 +1,4 @@
+import { VerifyComponent } from './verify/verify.component';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
 import { Camera } from '@ionic-native/camera/ngx';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
@@ -50,6 +51,7 @@ import { environment } from 'src/environments/environment';
     SettingsRoomComponent,
     DelegationComponent,
     EditProfileComponent,
+    VerifyComponent,
   ],
   entryComponents: [],
   imports: [

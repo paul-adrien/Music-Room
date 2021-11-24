@@ -1,6 +1,7 @@
 const config = require(appRoot + "/config/auth");
 const db = require(appRoot + "/models");
 const User = db.user;
+var nodemailer = require("nodemailer");
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
@@ -23,13 +24,47 @@ exports.signup = (req, res) => {
       });
     }
   });
+
+  var rand = Math.floor(Math.random() * 100 + 54);
+  var link = " https://music-room://localhost/verify/" + rand;
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      type: "OAuth2",
+      user: "42.noreplymatcha@gmail.com", //your gmail account you used to set the project up in google cloud console"
+      clientId:
+        "704787272588-v0aava438lpq06jbqkj3pkue0qv98os8.apps.googleusercontent.com",
+      clientSecret: "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",
+      refreshToken:
+        "1//04XMjWIzKX6A0CgYIARAAGAQSNwF-L9Ir0I2GCKZ2rOsblkUNe9saUK7u7FkRYNbRTFJUYuPnmGY6g256cB31_wTnXv3WdhY763g",
+    },
+  });
+
+  var mailOptions = {
+    from: "42.noreplymatcha@gmail.com",
+    to: req.body.email,
+    subject: "Please confirm your Email account",
+    html:
+      "Hello,<br> Please Click on the link to verify your email.<br><a href=" +
+      link +
+      ">Click here to verify</a>",
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+    } else {
+      console.log("an email was send");
+    }
+  });
+
   const user = new User({
     userName: req.body.userName,
     email: req.body.email,
     lastName: req.body.lastName,
     firstName: req.body.firstName,
     password: bcrypt.hashSync(req.body.password, 8),
-    lang: "en",
+    rand: rand,
   });
 
   user.id = user._id;
@@ -54,7 +89,6 @@ exports.signup = (req, res) => {
       lastName: user.lastName,
       firstName: user.firstName,
       accessToken: token,
-      lang: "en",
     });
   });
 };
@@ -108,7 +142,6 @@ exports.signin = (req, res) => {
       lastName: user.lastName,
       firstName: user.firstName,
       accessToken: token,
-      lang: "en",
     });
   });
 };
