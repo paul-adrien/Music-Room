@@ -470,6 +470,7 @@ export class RoomComponent implements OnInit, OnDestroy {
       )
         .toPromise()
         .then((data) => {
+          console.log("pourauoi c'est luo");
           this.playerInfo.is_playing = true;
           this.wait = false;
           this.cd.detectChanges();
