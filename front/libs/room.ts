@@ -15,6 +15,7 @@ export interface Room {
     vote: string[];
   }[];
   progress_ms: number;
+  track_playing: string;
   type: 'public' | 'private';
   onlyInvited: boolean;
   limits: {

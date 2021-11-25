@@ -45,11 +45,12 @@ export class RoomService {
     );
   }
 
-  stockPositionTrack(roomId: string, progress_ms: number) {
+  stockPositionTrack(roomId: string, progress_ms: number, trackId: string) {
     return this.http.post<any>(
       environment.AUTH_API + `room/${roomId}/progress-track`,
       {
         progress_ms,
+        trackId,
       },
       httpOptions
     );

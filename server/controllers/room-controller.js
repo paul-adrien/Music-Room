@@ -634,7 +634,7 @@ exports.enterRoomSocket = async (userId, roomId, deviceId) => {
 
 exports.stockPositionTrack = async (req, res, next) => {
   const { roomId } = req.params;
-  const { progress_ms } = req.body;
+  const { progress_ms, trackId } = req.body;
 
   Room.findOne({ _id: roomId }).exec((err, room) => {
     if (err) {
@@ -655,6 +655,7 @@ exports.stockPositionTrack = async (req, res, next) => {
         {
           $set: {
             progress_ms: progress_ms,
+            track_playling: trackId,
           },
         }
       ).exec((err, room) => {
@@ -701,18 +702,6 @@ exports.quitRoom = async (req, res, next) => {
         })
         .indexOf(userId);
       if (roomIndex != -1 && room.created_by === userId) {
-        // Room.deleteOne({ _id: roomId }).exec((err, room) => {
-        //   if (err) {
-        //     return res.json({
-        //       status: false,
-        //       message: err,
-        //     });
-        //   } else {
-        // return res.json({
-        //   status: true,
-        //   message: "you have quit this room and delete this room",
-        //   }
-        // });
         Room.updateOne(
           { _id: roomId },
           { $pull: { users: { id: userId } } }
@@ -759,6 +748,52 @@ exports.quitRoom = async (req, res, next) => {
       }
     }
     next();
+  });
+};
+
+exports.quitRoomSocket = async (roomId, userId) => {
+  const { roomId } = req.params;
+  const { userId } = req.query;
+
+  Room.findOne({ _id: roomId }).then((room) => {
+    if (!room) {
+      return {
+        status: true,
+        message: "this room doesn't exist or you dont have the good right",
+      };
+    } else {
+      let roomIndex = room.users
+        .map((u) => {
+          return u.id;
+        })
+        .indexOf(userId);
+      if (roomIndex != -1 && room.created_by === userId) {
+        return Room.updateOne(
+          { _id: roomId },
+          { $pull: { users: { id: userId } } }
+        ).then((room) => {
+          return {
+            status: true,
+            message: "you have quit this room",
+          };
+        });
+      } else if (roomIndex != -1) {
+        return Room.updateOne(
+          { _id: roomId },
+          { $pull: { users: { id: userId } } }
+        ).then((room) => {
+          return {
+            status: true,
+            message: "you have quit this room",
+          };
+        });
+      } else {
+        return {
+          status: false,
+          message: "this user is not in this room",
+        };
+      }
+    }
   });
 };
 

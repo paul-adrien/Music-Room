@@ -97,7 +97,7 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
       <div class="buttons-middle">
         <div
           *ngIf="
-            this.isInvited ||
+            !(this.room.onlyInvited && !this.isInvited) ||
             this.room?.created_by === this.user?.id ||
             this.zone
           "
@@ -176,7 +176,6 @@ export class RoomComponent implements OnInit, OnDestroy {
     private socketService: WebsocketService,
     private geolocation: Geolocation
   ) {
-    console.log(`room update ${this.roomId}`);
     this.socketService
       .listenToServer(`room update ${this.roomId}`)
       .subscribe((data) => {
@@ -255,10 +254,13 @@ export class RoomComponent implements OnInit, OnDestroy {
         this.room.created_by === this.user.id
           ? true
           : false;
+
       if (this.isInvited === false && this.room.type === 'private') {
         this.quitRoom();
       }
-      this.getPlayerInfo();
+
+      // this.getPlayerInfo();
+
       if (res.room.musics.length > 0) {
         this.spotifyService
           .getTracksInfo(this.room.musics.map((music) => music.trackId))
@@ -273,7 +275,9 @@ export class RoomComponent implements OnInit, OnDestroy {
             )
           )
           .subscribe((res) => {
-            this.trackPlaying = res[0];
+            this.trackPlaying = res.find(
+              (track) => track.id === this.room.track_playing
+            );
             this.tracks = res?.filter(
               (music) => music.id !== this.trackPlaying?.id
             );
@@ -293,6 +297,7 @@ export class RoomComponent implements OnInit, OnDestroy {
             this.cd.detectChanges();
           });
       }
+
       this.cd.detectChanges();
     });
   }
@@ -314,6 +319,7 @@ export class RoomComponent implements OnInit, OnDestroy {
             this.trackPlaying
           ) {
             console.log('wesh');
+
             if (
               this.room.created_by === this.user.id ||
               this.room.users[0].id === this.user.id
@@ -324,6 +330,7 @@ export class RoomComponent implements OnInit, OnDestroy {
               });
               this.trackPlaying = undefined;
             }
+
             if (this.tracks[0]) {
               this.trackPlaying = this.tracks[0];
               console.log('celui la');
@@ -341,6 +348,7 @@ export class RoomComponent implements OnInit, OnDestroy {
           ) {
             // this.spotifyService.playTrack(this.trackPlaying?.uri).subscribe();
           }
+
           this.playerInfo = {
             is_playing: res.is_playing,
             item: res.item as any,
@@ -349,7 +357,7 @@ export class RoomComponent implements OnInit, OnDestroy {
 
           if (this.room.users[0].id === this.user.id) {
             this.roomService
-              .stockPositionTrack(this.roomId, res.progress_ms)
+              .stockPositionTrack(this.roomId, res.progress_ms, res.item.id)
               .subscribe();
           }
         }
@@ -392,14 +400,14 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   quitRoom() {
-    this.roomService.quitRoom(this.user?.id, this.roomId).subscribe((res) => {
-      if (res.status) {
-        //this.location.back();
-        this.location.historyGo(-1);
-        //this.navCtrl.navigateBack('');
-        //this.navCtrl.navigateBack('/tabs/home');
-      }
+    this.socketService.emitToServer('room quit', {
+      userId: this.user.id,
+      roomId: this.roomId,
     });
+    //this.location.back();
+    this.location.historyGo(-1);
+    //this.navCtrl.navigateBack('');
+    //this.navCtrl.navigateBack('/tabs/home');
   }
 
   async presentModalSuggestion() {
@@ -568,11 +576,6 @@ export class RoomComponent implements OnInit, OnDestroy {
     const music = this.room?.musics?.find((music) => music.trackId === trackId);
     return !!music?.vote?.find((user) => user === this.user.id);
   }
-
-  // getNbVoteTrack(trackId: string) {
-  //   return this.room?.musics?.find((music) => music.trackId === trackId)
-  //     ?.nb_vote;
-  // }
 
   ngOnDestroy() {
     if (this.interval) {

@@ -33,6 +33,7 @@ const Room = mongoose.model(
     type: "public" | "private",
     onlyInvited: Boolean,
     progress_ms: Number,
+    track_playing: String,
   })
 );
 
