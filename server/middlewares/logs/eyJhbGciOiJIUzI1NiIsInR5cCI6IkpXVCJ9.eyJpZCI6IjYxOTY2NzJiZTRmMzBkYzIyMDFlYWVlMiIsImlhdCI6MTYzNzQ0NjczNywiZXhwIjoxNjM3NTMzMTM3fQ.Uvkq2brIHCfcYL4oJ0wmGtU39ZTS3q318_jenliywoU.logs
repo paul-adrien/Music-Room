@@ -1,0 +1,18 @@
+date=2021-11-21T16:24:07.447Z;root=http://localhost:8080/user/6196672be4f30dc2201eaee2;status=304;message=send user
+date=2021-11-21T16:24:17.435Z;root=http://localhost:8080/user/6196672be4f30dc2201eaee2;status=304;message=send user
+date=2021-11-21T16:24:27.433Z;root=http://localhost:8080/user/6196672be4f30dc2201eaee2;status=304;message=send user
+date=2021-11-21T16:24:37.435Z;root=http://localhost:8080/user/6196672be4f30dc2201eaee2;status=304;message=send user
+date=2021-11-21T16:24:47.431Z;root=http://localhost:8080/user/6196672be4f30dc2201eaee2;status=304;message=send user
+date=2021-11-21T16:24:57.433Z;root=http://localhost:8080/user/6196672be4f30dc2201eaee2;status=304;message=send user
+date=2021-11-21T16:25:07.434Z;root=http://localhost:8080/user/6196672be4f30dc2201eaee2;status=304;message=send user
+date=2021-11-21T16:25:17.435Z;root=http://localhost:8080/user/6196672be4f30dc2201eaee2;status=304;message=send user
+date=2021-11-21T16:25:27.433Z;root=http://localhost:8080/user/6196672be4f30dc2201eaee2;status=304;message=send user
+date=2021-11-21T16:29:46.355Z;root=http://localhost:8080/playlist?userId=undefined;status=304;message=playlists success
+date=2021-11-21T16:29:56.285Z;root=http://localhost:8080/user/6196672be4f30dc2201eaee2;status=304;message=send user
+date=2021-11-21T16:29:58.856Z;root=http://localhost:8080/user/6196672be4f30dc2201eaee2;status=304;message=send user
+date=2021-11-21T16:29:58.893Z;root=http://localhost:8080/playlist?userId=undefined;status=304;message=playlists success
+date=2021-11-21T16:30:00.883Z;root=http://localhost:8080/user/6196672be4f30dc2201eaee2;status=304;message=send user
+date=2021-11-21T16:30:06.280Z;root=http://localhost:8080/user/6196672be4f30dc2201eaee2;status=304;message=send user
+date=2021-11-21T16:30:11.677Z;root=socket.io;status=true;message=user was update
+date=2021-11-21T16:30:16.276Z;root=http://localhost:8080/user/6196672be4f30dc2201eaee2;status=200;message=send user
+date=2021-11-21T16:30:26.280Z;root=http://localhost:8080/user/6196672be4f30dc2201eaee2;status=304;message=send user

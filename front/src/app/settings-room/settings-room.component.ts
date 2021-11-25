@@ -121,6 +121,11 @@ declare var google: any;
         <div id="mapError"></div>
       </div>
       <ion-button
+        (click)="deleteZone()"
+        expand="block"
+        size="small"
+        >supprimer la zone</ion-button>
+      <ion-button
         (click)="submitForm()"
         [disabled]="!formReady"
         expand="block"
@@ -196,6 +201,15 @@ export class SettingsRoomComponent implements OnInit {
     this.cd.detectChanges();
 
     this.mapInitializer();
+    if (this.room?.limits) {
+      if (this.room.limits.end && this.room.limits.start){
+        this.form.start = this.room.limits.start;
+        this.form.end = this.room.limits.end;
+      }
+      if (this.room.limits.center)
+        this.pushCirc({lat: this.room.limits.center.latitude, lng: this.room.limits.center.longitude }, this.room.limits.radius)
+      this.cd.detectChanges();
+    }
     $('#pac-input3').on('input', function (e) {
       $('.pac-container').append(`<style>.pac-container {
         z-index: 10000 !important;
@@ -226,7 +240,7 @@ export class SettingsRoomComponent implements OnInit {
       await this.pushCirc(this.locationCirc, this.form.radius);
   }
 
-  pushCirc(location: any, radius: string) {
+  pushCirc(location: any, radius: any) {
     return new Promise((resolve) => {
       this.clear();
       var lng = location.lng;
@@ -269,6 +283,26 @@ export class SettingsRoomComponent implements OnInit {
     this.roomService.addGeoAndHoursLimit(
       this.form,
       this.circlesData,
+      this.room._id,
+      this.userId
+    );
+  }
+
+  deleteZone() {
+    this.circles.map(function (circ) {
+      if (circ.getMap() != null)
+        circ.setMap(null);
+    })
+    this.circlesData = [];
+    this.roomService.addGeoAndHoursLimit(
+      this.form,
+      {
+        radius: 0,
+        center: {
+          latitude: 0,
+          longitude: 0,
+        },
+      },
       this.room._id,
       this.userId
     );

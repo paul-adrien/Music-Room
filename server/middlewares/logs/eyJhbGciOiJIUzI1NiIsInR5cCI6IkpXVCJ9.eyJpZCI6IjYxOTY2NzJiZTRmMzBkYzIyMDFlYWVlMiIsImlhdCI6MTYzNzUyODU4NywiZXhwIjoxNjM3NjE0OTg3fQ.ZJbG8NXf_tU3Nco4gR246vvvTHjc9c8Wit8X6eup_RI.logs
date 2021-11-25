@@ -1,0 +1,11 @@
+date=2021-11-21T21:04:03.451Z;root=http://localhost:8080/room?userId=undefined;status=304;message=rooms success
+date=2021-11-21T21:04:03.484Z;root=http://localhost:8080/playlist?userId=undefined;status=304;message=playlists success
+date=2021-11-21T21:04:07.645Z;root=http://localhost:8080/room?userId=undefined;status=304;message=rooms success
+date=2021-11-21T21:04:07.672Z;root=http://localhost:8080/playlist?userId=undefined;status=304;message=playlists success
+date=2021-11-21T21:04:07.674Z;root=http://localhost:8080/user/6196672be4f30dc2201eaee2;status=304;message=send user
+date=2021-11-21T21:04:09.709Z;root=http://localhost:8080/user/6196672be4f30dc2201eaee2;status=304;message=send user
+date=2021-11-22T20:45:54.601Z;root=http://localhost:8080/room?userId=undefined;status=304;message=rooms success
+date=2021-11-22T20:45:54.637Z;root=http://localhost:8080/playlist?userId=undefined;status=304;message=playlists success
+date=2021-11-22T20:45:57.260Z;root=http://localhost:8080/room?userId=undefined;status=304;message=rooms success
+date=2021-11-22T20:45:57.284Z;root=http://localhost:8080/playlist?userId=undefined;status=304;message=playlists success
+date=2021-11-22T20:45:57.287Z;root=http://localhost:8080/user/6196672be4f30dc2201eaee2;status=200;message=send user

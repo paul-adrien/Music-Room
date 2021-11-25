@@ -22,6 +22,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     let scheme;
+    console.log(this.device)
     if (this.device.platform === 'iOS') {
       scheme = 'twitter://';
     } else if (this.device.platform === 'Android') {
@@ -29,6 +30,7 @@ export class AppComponent implements OnInit {
     }
 
     this.platform.ready().then(() => {
+      console.log(this.platform)
       if (this.platform.is('mobile') && !this.platform.is('mobileweb')) {
         StatusBar.setStyle({ style: Style.Dark });
         if (this.platform.is('ios')) {
@@ -45,20 +47,5 @@ export class AppComponent implements OnInit {
         }
       }
     });
-
-    // this.authService.checkIfUserCo()
-    // .toPromise()
-    // .then(
-    //   (data) => {
-    //     if (
-    //       JSON.parse(data)['status'] === true &&
-    //       this.authService.getUser()
-    //     ) {
-    //       this.socketService.setupSocketConnection();
-    //     }
-    //   },
-    //   (err) => {
-    //   }
-    // );
   }
 }

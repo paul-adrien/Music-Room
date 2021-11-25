@@ -1226,7 +1226,7 @@ exports.checkLimitRoom = async (req, res, next) => {
         message: "this room doesn't exist or you dont have the good right",
       });
     } else {
-      if (room?.limits) {
+      if (room?.limits?.center != null && room?.limits?.radius != null) {
         const isIn = await checkLimits(lat, long, room.limits);
         if (isIn) {
           res.message = "The user is in limit";
