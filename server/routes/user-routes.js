@@ -48,7 +48,7 @@ module.exports = function (app) {
   );
   app.put(
     "/user/changePass",
-    controller.forgotPass_change
+    controller.forgotPass_check
   );
   app.post(
     "/user/:id/update-picture",

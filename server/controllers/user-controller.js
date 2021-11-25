@@ -1,7 +1,9 @@
 const { updateUser, getUser, getUsers } = require(appRoot +
   "/models/lib-user.model");
 var nodemailer = require("nodemailer");
-const User = require(appRoot + "/models/users.model");
+const db = require(appRoot + "/models");
+const User = db.user;
+const ForgotPass = db.forgotPass;
 var bcrypt = require("bcryptjs");
 
 exports.userBoard = (req, res) => {
@@ -143,8 +145,8 @@ exports.forgotPass_send = async (req, res) => {
 
   if ((user = await getUser({ email: email }))) {
     var rand = Math.floor(Math.random() * 100 + 54);
-    var link = "http://localhost:8081/forgotPass/" + rand;
 
+    ForgotPass.updateOne({ email: email }, { email: email, rand: rand }, { upsert: true }).exec();
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -153,16 +155,15 @@ exports.forgotPass_send = async (req, res) => {
            clientId: "704787272588-v0aava438lpq06jbqkj3pkue0qv98os8.apps.googleusercontent.com",
            clientSecret: "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",
            refreshToken: "1//04XMjWIzKX6A0CgYIARAAGAQSNwF-L9Ir0I2GCKZ2rOsblkUNe9saUK7u7FkRYNbRTFJUYuPnmGY6g256cB31_wTnXv3WdhY763g"
-      }});
+      }
+    });
 
     var mailOptions = {
       from: "42.noreplymatcha@gmail.com",
       to: email,
       subject: "Reset password",
       html:
-        "Hello,<br> Please Click on the link to reset your password.<br><a href=" +
-        link +
-        ">Click here to verify</a>",
+        "Hello,<br> Please enter this code: <span style='font-weight: bold'>"+rand+"</span> on the app to reset your password.<br>",
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
@@ -194,8 +195,8 @@ exports.forgotPass_send = async (req, res) => {
   }
 };
 
-exports.forgotPass_change = async (req, res, next) => {
-  const { email, password, id } = req.body;
+exports.forgotPass_check = async (req, res, next) => {
+  const { email, password, rand } = req.body;
   const user = await getUser({ email: email });
   if (user) {
     user.password = bcrypt.hashSync(password, 8);
