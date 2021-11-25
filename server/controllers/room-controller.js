@@ -655,7 +655,7 @@ exports.stockPositionTrack = async (req, res, next) => {
         {
           $set: {
             progress_ms: progress_ms,
-            track_playling: trackId,
+            track_playing: trackId,
           },
         }
       ).exec((err, room) => {
