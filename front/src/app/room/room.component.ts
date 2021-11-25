@@ -217,9 +217,6 @@ export class RoomComponent implements OnInit, OnDestroy {
           this.zone = undefined;
         }
 
-        this.room.musics = this.room.musics.filter(
-          (music) => music?.trackId !== this.trackPlaying?.id
-        );
         if (data?.musics?.length > 0) {
           this.getTracksInfo(data.musics);
         } else {
@@ -272,9 +269,7 @@ export class RoomComponent implements OnInit, OnDestroy {
             this.tracks = res?.filter(
               (music) => music.id !== this.trackPlaying?.id
             );
-            this.room.musics = this.room.musics.filter(
-              (music) => music.trackId !== this.trackPlaying?.id
-            );
+
             this.spotifyService
               .playTrack(
                 this.trackPlaying?.uri,
