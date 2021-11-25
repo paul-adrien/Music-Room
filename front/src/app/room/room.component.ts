@@ -181,17 +181,15 @@ export class RoomComponent implements OnInit, OnDestroy {
       .listenToServer(`room update ${this.roomId}`)
       .subscribe((data) => {
         console.log(data);
-        if (JSON.stringify(this.room) !== JSON.stringify(data)) {
-          this.room = data;
+        this.room = data;
 
-          this.isInvited =
-            this.room.invited.indexOf(this.user.id) >= 0 ||
-            this.room.created_by === this.user.id
-              ? true
-              : false;
-          if (this.isInvited === false && this.room.type === 'private')
-            this.quitRoom();
-        }
+        this.isInvited =
+          this.room.invited.indexOf(this.user.id) >= 0 ||
+          this.room.created_by === this.user.id
+            ? true
+            : false;
+        if (this.isInvited === false && this.room.type === 'private')
+          this.quitRoom();
 
         if (this.room?.limits) {
           this.geolocation
@@ -277,7 +275,9 @@ export class RoomComponent implements OnInit, OnDestroy {
                 undefined,
                 this.room?.progress_ms
               )
-              .subscribe();
+              .subscribe((res) => {
+                console.log('celui la');
+              });
 
             this.cd.detectChanges();
           });
@@ -320,7 +320,9 @@ export class RoomComponent implements OnInit, OnDestroy {
               this.trackPlaying = this.tracks[0];
               this.spotifyService
                 .playTrack(this.tracks[0]?.uri, this.tracks[0]?.id)
-                .subscribe();
+                .subscribe((res) => {
+                  console.log('celui la');
+                });
             }
           } else if (
             res.progress_ms >= 0 &&
@@ -352,7 +354,9 @@ export class RoomComponent implements OnInit, OnDestroy {
         if (this.trackPlaying === undefined && this.room?.musics?.length > 0) {
           this.spotifyService
             .playTrack(this.tracks[0]?.uri, this.tracks[0]?.id)
-            .subscribe();
+            .subscribe((res) => {
+              console.log('celui la');
+            });
           this.trackPlaying = this.tracks[0];
         }
 
@@ -392,23 +396,13 @@ export class RoomComponent implements OnInit, OnDestroy {
           });
 
           if (this.trackPlaying === undefined) {
-            this.spotifyService.playTrack(track.uri, track.id).subscribe();
+            this.spotifyService
+              .playTrack(track.uri, track.id)
+              .subscribe((res) => {
+                console.log('celui la');
+              });
             this.trackPlaying = track;
           }
-
-          // this.roomService
-          //   .addTrack(track.id, this.roomId, this.user.id)
-          //   .subscribe((res) => {
-          //     this.roomService.getRoom(this.roomId).subscribe((res) => {
-          //       this.room = res.room;
-
-          //       if (this.trackPlaying === undefined) {
-          //         this.trackPlaying = track;
-          //         this.spotifyService.playTrack(track.uri).subscribe();
-          //       }
-          //     });
-          //     this.cd.detectChanges();
-          //   });
         } else {
           this.voteTrack(track.id);
         }
