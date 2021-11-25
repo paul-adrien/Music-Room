@@ -140,7 +140,7 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
                   : './assets/thumbs-down.svg'
               "
             /> -->
-            <div>{{ this.getNbVoteTrack(track.id) }}</div>
+            <div>{{ this.track?.nb_vote }}</div>
             <img
               *ngIf="
                 !(this.room.onlyInvited && !this.isInvited) ||
@@ -261,13 +261,22 @@ export class RoomComponent implements OnInit, OnDestroy {
       if (res.room.musics.length > 0) {
         this.spotifyService
           .getTracksInfo(this.room.musics.map((music) => music.trackId))
-          .pipe(map((res: any) => res.tracks))
+          .pipe(
+            map((res: any) =>
+              res.tracks.map((track) => {
+                const tmp = this.room.musics.find(
+                  (music) => music.trackId === track.id
+                );
+                return { ...track, nb_vote: tmp.nb_vote };
+              })
+            )
+          )
           .subscribe((res) => {
             this.trackPlaying = res[0];
             this.tracks = res?.filter(
               (music) => music.id !== this.trackPlaying?.id
             );
-            console.log('celui la');
+            console.log('celui la10101');
 
             this.spotifyService
               .playTrack(
@@ -297,9 +306,11 @@ export class RoomComponent implements OnInit, OnDestroy {
       .toPromise()
       .then((res) => {
         if (typeof res !== 'string' && res !== null) {
-          this.roomService
-            .stockPositionTrack(this.roomId, res.progress_ms)
-            .subscribe();
+          if (this.room.users[0].id === this.user.id) {
+            this.roomService
+              .stockPositionTrack(this.roomId, res.progress_ms)
+              .subscribe();
+          }
           if (
             res.progress_ms === 0 &&
             !res.is_playing &&
@@ -347,7 +358,16 @@ export class RoomComponent implements OnInit, OnDestroy {
   getTracksInfo(musics: any[]) {
     this.spotifyService
       .getTracksInfo(musics.map((music) => music.trackId))
-      .pipe(map((res: any) => res.tracks))
+      .pipe(
+        map((res: any) =>
+          res.tracks.map((track) => {
+            const tmp = this.room.musics.find(
+              (music) => music.trackId === track.id
+            );
+            return { ...track, nb_vote: tmp.nb_vote };
+          })
+        )
+      )
       .subscribe((res) => {
         this.trackPlaying = res[0];
         this.tracks = res?.filter(
@@ -533,12 +553,13 @@ export class RoomComponent implements OnInit, OnDestroy {
           music.trackId === trackId &&
           music.vote.find((user) => user === this.user.id) === undefined
       )
-    )
+    ) {
       this.socketService.emitToServer('room vote music', {
         userId: this.user.id,
         roomId: this.roomId,
         trackId: trackId,
       });
+    }
   }
 
   isVoteTrack(trackId: string) {
@@ -546,10 +567,10 @@ export class RoomComponent implements OnInit, OnDestroy {
     return !!music?.vote?.find((user) => user === this.user.id);
   }
 
-  getNbVoteTrack(trackId: string) {
-    return this.room?.musics?.find((music) => music.trackId === trackId)
-      ?.nb_vote;
-  }
+  // getNbVoteTrack(trackId: string) {
+  //   return this.room?.musics?.find((music) => music.trackId === trackId)
+  //     ?.nb_vote;
+  // }
 
   ngOnDestroy() {
     if (this.interval) {

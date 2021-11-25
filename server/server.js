@@ -211,6 +211,29 @@ io.use(function (socket, next) {
       );
   });
 
+  socket.on("room enter", (data) => {
+    room_controller
+      .enterRoomSocket(data.userId, data.roomId, data.deviceId)
+      .then(() =>
+        room_controller.getRoomSocket(data.roomId).then((res) => {
+          if (res.status) {
+            logs.logsSOCKS(
+              `room update ${data.roomId} enter room`,
+              res.status,
+              socket.handshake.query.token
+            );
+            io.emit(`room update ${data.roomId}`, res.room);
+          } else {
+            logs.logsSOCKS(
+              "Error when enter in a room",
+              res.status,
+              socket.handshake.query.token
+            );
+          }
+        })
+      );
+  });
+
   socket.on("room add music", (data) => {
     room_controller
       .addMusicRoomSocket(data.roomId, data.userId, data.trackId)
@@ -261,7 +284,7 @@ io.use(function (socket, next) {
       .then(() =>
         room_controller.getRoomSocket(data.roomId).then((res) => {
           if (res.status) {
-            io.emit(`room update ${data.roomId} vote music`, res.room);
+            io.emit(`room update ${data.roomId}`, res.room);
           } else {
             logs.logsSOCKS(
               "Error when vote for a music in room",
