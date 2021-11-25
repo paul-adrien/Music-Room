@@ -259,14 +259,16 @@ export class RoomComponent implements OnInit, OnDestroy {
         this.room.created_by === this.user.id
           ? true
           : false;
-      if (this.isInvited === false && this.room.type === 'private')
+      if (this.isInvited === false && this.room.type === 'private') {
         this.quitRoom();
+      }
+      this.getPlayerInfo();
       if (res.room.musics.length > 0) {
         this.spotifyService
           .getTracksInfo(this.room.musics.map((music) => music.trackId))
           .pipe(map((res: any) => res.tracks))
           .subscribe((res) => {
-            this.trackPlaying = res[0];
+            // this.trackPlaying = res[0];
             this.tracks = res?.filter(
               (music) => music.id !== this.trackPlaying?.id
             );
@@ -347,7 +349,6 @@ export class RoomComponent implements OnInit, OnDestroy {
       .getTracksInfo(musics.map((music) => music.trackId))
       .pipe(map((res: any) => res.tracks))
       .subscribe((res) => {
-        this.trackPlaying = res[0];
         this.tracks = res?.filter(
           (music) => music?.id !== this.trackPlaying?.id
         );
