@@ -543,7 +543,11 @@ export class RoomComponent implements OnInit, OnDestroy {
     if (this.tracks[0]) {
       forkJoin(
         this.room.users.map((user) =>
-          this.spotifyService.playTrack(this.tracks[0]?.uri, user.deviceId)
+          this.spotifyService.playTrack(
+            this.tracks[0]?.uri,
+            this.tracks[0]?.id,
+            user.deviceId
+          )
         )
       ).subscribe((data) => {
         this.trackPlaying = this.tracks[0];

@@ -217,7 +217,11 @@ export class PlayerComponent {
       console.log(res);
       if (res?.data?.deviceId) {
         this.spotifyService
-          .changeDevice(res?.data?.deviceId)
+          .playTrack(
+            'spotify:track:4RZ0ebWAxiQbMySXcFhGCk',
+            undefined,
+            res?.data?.deviceId
+          )
           .subscribe((data) => {
             this.playerInfo.is_playing = true;
             this.cd.detectChanges();

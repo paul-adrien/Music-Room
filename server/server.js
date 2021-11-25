@@ -190,7 +190,7 @@ io.use(function (socket, next) {
 
   socket.on("room enter", (data) => {
     room_controller
-      .enterRoomSocket(data.userId, data.roomId, data.deviceId)
+      .enterRoomSocket(data.userId, data.roomId, data.device)
       .then(() =>
         room_controller.getRoomSocket(data.roomId).then((res) => {
           if (res.status) {
