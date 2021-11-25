@@ -3,7 +3,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin: 1rem 3rem;
+  padding: 1rem 3rem;
+  overflow: scroll;
+
+  .header {
+    padding-top: var(--ion-safe-area-top);
+  }
 
   .title {
     font-size: 2rem;

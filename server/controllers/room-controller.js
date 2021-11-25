@@ -37,27 +37,27 @@ exports.getAllRoom = (req, res, next) => {
 };
 
 exports.getAllRoomSocket = async () => {
-    Room.find({}).then((err, rooms) => {
-      if (err) {
-        return {
-          status: false,
-          message: err,
-          rooms: null,
-        };
-      } else if (!rooms) {
-        return {
-          status: true,
-          message: "no room",
-          rooms: null,
-        };
-      } else {
-        return {
-          status: true,
-          message: "rooms success",
-          rooms: rooms,
-        };
-      }
-    })
+  Room.find({}).then((err, rooms) => {
+    if (err) {
+      return {
+        status: false,
+        message: err,
+        rooms: null,
+      };
+    } else if (!rooms) {
+      return {
+        status: true,
+        message: "no room",
+        rooms: null,
+      };
+    } else {
+      return {
+        status: true,
+        message: "rooms success",
+        rooms: rooms,
+      };
+    }
+  });
   return Room.find({}).then((rooms) => {
     if (!rooms) {
       return {
@@ -666,7 +666,7 @@ exports.stockPositionTrack = async (req, res, next) => {
           });
         } else {
           res.message = "you have stock the track's position in this room";
-          res.status(400).json({
+          res.status(200).json({
             status: true,
             message: "you have stock the track's position in this room",
           });

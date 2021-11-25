@@ -1,3 +1,4 @@
+import { environment } from 'src/environments/environment';
 import { SpotifyService } from './../_services/spotify_service';
 import { AuthService } from './../_services/auth_service';
 import { ChangeDetectorRef, Component, NgZone, OnInit } from '@angular/core';
@@ -57,6 +58,7 @@ function ValidatorPass(control: FormControl) {
 @Component({
   selector: 'app-login',
   template: `
+    <ion-header class="header"></ion-header>
     <div class="title">
       {{ this.loginMode ? 'Créer un compte' : 'Se connecter' }}
     </div>
@@ -417,7 +419,7 @@ export class LoginComponent implements OnInit {
       location.href = 'http://localhost:8080/user/authenticate/42';
     } else {
       const browser = this.iab.create(
-        'http://localhost:8080/user/authenticate/42',
+        environment.AUTH_API + 'user/authenticate/42',
         'defaults',
         options
       );
@@ -452,7 +454,7 @@ export class LoginComponent implements OnInit {
       location.href = 'http://localhost:8080/user/authenticate/google';
     } else {
       const browser = this.iab.create(
-        'http://localhost:8080/user/authenticate/google',
+        environment.AUTH_API + 'user/authenticate/google',
         'defaults',
         options
       );
@@ -486,7 +488,7 @@ export class LoginComponent implements OnInit {
       location.href = 'http://localhost:8080/user/authenticate/github';
     } else {
       const browser = this.iab.create(
-        'http://localhost:8080/user/authenticate/github',
+        environment.AUTH_API + 'user/authenticate/github',
         'defaults',
         options
       );

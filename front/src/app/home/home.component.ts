@@ -258,7 +258,8 @@ export class HomeComponent implements OnInit {
       console.log(this.device.platform, res);
       if (
         (this.device.platform === null ||
-          this.device.platform.toLocaleLowerCase() === 'ios') &&
+          this.device.platform.toLocaleLowerCase() === 'ios' ||
+          this.device.platform.toLocaleLowerCase() === 'android') &&
         res?.device?.id
       ) {
         this.socketService.emitToServer('room enter', {
@@ -267,7 +268,7 @@ export class HomeComponent implements OnInit {
           device: res?.device?.id,
         });
         this.router.navigate([`tabs/tab-home/room/${roomId}`]);
-      } else if (this.device.platform === null && !res?.device?.id) {
+      } else if (!res?.device?.id) {
         await this.presentAlert();
       }
     });
@@ -278,11 +279,12 @@ export class HomeComponent implements OnInit {
       console.log(this.device.platform, res);
       if (
         (this.device.platform === null ||
-          this.device.platform.toLocaleLowerCase() === 'ios') &&
+          this.device.platform.toLocaleLowerCase() === 'ios' ||
+          this.device.platform.toLocaleLowerCase() === 'android') &&
         res?.device?.id
       ) {
         this.router.navigate([`tabs/tab-home/playlist/${playlistId}`]);
-      } else if (this.device.platform === null && !res?.device?.id) {
+      } else if (!res?.device?.id) {
         await this.presentAlert();
       }
     });

@@ -34,7 +34,7 @@ import { forkJoin } from 'rxjs';
       <div *ngIf="this.playlists?.length > 0" class="title-category">
         Playlists
       </div>
-      <div class="playlists" *ngIf="this.playlists">
+      <div class="playlists" *ngIf="this.playlists?.length > 0">
         <div class="result-item" *ngFor="let playlist of this.playlists">
           <img
             (click)="
@@ -63,8 +63,8 @@ import { forkJoin } from 'rxjs';
           />
         </div>
       </div>
-      <div *ngIf="this.rooms" class="title-category">Rooms</div>
-      <div class="rooms" *ngIf="this.rooms">
+      <div *ngIf="this.rooms?.length > 0" class="title-category">Rooms</div>
+      <div class="rooms" *ngIf="this.rooms?.length > 0">
         <div class="result-item" *ngFor="let room of this.rooms">
           <img
             (click)="this.openRoom(room._id)"

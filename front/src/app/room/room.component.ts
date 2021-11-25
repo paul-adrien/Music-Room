@@ -108,7 +108,9 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
         </div>
         <div class="buttons-right">
           <img
-            *ngIf="this.isInvited || this.room.created_by === this.user.id"
+            *ngIf="
+              !this.room.onlyInvited || this.room.created_by === this.user.id
+            "
             class="add"
             (click)="this.presentModalInvite()"
             src="./assets/person-add-outline.svg"
@@ -141,7 +143,7 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
             <div>{{ this.getNbVoteTrack(track.id) }}</div>
             <img
               *ngIf="
-                !!this.isInvited ||
+                !(this.room.onlyInvited && !this.isInvited) ||
                 this.room?.created_by === this.user?.id ||
                 this.zone
               "
@@ -183,6 +185,7 @@ export class RoomComponent implements OnInit, OnDestroy {
           this.room = data;
 
           this.isInvited =
+            this.room.onlyInvited ||
             this.room.invited.indexOf(this.user.id) >= 0 ||
             this.room.created_by === this.user.id
               ? true
