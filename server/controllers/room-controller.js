@@ -752,9 +752,6 @@ exports.quitRoom = async (req, res, next) => {
 };
 
 exports.quitRoomSocket = async (roomId, userId) => {
-  const { roomId } = req.params;
-  const { userId } = req.query;
-
   Room.findOne({ _id: roomId }).then((room) => {
     if (!room) {
       return {
