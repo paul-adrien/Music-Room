@@ -212,7 +212,7 @@ io.use(function (socket, next) {
   });
 
   socket.on("room quit", (data) => {
-    room_controller.equitRoomSocket(data.roomId, data.userId).then(() =>
+    room_controller.quitRoomSocket(data.roomId, data.userId).then(() =>
       room_controller.getRoomSocket(data.roomId).then((res) => {
         if (res.status) {
           logs.logsSOCKS(
