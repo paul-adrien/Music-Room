@@ -182,6 +182,7 @@ export class RoomComponent implements OnInit, OnDestroy {
       .subscribe((data) => {
         console.log(data);
         this.room = data;
+        console.log(this.room.progress_ms);
 
         this.isInvited =
           this.room.invited.indexOf(this.user.id) >= 0 ||

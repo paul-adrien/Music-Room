@@ -88,6 +88,9 @@ export class SpotifyService {
       userId: user.id,
       trackId: trackId,
     });
+    console.log(position_ms);
+    const payload = { uris: [uri], position_ms };
+    console.log(payload);
     return this.http
       .put<any>(
         deviceId
