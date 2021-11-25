@@ -185,7 +185,6 @@ export class RoomComponent implements OnInit, OnDestroy {
           this.room = data;
 
           this.isInvited =
-            this.room.onlyInvited ||
             this.room.invited.indexOf(this.user.id) >= 0 ||
             this.room.created_by === this.user.id
               ? true
@@ -208,6 +207,7 @@ export class RoomComponent implements OnInit, OnDestroy {
                   if (res.status) {
                     this.zone = res.isIn;
                   }
+                  this.cd.detectChanges();
                 });
             })
             .catch((error) => {
@@ -347,6 +347,7 @@ export class RoomComponent implements OnInit, OnDestroy {
       .getTracksInfo(musics.map((music) => music.trackId))
       .pipe(map((res: any) => res.tracks))
       .subscribe((res) => {
+        this.trackPlaying = res[0];
         this.tracks = res?.filter(
           (music) => music?.id !== this.trackPlaying?.id
         );

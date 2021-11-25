@@ -1,14 +1,10 @@
 import { Device } from '@ionic-native/device/ngx';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { Platform } from '@ionic/angular';
 import { AuthService } from './_services/auth_service';
 import { WebsocketService } from './_services/websocketService';
-import {
-  Keyboard,
-  KeyboardResize,
-  KeyboardResizeOptions,
-} from '@capacitor/keyboard';
+import { Keyboard } from '@capacitor/keyboard';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +16,8 @@ export class AppComponent implements OnInit {
     private device: Device,
     private platform: Platform,
     private socketService: WebsocketService,
-    private authService: AuthService
+    private authService: AuthService,
+    private cd: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -35,13 +32,15 @@ export class AppComponent implements OnInit {
       if (this.platform.is('mobile') && !this.platform.is('mobileweb')) {
         StatusBar.setStyle({ style: Style.Dark });
         if (this.platform.is('ios')) {
-          Keyboard.addListener('keyboardWillShow', async (info) => {
+          Keyboard.addListener('keyboardDidShow', async (info) => {
             console.log('keyboard did show with height:', info.keyboardHeight);
             await Keyboard.setScroll({ isDisabled: false });
+            this.cd.detectChanges();
           });
 
-          Keyboard.addListener('keyboardWillHide', async () => {
+          Keyboard.addListener('keyboardDidHide', async () => {
             await Keyboard.setScroll({ isDisabled: true });
+            this.cd.detectChanges();
           });
         }
       }
