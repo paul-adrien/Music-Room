@@ -379,7 +379,9 @@ export class RoomComponent implements OnInit, OnDestroy {
         )
       )
       .subscribe((res) => {
-        this.trackPlaying = res[0];
+        this.trackPlaying = res.find(
+          (track) => track.id === this.room.track_playing
+        );
         this.tracks = res?.filter(
           (music) => music?.id !== this.trackPlaying?.id
         );
