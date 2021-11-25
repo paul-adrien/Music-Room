@@ -268,7 +268,7 @@ export class RoomComponent implements OnInit, OnDestroy {
           .getTracksInfo(this.room.musics.map((music) => music.trackId))
           .pipe(map((res: any) => res.tracks))
           .subscribe((res) => {
-            // this.trackPlaying = res[0];
+            this.trackPlaying = res[0];
             this.tracks = res?.filter(
               (music) => music.id !== this.trackPlaying?.id
             );
@@ -357,6 +357,7 @@ export class RoomComponent implements OnInit, OnDestroy {
           this.spotifyService
             .playTrack(this.tracks[0]?.uri, this.tracks[0]?.id)
             .subscribe();
+          this.trackPlaying = this.tracks[0];
         }
 
         this.cd.detectChanges();
