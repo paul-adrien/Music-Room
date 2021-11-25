@@ -306,11 +306,6 @@ export class RoomComponent implements OnInit, OnDestroy {
       .toPromise()
       .then((res) => {
         if (typeof res !== 'string' && res !== null) {
-          if (this.room.users[0].id === this.user.id) {
-            this.roomService
-              .stockPositionTrack(this.roomId, res.progress_ms)
-              .subscribe();
-          }
           if (
             res.progress_ms === 0 &&
             !res.is_playing &&
@@ -350,6 +345,12 @@ export class RoomComponent implements OnInit, OnDestroy {
             item: res.item as any,
             progress_ms: res.progress_ms,
           };
+
+          if (this.room.users[0].id === this.user.id) {
+            this.roomService
+              .stockPositionTrack(this.roomId, res.progress_ms)
+              .subscribe();
+          }
         }
         this.cd.detectChanges();
       });
