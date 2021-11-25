@@ -1,5 +1,4 @@
-const { updateUser, getUser, getUsers } = require(appRoot +
-  "/models/lib-user.model");
+const { updateUser, getUser, getUsers } = require(appRoot + "/models/lib-user.model");
 var nodemailer = require("nodemailer");
 const db = require(appRoot + "/models");
 const User = db.user;
@@ -144,18 +143,24 @@ exports.forgotPass_send = async (req, res) => {
   var user = new User();
 
   if ((user = await getUser({ email: email }))) {
-    var rand = Math.floor(Math.random() * 100 + 54);
+    var rand = Math.floor(Math.random() * 100000 + 54);
 
-    ForgotPass.updateOne({ email: email }, { email: email, rand: rand }, { upsert: true }).exec();
+    ForgotPass.updateOne(
+      { email: email },
+      { email: email, rand: rand },
+      { upsert: true }
+    ).exec();
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-           type: "OAuth2",
-           user: "42.noreplymatcha@gmail.com", //your gmail account you used to set the project up in google cloud console"
-           clientId: "704787272588-v0aava438lpq06jbqkj3pkue0qv98os8.apps.googleusercontent.com",
-           clientSecret: "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",
-           refreshToken: "1//04XMjWIzKX6A0CgYIARAAGAQSNwF-L9Ir0I2GCKZ2rOsblkUNe9saUK7u7FkRYNbRTFJUYuPnmGY6g256cB31_wTnXv3WdhY763g"
-      }
+        type: "OAuth2",
+        user: "42.noreplymatcha@gmail.com", //your gmail account you used to set the project up in google cloud console"
+        clientId:
+          "704787272588-v0aava438lpq06jbqkj3pkue0qv98os8.apps.googleusercontent.com",
+        clientSecret: "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",
+        refreshToken:
+          "1//04XMjWIzKX6A0CgYIARAAGAQSNwF-L9Ir0I2GCKZ2rOsblkUNe9saUK7u7FkRYNbRTFJUYuPnmGY6g256cB31_wTnXv3WdhY763g",
+      },
     });
 
     var mailOptions = {
@@ -163,13 +168,15 @@ exports.forgotPass_send = async (req, res) => {
       to: email,
       subject: "Reset password",
       html:
-        "Hello,<br> Please enter this code: <span style='font-weight: bold'>"+rand+"</span> on the app to reset your password.<br>",
+        "Hello,<br> Please enter this code: <span style='font-weight: bold'>" +
+        rand +
+        "</span> on the app to reset your password.<br>",
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
       } else {
-        console.log('an email was send')
+        console.log("an email was send");
       }
     });
     user.rand = rand;
@@ -199,28 +206,40 @@ exports.forgotPass_check = async (req, res, next) => {
   const { email, password, rand } = req.body;
   const user = await getUser({ email: email });
   if (user) {
-    user.password = bcrypt.hashSync(password, 8);
-    if (user.rand == id) {
-      if (await updateUser(user.id, user)) {
-        res.message = "Password was changed";
-        res.status(200).json({
+    ForgotPass.find({ email: email }).exec(async (err, data) => {
+      console.log(data)
+      if (err) {
+        res.status(400).json({
+          status: false,
+          message: err,
+        });
+      } else if (!data) {
+        res.status(201).json({
           status: true,
-          message: "Password was changed",
+          message: "no code",
         });
       } else {
-        res.message = "user doesn't exist";
-        res.status(200).json({
-          status: false,
-          message: "user doesn't exist",
-        });
+        user.password = bcrypt.hashSync(password, 8);
+        if (rand === data.rand) {
+          if (await updateUser(user.id, user)) {
+            res.status(200).json({
+              status: true,
+              message: "Your passward was changed",
+            });
+          } else {
+            res.status(200).json({
+              status: false,
+              message: "user doesn't exist",
+            });
+          }
+        } else {
+          res.status(200).json({
+            status: false,
+            message: "wrong code, please take the last code send by mail",
+          });
+        }
       }
-    } else {
-      res.message = "wrong link";
-      res.status(200).json({
-        status: false,
-        message: "wrong link",
-      });
-    }
+    });
   } else {
     res.message = "user doesn't exist";
     res.status(200).json({
