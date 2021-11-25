@@ -267,6 +267,7 @@ export class RoomComponent implements OnInit, OnDestroy {
             this.tracks = res?.filter(
               (music) => music.id !== this.trackPlaying?.id
             );
+            console.log('celui la');
 
             this.spotifyService
               .playTrack(
@@ -318,6 +319,8 @@ export class RoomComponent implements OnInit, OnDestroy {
             }
             if (this.tracks[0]) {
               this.trackPlaying = this.tracks[0];
+              console.log('celui la');
+
               this.spotifyService
                 .playTrack(this.tracks[0]?.uri, this.tracks[0]?.id)
                 .subscribe((res) => {
@@ -352,6 +355,8 @@ export class RoomComponent implements OnInit, OnDestroy {
         );
 
         if (this.trackPlaying === undefined && this.room?.musics?.length > 0) {
+          console.log('celui la1');
+
           this.spotifyService
             .playTrack(this.tracks[0]?.uri, this.tracks[0]?.id)
             .subscribe((res) => {
@@ -396,6 +401,8 @@ export class RoomComponent implements OnInit, OnDestroy {
           });
 
           if (this.trackPlaying === undefined) {
+            console.log('celui la');
+
             this.spotifyService
               .playTrack(track.uri, track.id)
               .subscribe((res) => {
