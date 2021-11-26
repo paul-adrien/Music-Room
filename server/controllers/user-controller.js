@@ -366,9 +366,7 @@ exports.sendVerifyEmail = async (req, res) => {
       to: email,
       subject: "Please confirm your Email account",
       html:
-        "Hello,<br> Please Click on the link to verify your email.<br><a target='_blank' href=" +
-        link +
-        ">Click here to verify</a>",
+        "Hello,<br> Please Click on the link to verify your email.<br><a onclick='window.open('"+ link +"')'>Click here to verify</a>",
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
@@ -400,7 +398,7 @@ exports.verifyEmail =  async (req, res, next) => {
   const user = await getUser({ email: email });
   console.log(user)
   if (user) {
-    if (rand === user.rand) {
+    if (parseInt(rand) === user.rand) {
       user.rand = null;
       user.verifyEmail = true;
       console.log(user);
