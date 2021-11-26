@@ -380,7 +380,7 @@ exports.sendVerifyEmail = async (req, res) => {
       } else {
         res.status(200).json({
           status: true,
-          message: "user doesn't exist",
+          message: "an email was send",
         });
         console.log("an email was send");
       }
@@ -395,6 +395,7 @@ exports.sendVerifyEmail = async (req, res) => {
 
 exports.verifyEmail =  async (req, res, next) => {
   const { rand, email } = req.params;
+  console.log(rand, email)
 
   const user = await getUser({ email: email });
   if (user) {
