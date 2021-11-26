@@ -46,7 +46,7 @@ exports.signup = (req, res) => {
     to: req.body.email,
     subject: "Please confirm your Email account",
     html:
-      "Hello,<br> Please Click on the link to verify your email.<br><a href=" +
+      "Hello,<br> Please Click on the link to verify your email.<br><a target='_blank' href=" +
       link +
       ">Click here to verify</a>",
   };
