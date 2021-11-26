@@ -16,7 +16,7 @@ import { WebsocketService } from '../_services/websocketService';
       <app-player></app-player>
       <ion-tab-bar color="dark" slot="bottom">
         <ion-tab-button tab="tab-home">
-          <ion-icon name="triangle"></ion-icon>
+          <ion-icon name="home-outline"></ion-icon>
           <ion-label>Accueil</ion-label>
         </ion-tab-button>
 
@@ -26,8 +26,8 @@ import { WebsocketService } from '../_services/websocketService';
         </ion-tab-button>
 
         <ion-tab-button tab="profile">
-          <ion-icon name="albums-outline"></ion-icon>
-          <ion-label>Découvrir</ion-label>
+          <ion-icon name="person-circle-outline"></ion-icon>
+          <ion-label>Profil</ion-label>
         </ion-tab-button>
       </ion-tab-bar>
     </ion-tabs>
@@ -45,7 +45,7 @@ export class TabsPage {
     private cd: ChangeDetectorRef,
     private socketService: WebsocketService,
     public modalController: ModalController
-  ) { }
+  ) {}
 
   ngAfterContentInit() {
     this.socketService.setupSocketConnection();

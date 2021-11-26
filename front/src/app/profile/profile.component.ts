@@ -14,6 +14,7 @@ import { Device } from '@ionic-native/device/ngx';
 import { Router } from '@angular/router';
 import { AlertController, ModalController } from '@ionic/angular';
 import { forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-profile',
@@ -31,9 +32,18 @@ import { forkJoin } from 'rxjs';
       </div>
     </div>
     <div class="bottom-container">
+      <div *ngIf="this.musicsHistory?.length > 0" class="title-category">
+        Écoutés récemment
+      </div>
+      <div class="playlists" *ngIf="this.musicsHistory?.length > 0">
+        <div class="result-item" *ngFor="let music of this.musicsHistory">
+          {{ music.id }}
+        </div>
+      </div>
       <div *ngIf="this.playlists?.length > 0" class="title-category">
         Playlists
       </div>
+
       <div class="playlists" *ngIf="this.playlists?.length > 0">
         <div class="result-item" *ngFor="let playlist of this.playlists">
           <img
@@ -90,6 +100,7 @@ export class ProfileComponent implements OnInit {
   public user: User;
   public playlists: Playlist[];
   public rooms: Room[];
+  public musicsHistory: any[];
 
   constructor(
     private authService: AuthService,
@@ -117,6 +128,7 @@ export class ProfileComponent implements OnInit {
         } else {
           this.user.picture = data.picture;
         }
+        this.getTracksInfo(this.user.musicHistory);
         this.cd.detectChanges();
       });
 
@@ -143,6 +155,8 @@ export class ProfileComponent implements OnInit {
     this.user = this.authService.getUser();
     this.userService.getUser(this.user?.id).subscribe(async (res) => {
       this.user = res;
+      this.getTracksInfo(this.user.musicHistory);
+
       console.log(res);
       if (typeof this.user?.picture !== 'string' && this.user?.picture) {
         this.user.picture = 'data:image/jpeg;base64,' + res.picture.buffer;
@@ -210,6 +224,19 @@ export class ProfileComponent implements OnInit {
     });
     // this.roomService.enterRoom(this.user.id, roomId);
     //com.spotify.music
+  }
+
+  getTracksInfo(musics: string[]) {
+    this.spotifyService
+      .getTracksInfo(musics)
+      .pipe(map((res: any) => res.tracks))
+      .subscribe((res) => {
+        console.log(res);
+        if (JSON.stringify(this.musicsHistory) !== JSON.stringify(res)) {
+          this.musicsHistory = res;
+        }
+        this.cd.detectChanges();
+      });
   }
 
   async presentAlert() {

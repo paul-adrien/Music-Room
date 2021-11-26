@@ -19,6 +19,7 @@ export interface User {
   validEmail: boolean;
   devices: { id: string; name: string; userId: string }[];
   friends: { id: string }[];
+  musicHistory: string[];
   notifs: {
     playlist: {
       name: string;
@@ -38,7 +39,7 @@ export interface User {
       date: string;
     }[];
   };
-  type: "free" | "premium";
+  type: 'free' | 'premium';
 }
 
 export function mapUserBackToUserFront(user: any): Partial<User> {
