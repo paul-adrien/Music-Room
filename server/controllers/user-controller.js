@@ -335,6 +335,64 @@ exports.userUpdateMusicHistorySocket = async (userId, trackId) => {
   }
 };
 
+
+
+exports.sendVerifyEmail = async (req, res) => {
+  const email = req.body.email;
+
+  const user = await getUser({ email: email });
+  if (user) {
+    var rand = Math.floor(Math.random() * 100000 + 54);
+    var link = "https://musicroom.site./verify/" + rand + '/email/' + email;
+
+    user.rand = rand; 
+    await updateUser(user._id, user);
+
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        type: "OAuth2",
+        user: "42.noreplymatcha@gmail.com", //your gmail account you used to set the project up in google cloud console"
+        clientId:
+          "704787272588-v0aava438lpq06jbqkj3pkue0qv98os8.apps.googleusercontent.com",
+        clientSecret: "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",
+        refreshToken:
+          "1//04XMjWIzKX6A0CgYIARAAGAQSNwF-L9Ir0I2GCKZ2rOsblkUNe9saUK7u7FkRYNbRTFJUYuPnmGY6g256cB31_wTnXv3WdhY763g",
+      },
+    });
+
+    var mailOptions = {
+      from: "42.noreplymatcha@gmail.com",
+      to: email,
+      subject: "Please confirm your Email account",
+      html:
+        "Hello,<br> Please Click on the link to verify your email.<br><a href=" +
+        link +
+        ">Click here to verify</a>",
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        res.status(200).json({
+          status: true,
+          message: error,
+        });
+      } else {
+        res.status(200).json({
+          status: true,
+          message: "user doesn't exist",
+        });
+        console.log("an email was send");
+      }
+    });
+  } else {
+    res.status(200).json({
+      status: false,
+      message: "user doesn't exist",
+    });
+  }
+}
+
 exports.verifyEmail =  async (req, res, next) => {
   const { rand, email } = req.params;
 

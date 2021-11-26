@@ -62,5 +62,6 @@ module.exports = function (app) {
     controller.userUpdateAccount,
     logs.logsHTTP
   );
+  app.post("/verify/email", controller.sendVerifyEmail);
   app.get("/verify/:rand/email/:email", controller.verifyEmail);
 };
