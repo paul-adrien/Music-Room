@@ -1,5 +1,5 @@
-import { VerifyComponent } from './verify/verify.component';
 import { Geolocation } from '@ionic-native/geolocation/ngx';
+import { UserProfileComponent } from './user-profile/user-profile.component';
 import { Camera } from '@ionic-native/camera/ngx';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 import { Device } from '@ionic-native/device/ngx';
@@ -32,6 +32,7 @@ import { DelegationComponent } from './delegation/delegation.component';
 import { EditProfileComponent } from './edit-profile/edit-profile.component';
 // import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { environment } from 'src/environments/environment';
+import { VerifyComponent } from './verify/verify.component';
 
 // const config: SocketIoConfig = { url: environment.AUTH_API, options: {} };
 
@@ -52,6 +53,7 @@ import { environment } from 'src/environments/environment';
     DelegationComponent,
     EditProfileComponent,
     VerifyComponent,
+    UserProfileComponent,
   ],
   entryComponents: [],
   imports: [

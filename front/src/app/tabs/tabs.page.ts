@@ -25,7 +25,7 @@ import { WebsocketService } from '../_services/websocketService';
           <ion-label>Search</ion-label>
         </ion-tab-button>
 
-        <ion-tab-button tab="profile">
+        <ion-tab-button tab="tab-profile">
           <ion-icon name="person-circle-outline"></ion-icon>
           <ion-label>Profil</ion-label>
         </ion-tab-button>

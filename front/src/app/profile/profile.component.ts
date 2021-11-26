@@ -12,9 +12,10 @@ import { Playlist } from 'libs/playlist';
 import { Observable } from 'rxjs-compat/Observable';
 import { Device } from '@ionic-native/device/ngx';
 import { Router } from '@angular/router';
-import { AlertController, ModalController } from '@ionic/angular';
+import { AlertController, ModalController, NavController } from '@ionic/angular';
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { SearchComponent } from './../search/search.component';
 
 @Component({
   selector: 'app-profile',
@@ -29,6 +30,9 @@ import { map } from 'rxjs/operators';
       <div>{{ this.user.userName }}</div>
       <div class="primary-button" (click)="this.presentModalEdit()">
         Modifier le profil
+      </div>
+      <div class="primary-button" (click)="this.presentModalUserProfile()">
+        Chercher un profil
       </div>
     </div>
     <div class="bottom-container">
@@ -265,6 +269,27 @@ export class ProfileComponent implements OnInit {
     modal.onWillDismiss().then((res) => {
       if (res?.data?.picture) {
         this.user.picture = res?.data?.picture;
+      }
+      this.cd.detectChanges();
+    });
+    return await modal.present();
+  }
+
+  async presentModalUserProfile() {
+    const modal = await this.modalController.create({
+      component: SearchComponent,
+      cssClass: ['my-custom-class', 'my-custom-modal'],
+      swipeToClose: true,
+      componentProps: {
+        isModal: true,
+        isUser: true,
+      },
+    });
+    modal.onWillDismiss().then((res) => {
+      if (res?.data?.user) {
+        const user = res.data.user;
+        console.log("user ==+== user.id ", user, user.id);
+        this.router.navigate([`tabs/tab-profile/user-profile/${user.id}`]);
       }
       this.cd.detectChanges();
     });

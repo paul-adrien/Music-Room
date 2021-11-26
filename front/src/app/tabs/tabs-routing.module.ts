@@ -7,6 +7,7 @@ import { SearchComponent } from '../search/search.component';
 import { TabsPage } from './tabs.page';
 import { RoomComponent } from '../room/room.component';
 import { AuthGuard } from '../_services/auth-guard';
+import { UserProfileComponent } from './../user-profile/user-profile.component';
 
 const routes: Routes = [
   {
@@ -31,9 +32,24 @@ const routes: Routes = [
       },
       { path: 'search', canActivate: [AuthGuard], component: SearchComponent },
       {
-        path: 'profile',
-        canActivate: [AuthGuard],
-        component: ProfileComponent,
+        path: 'tab-profile',
+        children: [
+          {
+            path: 'user-profile/:id',
+            canActivate: [AuthGuard],
+            component: UserProfileComponent,
+          },
+          {
+            path: 'profile',
+            canActivate: [AuthGuard],
+            component: ProfileComponent,
+            pathMatch: "full",
+          },
+          {
+            path: '',
+            redirectTo: 'profile',
+          },
+        ],
       },
       {
         path: '',
