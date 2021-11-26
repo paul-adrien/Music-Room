@@ -47,7 +47,7 @@ import { SearchComponent } from './../search/search.component';
         <div class="result-item" *ngFor="let music of this.musicsHistory">
           <img
             (click)="this.openRoom(music.uri)"
-            class="logo no-img"
+            class="logo "
             [src]="music.album.images[0].url"
           />
           <div (click)="this.openRoom(music.uri)" class="item-info">
@@ -144,7 +144,9 @@ export class ProfileComponent implements OnInit {
         } else {
           this.user.picture = data.picture;
         }
-        this.getTracksInfo(this.user.musicHistory);
+        if (this.user?.musicHistory?.length > 0) {
+          this.getTracksInfo(this.user.musicHistory);
+        }
         this.cd.detectChanges();
       });
 
@@ -171,8 +173,9 @@ export class ProfileComponent implements OnInit {
     this.user = this.authService.getUser();
     this.userService.getUser(this.user?.id).subscribe(async (res) => {
       this.user = res;
-      this.getTracksInfo(this.user.musicHistory);
-
+      if (this.user?.musicHistory?.length > 0) {
+        this.getTracksInfo(this.user.musicHistory);
+      }
       console.log(res);
       if (typeof this.user?.picture !== 'string' && this.user?.picture) {
         this.user.picture = 'data:image/jpeg;base64,' + res.picture.buffer;

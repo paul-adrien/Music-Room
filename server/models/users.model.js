@@ -20,7 +20,7 @@ const User = mongoose.model(
       } | String,
     rand: Number,
     validEmail: Boolean,
-    friends: [{ id: String }],
+    friends: [String],
     devices: [{ id: String, name: String, userId: String }],
     musicHistory: [String],
     notifs: {

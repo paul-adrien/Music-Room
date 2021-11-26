@@ -1,10 +1,11 @@
-const { updateUser, getUser, getUsers } = require(appRoot + "/models/lib-user.model");
+const { updateUser, getUser, getUsers } = require(appRoot +
+  "/models/lib-user.model");
 var nodemailer = require("nodemailer");
 const db = require(appRoot + "/models");
 const User = db.user;
 const ForgotPass = db.forgotPass;
 var bcrypt = require("bcryptjs");
-const path = require('path');
+const path = require("path");
 
 exports.userBoard = (req, res) => {
   res.json({
@@ -208,7 +209,7 @@ exports.forgotPass_check = async (req, res, next) => {
   const user = await getUser({ email: email });
   if (user) {
     ForgotPass.findOne({ email: email }).exec(async (err, data) => {
-      console.log(data)
+      console.log(data);
       if (err) {
         res.status(400).json({
           status: false,
@@ -223,7 +224,7 @@ exports.forgotPass_check = async (req, res, next) => {
         user.password = bcrypt.hashSync(password, 8);
         if (rand === data.rand) {
           if (await updateUser(user.id, user)) {
-            ForgotPass.deleteOne({ email: email }).exec()
+            ForgotPass.deleteOne({ email: email }).exec();
             res.status(200).json({
               status: true,
               message: "Your passward was changed",
@@ -310,9 +311,10 @@ exports.userUpdateMusicHistorySocket = async (userId, trackId) => {
   if (user) {
     if (user?.musicHistory?.indexOf(trackId) >= 0) {
       user.musicHistory = user?.musicHistory?.filter((el) => el !== trackId);
-    } else if (user?.musicHistory?.lenght >= 5) {
+    } else if (user?.musicHistory?.length >= 5) {
       user?.musicHistory?.pop();
     }
+    console.log("ici connard", user?.musicHistory);
     user.musicHistory.unshift(trackId);
     if (await updateUser(user.id, user)) {
       const tmp = await getUser({ id: userId });
@@ -336,17 +338,15 @@ exports.userUpdateMusicHistorySocket = async (userId, trackId) => {
   }
 };
 
-
-
 exports.sendVerifyEmail = async (req, res) => {
   const email = req.body.email;
 
   const user = await getUser({ email: email });
   if (user) {
     var rand = Math.floor(Math.random() * 100000 + 54);
-    var link = "http://54.38.243.206/verify/" + rand + '/email/' + email;
+    var link = "http://54.38.243.206/verify/" + rand + "/email/" + email;
 
-    user.rand = rand; 
+    user.rand = rand;
     await updateUser(user._id, user);
 
     const transporter = nodemailer.createTransport({
@@ -392,15 +392,15 @@ exports.sendVerifyEmail = async (req, res) => {
       message: "user doesn't exist",
     });
   }
-}
+};
 
-exports.verifyEmail =  async (req, res, next) => {
+exports.verifyEmail = async (req, res, next) => {
   const { rand, email } = req.params;
-  console.log(rand, email, path.join(appRoot, "/html/verifEmail.html"))
+  console.log(rand, email, path.join(appRoot, "/html/verifEmail.html"));
 
   const user = await getUser({ email: email });
   if (user) {
-    console.log(rand, user.rand)
+    console.log(rand, user.rand);
     if (parseInt(rand) === user.rand) {
       user.rand = null;
       user.validEmail = true;

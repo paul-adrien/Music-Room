@@ -5,6 +5,8 @@ const app = require(appRoot + "/app");
 const messaging_controller = require(appRoot +
   "/controllers/messaging-controller");
 const room_controller = require(appRoot + "/controllers/room-controller");
+const friend_controller = require(appRoot + "/controllers/friend-controller");
+
 const playlist_controller = require(appRoot +
   "/controllers/playlist-controller");
 const user_controller = require(appRoot + "/controllers/user-controller");
@@ -92,6 +94,111 @@ io.use(function (socket, next) {
         console.log(res);
         if (res?.status) {
           io.emit(`user update ${data.userId}`, res?.user);
+        }
+      });
+  });
+
+  // FRIEND /////////////////////////////////////////////////////////////////////////////
+
+  socket.on("friend invite", (data) => {
+    friend_controller
+      .inviteFriendSocket(data.userId, data.friendId)
+      .then((res) => {
+        if (res.status) {
+          return getUser({ id: data.friendId }).then((res) => {
+            if (res !== null) {
+              logs.logsSOCKS(
+                `user update ${data.friendId} invite friend`,
+                res.status,
+                socket.handshake.query.token
+              );
+              io.emit(`user update ${data.friendId}`, res);
+            } else {
+              logs.logsSOCKS(
+                "Error when invite in friend",
+                res.status,
+                socket.handshake.query.token
+              );
+            }
+          });
+        } else {
+          logs.logsSOCKS(
+            "Error when invite in friend",
+            res.status,
+            socket.handshake.query.token
+          );
+        }
+      });
+  });
+
+  socket.on("friend accept invite", (data) => {
+    friend_controller
+      .acceptInvitationSocket(data.userId, data.friendId)
+      .then((res) => {
+        if (res.status) {
+          Promise.all(
+            getUser({ id: data.userId }),
+            getUser({ id: data.friendId })
+          ).then(([resUser, resFriend]) => {
+            if (resUser !== null && resFriend !== null) {
+              logs.logsSOCKS(
+                `friend update ${data.friendId} accepte invite`,
+                res.status,
+                socket.handshake.query.token
+              );
+              io.emit(`user update ${data.user}`, resUser);
+
+              io.emit(`user update ${data.friendId}`, resFriend);
+            } else {
+              logs.logsSOCKS(
+                "Error when accepte invite for a friend",
+                res.status,
+                socket.handshake.query.token
+              );
+            }
+          });
+        } else {
+          logs.logsSOCKS(
+            "Error when accepte invite for a friend",
+            res.status,
+            socket.handshake.query.token
+          );
+        }
+      });
+  });
+
+  socket.on("friend delete", (data) => {
+    friend_controller
+      .deleteFriendSocket(data.userId, data.friendId)
+      .then((res) => {
+        if (res.status) {
+          Promise.all(
+            getUser({ id: data.userId }),
+            getUser({ id: data.friendId })
+          ).then(([resUser, resFriend]) => {
+            if (resUser !== null && resFriend !== null) {
+              logs.logsSOCKS(
+                `friend update ${data.friendId} delete`,
+                res.status,
+                socket.handshake.query.token
+              );
+              io.emit(`user update ${data.user}`, resUser);
+
+              io.emit(`user update ${data.friendId}`, resFriend);
+            } else {
+              logs.logsSOCKS(
+                "Error when delete a friend",
+                res.status,
+                socket.handshake.query.token
+              );
+            }
+          });
+        } else {
+          logs.logsSOCKS(
+            "Error when delete a friend",
+            res.status,
+            socket.handshake.query.token
+          );
         }
       });
   });

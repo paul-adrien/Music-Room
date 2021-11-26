@@ -137,15 +137,15 @@ export class NotificationsComponent implements OnInit {
 
   ngOnInit() {
     this.user = this.authService.getUser();
-    const tmpRoom = this.user?.notifs.rooms.map((room) => ({
+    const tmpRoom = this.user?.notifs?.rooms.map((room) => ({
       ...room,
       type: 'rooms',
     }));
-    const tmpPlaylist = this.user?.notifs.playlist.map((playlist) => ({
+    const tmpPlaylist = this.user?.notifs?.playlist.map((playlist) => ({
       ...playlist,
       type: 'playlist',
     }));
-    const tmpFriend = this.user?.notifs.friends.map((friend) => ({
+    const tmpFriend = this.user?.notifs?.friends.map((friend) => ({
       ...friend,
       type: 'friends',
     }));
