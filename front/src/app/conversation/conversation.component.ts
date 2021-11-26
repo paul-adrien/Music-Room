@@ -1,5 +1,6 @@
 import { User } from 'libs/user';
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
@@ -24,7 +25,7 @@ import { AuthService } from '../_services/auth_service';
     />
     <div *ngIf="this.conv" class="conv-container">
       <p class="title">{{ conv.name }}</p>
-      <div class="messages">
+      <div class="messages" #convContainer>
         <div
           [class.me]="this.user?.id === msg.userId"
           class="message-container"
@@ -50,6 +51,7 @@ import { AuthService } from '../_services/auth_service';
 })
 export class ConversationComponent implements OnInit {
   @ViewChild('input', { static: false }) input: ElementRef;
+  @ViewChild('convContainer') convContainer: ElementRef;
 
   public convId: string = this.route.snapshot.params.id;
 
@@ -68,6 +70,10 @@ export class ConversationComponent implements OnInit {
         if (JSON.stringify(this.conv) !== JSON.stringify(data)) {
           this.conv = data;
         }
+        if (this.convContainer) {
+          this.convContainer.nativeElement.scrollTop =
+            this.convContainer.nativeElement.scrollHeight;
+        }
         this.cd.detectChanges();
       });
   }
@@ -85,6 +91,11 @@ export class ConversationComponent implements OnInit {
         console.log(res);
         this.conv = res.conversation;
         this.cd.detectChanges();
+        if (this.convContainer) {
+          this.convContainer.nativeElement.scrollTop =
+            this.convContainer.nativeElement.scrollHeight;
+        }
+        this.cd.detectChanges();
       });
   }
 
@@ -99,6 +110,7 @@ export class ConversationComponent implements OnInit {
         convId: this.convId,
         message: this.input.nativeElement.value,
       });
+      this.input.nativeElement.value = '';
     }
   }
 }

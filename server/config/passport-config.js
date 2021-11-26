@@ -13,7 +13,7 @@ passport.use(
     {
       clientID: keys["42"].clientID,
       clientSecret: keys["42"].clientSecret,
-      callbackURL: `http://localhost:8080/user/authenticate/42/callback`,
+      callbackURL: `https://musicroom.site./user/authenticate/42/callback`,
     },
     async function (accessToken, refreshToken, profile, done) {
       const user = await getUser({ id: `42_${profile._json.id}` });
@@ -52,7 +52,7 @@ passport.use(
     {
       clientID: keys["google"].clientID,
       clientSecret: keys["google"].clientSecret,
-      callbackURL: `http://localhost:8080/user/authenticate/google/callback`,
+      callbackURL: `https://musicroom.site./user/authenticate/google/callback`,
     },
     async function (accessToken, refreshToken, profile, done) {
       const user = await getUser({ id: `google_${profile.id}` });

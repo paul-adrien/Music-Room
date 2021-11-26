@@ -1,5 +1,4 @@
 import { CapacitorConfig } from '@capacitor/cli';
-import { Keyboard, KeyboardResize } from '@capacitor/keyboard';
 
 const config: CapacitorConfig = {
   appId: 'io.ionic.starter',
@@ -8,7 +7,9 @@ const config: CapacitorConfig = {
   bundledWebRuntime: false,
   plugins: {
     Keyboard: {
-      resize: KeyboardResize.Native,
+      resize: 'body' as any,
+      style: 'dark',
+      resizeOnFullScreen: true,
     },
   },
 };
