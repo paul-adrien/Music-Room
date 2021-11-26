@@ -395,9 +395,10 @@ exports.sendVerifyEmail = async (req, res) => {
 
 exports.verifyEmail =  async (req, res, next) => {
   const { rand, email } = req.params;
-  console.log(rand, email)
+  console.log(rand, email, appRoot + "/html/verifEmail.html")
 
   const user = await getUser({ email: email });
+  console.log(user)
   if (user) {
     if (rand === user.rand) {
       user.rand = null;
