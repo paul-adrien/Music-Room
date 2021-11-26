@@ -5,7 +5,7 @@ const app = require(appRoot + "/app");
 const messaging_controller = require(appRoot +
   "/controllers/messaging-controller");
 const room_controller = require(appRoot + "/controllers/room-controller");
-const friend_controller = require(appRoot + "/controllers/friend-controller");
+const friends_controller = require(appRoot + "/controllers/friends-controller");
 
 const playlist_controller = require(appRoot +
   "/controllers/playlist-controller");
@@ -101,7 +101,7 @@ io.use(function (socket, next) {
   // FRIEND /////////////////////////////////////////////////////////////////////////////
 
   socket.on("friend invite", (data) => {
-    friend_controller
+    friends_controller
       .inviteFriendSocket(data.userId, data.friendId)
       .then((res) => {
         if (res.status) {
@@ -132,7 +132,7 @@ io.use(function (socket, next) {
   });
 
   socket.on("friend accept invite", (data) => {
-    friend_controller
+    friends_controller
       .acceptInvitationSocket(data.userId, data.friendId)
       .then((res) => {
         if (res.status) {
@@ -168,7 +168,7 @@ io.use(function (socket, next) {
   });
 
   socket.on("friend delete", (data) => {
-    friend_controller
+    friends_controller
       .deleteFriendSocket(data.userId, data.friendId)
       .then((res) => {
         if (res.status) {
