@@ -343,7 +343,7 @@ exports.sendVerifyEmail = async (req, res) => {
   const user = await getUser({ email: email });
   if (user) {
     var rand = Math.floor(Math.random() * 100000 + 54);
-    var link = "https://musicroom.site./verify/" + rand + '/email/' + email;
+    var link = "'https://musicroom.site./verify/" + rand + '/email/' + email + "'";
 
     user.rand = rand; 
     await updateUser(user._id, user);
@@ -366,7 +366,7 @@ exports.sendVerifyEmail = async (req, res) => {
       to: email,
       subject: "Please confirm your Email account",
       html:
-        "Hello,<br> Please Click on the link to verify your email.<br><a onclick='window.open('"+ link +"')'>Click here to verify</a>",
+        "Hello,<br> Please Click on the link to verify your email.<br><a onclick='window.open("+ link +")'>Click here to verify</a>",
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
