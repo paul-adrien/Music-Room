@@ -334,3 +334,16 @@ exports.userUpdateMusicHistorySocket = async (userId, trackId) => {
     };
   }
 };
+
+exports.verifyEmail =  async (req, res, next) => {
+  const { rand, email } = req.params;
+
+  const user = await getUser({ email: email });
+  if (user) {
+    if (rand === user.rand) {
+      user.rand = null;
+      user.verifyEmail = true;
+      await updateUser(user._id, user)
+    }
+  }
+};

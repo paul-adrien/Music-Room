@@ -62,4 +62,5 @@ module.exports = function (app) {
     controller.userUpdateAccount,
     logs.logsHTTP
   );
+  app.get("/verify/:rand/email/:email", controller.verifyEmail);
 };

@@ -25,8 +25,8 @@ exports.signup = (req, res) => {
     }
   });
 
-  var rand = Math.floor(Math.random() * 100 + 54);
-  var link = " https://music-room://localhost/verify/" + rand;
+  var rand = Math.floor(Math.random() * 100000 + 54);
+  var link = "http://54.38.243.206/verify/" + rand;
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
@@ -65,6 +65,7 @@ exports.signup = (req, res) => {
     firstName: req.body.firstName,
     password: bcrypt.hashSync(req.body.password, 8),
     rand: rand,
+    validEmail: false
   });
 
   user.id = user._id;
