@@ -343,7 +343,13 @@ exports.verifyEmail =  async (req, res, next) => {
     if (rand === user.rand) {
       user.rand = null;
       user.verifyEmail = true;
-      await updateUser(user._id, user)
+      console.log(user);
+      await updateUser(user._id, user);
+      res.sendFile(appRoot + "/html/verifEmail.html");
+    } else {
+      res.sendFile(appRoot + "/html/errorVerifEmail.html");
     }
+  } else {
+    res.sendFile(appRoot + "/html/errorVerifEmail.html");
   }
 };

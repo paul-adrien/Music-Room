@@ -26,7 +26,7 @@ exports.signup = (req, res) => {
   });
 
   var rand = Math.floor(Math.random() * 100000 + 54);
-  var link = "http://54.38.243.206/verify/" + rand;
+  var link = "https://musicroom.site./verify/" + rand + '/email/' + req.body.email;
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
