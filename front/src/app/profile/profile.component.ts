@@ -12,7 +12,11 @@ import { Playlist } from 'libs/playlist';
 import { Observable } from 'rxjs-compat/Observable';
 import { Device } from '@ionic-native/device/ngx';
 import { Router } from '@angular/router';
-import { AlertController, ModalController, NavController } from '@ionic/angular';
+import {
+  AlertController,
+  ModalController,
+  NavController,
+} from '@ionic/angular';
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { SearchComponent } from './../search/search.component';
@@ -41,7 +45,15 @@ import { SearchComponent } from './../search/search.component';
       </div>
       <div class="playlists" *ngIf="this.musicsHistory?.length > 0">
         <div class="result-item" *ngFor="let music of this.musicsHistory">
-          {{ music.id }}
+          <img
+            (click)="this.openRoom(music.uri)"
+            class="logo no-img"
+            [src]="music.album.images[0].url"
+          />
+          <div (click)="this.openRoom(music.uri)" class="item-info">
+            <div class="info-top">{{ music.name }}</div>
+            <div class="info-bottom">{{ music.artists[0].name }}</div>
+          </div>
         </div>
       </div>
       <div *ngIf="this.playlists?.length > 0" class="title-category">
@@ -288,7 +300,7 @@ export class ProfileComponent implements OnInit {
     modal.onWillDismiss().then((res) => {
       if (res?.data?.user) {
         const user = res.data.user;
-        console.log("user ==+== user.id ", user, user.id);
+        console.log('user ==+== user.id ', user, user.id);
         this.router.navigate([`tabs/tab-profile/user-profile/${user.id}`]);
       }
       this.cd.detectChanges();

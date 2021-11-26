@@ -1,3 +1,4 @@
+import { TabProfileModule } from './../tab-profile/tab-profile.module';
 import { TabHomePage } from '../tab-home/tab-home.page';
 import { HomeComponent } from './../home/home.component';
 import { ProfileComponent } from './../profile/profile.component';
@@ -33,23 +34,10 @@ const routes: Routes = [
       { path: 'search', canActivate: [AuthGuard], component: SearchComponent },
       {
         path: 'tab-profile',
-        children: [
-          {
-            path: 'user-profile/:id',
-            canActivate: [AuthGuard],
-            component: UserProfileComponent,
-          },
-          {
-            path: 'profile',
-            canActivate: [AuthGuard],
-            component: ProfileComponent,
-            pathMatch: "full",
-          },
-          {
-            path: '',
-            redirectTo: 'profile',
-          },
-        ],
+        loadChildren: () =>
+          import('../tab-profile/tab-profile.module').then(
+            (m) => m.TabProfileModule
+          ),
       },
       {
         path: '',

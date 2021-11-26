@@ -1,13 +1,13 @@
-import { CreateModalComponent } from './../create-modal/create-modal.component';
-import { SearchComponent } from './../search/search.component';
+import { CreateModalComponent } from '../create-modal/create-modal.component';
+import { SearchComponent } from '../search/search.component';
 import { IonicModule } from '@ionic/angular';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { TabHomePage } from './tab-home.page';
+import { TabProfilePage } from './tab-profile.page';
 import { ExploreContainerComponentModule } from '../explore-container/explore-container.module';
 
-import { TabHomePageRoutingModule } from './tab-home-routing.module';
+import { TabProfilePageRoutingModule as TabProfilePageRoutingModule } from './tab-profile-routing.module';
 import { SettingsRoomComponent } from '../settings-room/settings-room.component';
 
 @NgModule({
@@ -16,13 +16,13 @@ import { SettingsRoomComponent } from '../settings-room/settings-room.component'
     CommonModule,
     FormsModule,
     ExploreContainerComponentModule,
-    TabHomePageRoutingModule,
+    TabProfilePageRoutingModule,
   ],
   entryComponents: [
     SearchComponent,
     CreateModalComponent,
     SettingsRoomComponent,
   ],
-  declarations: [TabHomePage],
+  declarations: [TabProfilePage],
 })
-export class TabHomeModule {}
+export class TabProfileModule {}

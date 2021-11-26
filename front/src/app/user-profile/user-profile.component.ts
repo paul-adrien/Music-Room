@@ -19,29 +19,42 @@ import { ActivatedRoute } from '@angular/router';
   selector: 'app-user-profile',
   template: `
     <div class="top-container" *ngIf="this.user">
-      <img class="back-img" src="./assets/chevron-back-outline.svg" (click)="this.quitUserProfile()" />
+      <img
+        class="back-img"
+        src="./assets/chevron-back-outline.svg"
+        (click)="this.quitUserProfile()"
+      />
       <img
         class="picture"
         [src]="this.user?.picture ? this.user.picture : './assets/person.svg'"
       />
       <div class="name">{{ this.user.userName }}</div>
-      <div *ngIf="this.friends == false" class="primary-button" (click)="this.addFriend()">
+      <div
+        *ngIf="this.friends == false"
+        class="primary-button"
+        (click)="this.addFriend()"
+      >
         Ajouter en ami
       </div>
-      <div *ngIf="this.friends == true" class="primary-button" (click)="this.removeFriend()">
+      <div
+        *ngIf="this.friends == true"
+        class="primary-button"
+        (click)="this.removeFriend()"
+      >
         Enlever des amis
       </div>
     </div>
     <div class="bottom-container">
-      <div *ngIf="(this.playlists)?.length > 0" class="title-category">
+      <div *ngIf="this.playlists?.length > 0" class="title-category">
         Playlists
       </div>
       <div class="playlists" *ngIf="this.playlists">
-        <div
-          class="result-item"
-          *ngFor="let playlist of this.playlists"
-        >
-          <img (click)="this.openPlaylist(playlist._id)" class="logo no-img" src="./assets/musical-notes.svg" />
+        <div class="result-item" *ngFor="let playlist of this.playlists">
+          <img
+            (click)="this.openPlaylist(playlist._id)"
+            class="logo no-img"
+            src="./assets/musical-notes.svg"
+          />
           <div (click)="this.openPlaylist(playlist._id)" class="item-info">
             <div class="info-top">{{ playlist.name }}</div>
             <!-- <div class="info-bottom">{{ item.artists[0].name }}</div> -->
@@ -70,14 +83,14 @@ export class UserProfileComponent implements OnInit {
     private socketService: WebsocketService,
     private cd: ChangeDetectorRef,
     private location: Location,
-    private route: ActivatedRoute,
+    private route: ActivatedRoute
   ) {
     const userId = this.route.snapshot.params.id;
-    console.log("user id ==> ", userId);
+    console.log('user id ==> ', userId);
     const user = this.userService.getUser(userId);
-    console.log("this.friends 1==> ", this.friends, userId, this.user);
+    console.log('this.friends 1==> ', this.friends, userId, this.user);
     this.friends = this.user?.friends?.indexOf(userId) >= 0 ? true : false;
-    console.log("this.friends 2==> ", this.friends);
+    console.log('this.friends 2==> ', this.friends);
 
     this.socketService
       .listenToServer(`user update ${userId}`)
@@ -91,38 +104,29 @@ export class UserProfileComponent implements OnInit {
         this.cd.detectChanges();
       });
 
-    this.socketService
-      .listenToServer(`playlist create`)
-      .subscribe((data) => {
-        this.playlists = data.filter((playlist: Playlist) => {
-          if (playlist.created_by === this.user.id)
-            if (this.friends == false && playlist.type == "private")
-              return false;
-            else
-              return true;
-          else
-            return false;
-        });
-        this.cd.detectChanges();
+    this.socketService.listenToServer(`playlist create`).subscribe((data) => {
+      this.playlists = data.filter((playlist: Playlist) => {
+        if (playlist.created_by === this.user.id)
+          if (this.friends == false && playlist.type == 'private') return false;
+          else return true;
+        else return false;
       });
+      this.cd.detectChanges();
+    });
 
-    this.socketService
-      .listenToServer(`room create`)
-      .subscribe((data) => {
-        this.rooms = data.filter((room: Room) => {
-          if (room.created_by === this.user.id)
-            return true;
-          else
-            return false;
-        });
-        this.cd.detectChanges();
+    this.socketService.listenToServer(`room create`).subscribe((data) => {
+      this.rooms = data.filter((room: Room) => {
+        if (room.created_by === this.user.id) return true;
+        else return false;
       });
+      this.cd.detectChanges();
+    });
   }
 
   public base64data: string;
 
   ngOnInit() {
-    const userId = this.route.snapshot.params.id
+    const userId = this.route.snapshot.params.id;
     this.userService.getUser(userId).subscribe(async (res) => {
       this.user = res;
       console.log(res);
@@ -133,23 +137,19 @@ export class UserProfileComponent implements OnInit {
       }
       this.cd.detectChanges();
     });
-    this.friends = this.user.friends.indexOf(userId) >= 0 ? true : false;
+    this.friends = this.user?.friends?.indexOf(userId) >= 0 ? true : false;
 
     forkJoin([
       this.roomService.getAllRoom(),
       this.playlistService.getAllPlaylist(),
     ]).subscribe(([rooms, playlists]) => {
       this.rooms = rooms.filter((room: Room) => {
-        if (room.created_by === this.user.id)
-          return true;
-        else
-          return false;
+        if (room.created_by === this.user.id) return true;
+        else return false;
       });
       this.playlists = playlists.filter((playlist: Playlist) => {
-        if (playlist.created_by === this.user.id)
-          return true;
-        else
-          return false;
+        if (playlist.created_by === this.user.id) return true;
+        else return false;
       });
       this.cd.detectChanges();
     });
@@ -160,12 +160,12 @@ export class UserProfileComponent implements OnInit {
   }
 
   addFriend() {
-    console.log("addFriend called !");
+    console.log('addFriend called !');
     this.friends = true;
   }
 
   removeFriend() {
-    console.log("removeFriend called !");
+    console.log('removeFriend called !');
     this.friends = false;
   }
 
