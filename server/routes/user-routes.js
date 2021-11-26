@@ -36,12 +36,6 @@ module.exports = function (app) {
     controller.getSearchProfile,
     logs.logsHTTP
   );
-  app.put(
-    "/user/:id",
-    [authJwt.verifyToken],
-    controller.userUpdate,
-    logs.logsHTTP
-  );
   app.post(
     "/user/forgotPass",
     controller.forgotPass_send
@@ -49,6 +43,12 @@ module.exports = function (app) {
   app.put(
     "/user/changePass",
     controller.forgotPass_check
+  );
+  app.put(
+    "/user/:id",
+    [authJwt.verifyToken],
+    controller.userUpdate,
+    logs.logsHTTP
   );
   app.post(
     "/user/:id/update-picture",
