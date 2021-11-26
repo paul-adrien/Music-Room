@@ -4,6 +4,7 @@ const db = require(appRoot + "/models");
 
 verifyToken = (req, res, next) => {
   let token = req.headers["x-access-token"];
+  console.log(req.headers);
 
   if (!token) {
     return res.json({
