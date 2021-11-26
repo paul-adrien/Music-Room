@@ -752,7 +752,7 @@ exports.quitRoom = async (req, res, next) => {
 };
 
 exports.quitRoomSocket = async (roomId, userId) => {
-  Room.findOne({ _id: roomId }).then((room) => {
+  return Room.findOne({ _id: roomId }).then((room) => {
     if (!room) {
       return {
         status: true,
@@ -789,61 +789,6 @@ exports.quitRoomSocket = async (roomId, userId) => {
           status: false,
           message: "this user is not in this room",
         };
-      }
-    }
-  });
-};
-
-exports.quitRoomSocket = async (userId, roomId) => {
-  return Room.findOne({ _id: roomId }).then((err, room) => {
-    if (!room) {
-      return {
-        status: true,
-        message: "this room doesn't exist or you dont have the good right",
-      };
-    } else {
-      let roomIndex = room.users
-        .map((u) => {
-          return u.id;
-        })
-        .indexOf(userId);
-      if (roomIndex != -1 && room.created_by === userId) {
-        // Room.deleteOne({ _id: roomId }).exec((err, room) => {
-        //   if (err) {
-        //     return res.json({
-        //       status: false,
-        //       message: err,
-        //     });
-        //   } else {
-        // return res.json({
-        //   status: true,
-        //   message: "you have quit this room and delete this room",
-        //   }
-        // });
-        return Room.updateOne(
-          { _id: roomId },
-          { $pull: { users: { id: userId } } }
-        ).then((room) => {
-          return {
-            status: true,
-            message: "you have quit this room",
-          };
-        });
-      } else if (roomIndex != -1) {
-        return Room.updateOne(
-          { _id: roomId },
-          { $pull: { users: { id: userId } } }
-        ).then((room) => {
-          return {
-            status: true,
-            message: "you have quit this room",
-          };
-        });
-      } else {
-        return res.json({
-          status: false,
-          message: "this user is not in this room",
-        });
       }
     }
   });
