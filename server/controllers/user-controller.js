@@ -4,6 +4,7 @@ const db = require(appRoot + "/models");
 const User = db.user;
 const ForgotPass = db.forgotPass;
 var bcrypt = require("bcryptjs");
+const path = require('path');
 
 exports.userBoard = (req, res) => {
   res.json({
@@ -395,21 +396,21 @@ exports.sendVerifyEmail = async (req, res) => {
 
 exports.verifyEmail =  async (req, res, next) => {
   const { rand, email } = req.params;
-  console.log(rand, email, appRoot + "/html/verifEmail.html")
+  console.log(rand, email, path.join(appRoot, "/html/verifEmail.html"))
 
   const user = await getUser({ email: email });
   if (user) {
     console.log(rand, user.rand)
     if (parseInt(rand) === user.rand) {
       user.rand = null;
-      user.verifyEmail = true;
+      user.validEmail = true;
       console.log(user);
       await updateUser(user._id, user);
-      res.sendFile(appRoot + "/html/verifEmail.html");
+      res.sendFile(path.join(appRoot, "/html/verifEmail.html"));
     } else {
-      res.sendFile(appRoot + "/html/errorVerifEmail.html");
+      res.sendFile(path.join(appRoot, "/html/errorVerifEmail.html"));
     }
   } else {
-    res.sendFile(appRoot + "/html/errorVerifEmail.html");
+    res.sendFile(path.join(appRoot, "/html/errorVerifEmail.html"));
   }
 };
