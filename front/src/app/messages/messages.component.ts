@@ -31,27 +31,32 @@ import { Location } from '@angular/common';
       />
     </div>
     <div *ngIf="this.convList" class="messages-container">
-      <div
-        (click)="this.openConversation(conv._id)"
-        *ngFor="let conv of this.convList"
-        class="conv-container"
-      >
-        <img
-          class="picture"
-          [src]="this.user?.picture ? this.user.picture : './assets/person.svg'"
-        />
-        <div class="info-container">
-          <div class="conv-title">
-            {{ conv.name }}
-          </div>
-          <div class="last-message">
-            {{
-              conv?.messages[conv?.messages?.length - 1]?.message ||
-                'Envoyez un message !'
-            }}
+      <div *ngIf="this.convList?.length > 0; else noConv">
+        <div
+          (click)="this.openConversation(conv._id)"
+          *ngFor="let conv of this.convList"
+          class="conv-container"
+        >
+          <img
+            class="picture"
+            [src]="this.user?.picture ? this.user.picture : './assets/person.svg'"
+          />
+          <div class="info-container">
+            <div class="conv-title">
+              {{ conv.name }}
+            </div>
+            <div class="last-message">
+              {{
+                conv?.messages[conv?.messages?.length - 1]?.message ||
+                  'Envoyez un message !'
+              }}
+            </div>
           </div>
         </div>
       </div>
+      <ng-template #noConv>
+        <div>Aucune conversation pour l'instant</div>
+      </ng-template>
     </div>
   `,
   styleUrls: ['./messages.component.scss'],

@@ -18,6 +18,7 @@ import { WebsocketService } from '../_services/websocketService';
       src="./assets/chevron-back-outline.svg"
     />
     <div class="title">Mes notifications</div>
+    <div *ngIf="this.notifs?.length > 0; else noNotifs">
     <div *ngFor="let notif of this.notifs" class="notif-container">
       <div class="text" *ngIf="notif.type === 'rooms'">
         Vous avez été invité à rejoindre la room
@@ -50,6 +51,10 @@ import { WebsocketService } from '../_services/websocketService';
         />
       </div>
     </div>
+    </div>
+    <ng-template #noNotifs>
+      <div class="notif-none">Aucune notification pour l'instant</div>
+    </ng-template>
     <!-- <div *ngFor="let notif of this.user.notifs?.rooms" class="notif-container">
       <div class="text">
         Vous avez été invité à rejoindre la room

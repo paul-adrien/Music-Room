@@ -40,4 +40,15 @@
       flex-grow: 1;
     }
   }
+
+  .notif-none {
+    display: flex;
+    justify-content: flex-start;
+    margin: 0 1rem;
+    margin-bottom: 1rem;
+
+    &.me {
+      justify-content: flex-end;
+    }
+  }
 }
