@@ -31,7 +31,7 @@ import { SearchComponent } from './../search/search.component';
       <div class="primary-button" (click)="this.presentModalEdit()">
         Modifier le profil
       </div>
-      <div class="primary-button" (click)="presentModalUserProfile()">
+      <div class="primary-button" (click)="this.presentModalUserProfile()">
         Chercher un profil
       </div>
     </div>
@@ -288,9 +288,10 @@ export class ProfileComponent implements OnInit {
     modal.onWillDismiss().then((res) => {
       if (res?.data?.user) {
         const user = res.data.user;
-        console.log(user);
-        this.router.navigate([`tabs/user-profile/${user.id}`]);
+        console.log("user ==+== user.id ", user, user.id);
+        this.router.navigate([`tabs/tab-profile/user-profile/${user.id}`]);
       }
+      this.cd.detectChanges();
     });
     return await modal.present();
   }

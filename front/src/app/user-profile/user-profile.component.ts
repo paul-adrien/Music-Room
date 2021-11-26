@@ -75,9 +75,9 @@ export class UserProfileComponent implements OnInit {
     const userId = this.route.snapshot.params.id;
     console.log("user id ==> ", userId);
     const user = this.userService.getUser(userId);
-    //console.log("this.friends 1==> ", this.friends, userId, this.user.email);
-    //this.friends = this.user.friends.indexOf(userId) >= 0 ? true : false;
-    //console.log("this.friends 2==> ", this.friends);
+    console.log("this.friends 1==> ", this.friends, userId, this.user);
+    this.friends = this.user?.friends?.indexOf(userId) >= 0 ? true : false;
+    console.log("this.friends 2==> ", this.friends);
 
     this.socketService
       .listenToServer(`user update ${userId}`)

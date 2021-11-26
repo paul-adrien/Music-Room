@@ -32,14 +32,24 @@ const routes: Routes = [
       },
       { path: 'search', canActivate: [AuthGuard], component: SearchComponent },
       {
-        path: 'profile',
-        canActivate: [AuthGuard],
-        component: ProfileComponent,
-      },
-      {
-        path: 'user-profile/:id',
-        canActivate: [AuthGuard],
-        component: UserProfileComponent,
+        path: 'tab-profile',
+        children: [
+          {
+            path: 'user-profile/:id',
+            canActivate: [AuthGuard],
+            component: UserProfileComponent,
+          },
+          {
+            path: 'profile',
+            canActivate: [AuthGuard],
+            component: ProfileComponent,
+            pathMatch: "full",
+          },
+          {
+            path: '',
+            redirectTo: 'profile',
+          },
+        ],
       },
       {
         path: '',
