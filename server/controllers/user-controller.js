@@ -222,6 +222,7 @@ exports.forgotPass_check = async (req, res, next) => {
         user.password = bcrypt.hashSync(password, 8);
         if (rand === data.rand) {
           if (await updateUser(user.id, user)) {
+            ForgotPass.deleteOne({ email: email }).exec()
             res.status(200).json({
               status: true,
               message: "Your passward was changed",
