@@ -241,13 +241,11 @@ exports.forgotPass_check = async (req, res, next) => {
       }
     });
   } else {
-    res.message = "user doesn't exist";
     res.status(200).json({
       status: false,
       message: "user doesn't exist",
     });
   }
-  next();
 };
 
 exports.userUpdateAccount = async (req, res, next) => {

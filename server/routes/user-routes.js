@@ -17,6 +17,14 @@ module.exports = function (app) {
   app.use(multer().any());
 
   app.get("/token", [authJwt.verifyToken], controller.userBoard);
+  app.post(
+    "/forgotPass",
+    controller.forgotPass_send
+  );
+  app.put(
+    "/changePass",
+    controller.forgotPass_check
+  );
   app.get(
     "/user/:id",
     [authJwt.verifyToken],
@@ -35,14 +43,6 @@ module.exports = function (app) {
     [authJwt.verifyToken],
     controller.getSearchProfile,
     logs.logsHTTP
-  );
-  app.post(
-    "/user/forgotPass",
-    controller.forgotPass_send
-  );
-  app.put(
-    "/user/changePass",
-    controller.forgotPass_check
   );
   app.put(
     "/user/:id",
