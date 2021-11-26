@@ -206,7 +206,7 @@ exports.forgotPass_check = async (req, res, next) => {
   const { email, password, rand } = req.body;
   const user = await getUser({ email: email });
   if (user) {
-    ForgotPass.find({ email: email }).exec(async (err, data) => {
+    ForgotPass.findOne({ email: email }).exec(async (err, data) => {
       console.log(data)
       if (err) {
         res.status(400).json({
