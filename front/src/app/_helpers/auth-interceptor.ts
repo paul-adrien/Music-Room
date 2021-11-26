@@ -33,11 +33,7 @@ export class AuthInterceptor implements HttpInterceptor {
       const version = '1.0.0';
       if (token != null) {
         authReq = req.clone({
-          setHeaders: { 'x-access-token': token,
-          'model': model,
-          'platform': platform,
-          'version': version
-        },
+          headers: req.headers.set('x-access-token', token)
         });
       }
     }
