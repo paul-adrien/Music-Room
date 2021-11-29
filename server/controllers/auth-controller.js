@@ -2,6 +2,7 @@ const config = require(appRoot + "/config/auth");
 const db = require(appRoot + "/models");
 const User = db.user;
 var nodemailer = require("nodemailer");
+const { updateUser } = require(appRoot + "/models/lib-user.model");
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
@@ -146,3 +147,40 @@ exports.signin = (req, res) => {
     });
   });
 };
+
+exports.stockAppInfo = (req, res, next) => {
+  const { userId, model, platform, version} = req.body;
+
+  console.log(userId, model, platform, version);
+
+  User.findOne({ _id: userId }).exec(async (user) => {
+    if (err) {
+      res.message = err;
+      res.status(400).json({
+        status: false,
+        message: err,
+      });
+    } else if (!user) {
+      res.message = "user doesn't exist";
+      res.status(200).json({
+        status: false,
+        message: "user doesn't exist",
+      });
+    } else {
+      user.application = { model: model, platform: platform, version: version };
+      if (await updateUser(userId)) {
+        res.message = "user application update";
+        res.status(200).json({
+          status: false,
+          message: "user application update",
+        });
+      } else {
+        res.message = "error when update application information";
+        res.status(200).json({
+          status: false,
+          message: "error when update application information",
+        });
+      }
+    }
+  })
+}

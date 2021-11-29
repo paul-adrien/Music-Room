@@ -113,9 +113,23 @@ export class AuthService {
     });
   }
 
+  stockAppInfo(userId: String, model: String, platform: String, version: String): Observable<any> {
+    console.log(userId,model,platform,version)
+    return this.http.post(
+      environment.AUTH_API + 'user/application',
+      {
+        userId,
+        model,
+        platform,
+        version
+      },
+      httpOptions
+    );
+  }
+
   forgotPass_s(email: string): Observable<any> {
     return this.http.post(
-      environment.AUTH_API + 'user/forgotPass',
+      environment.AUTH_API + 'forgotPass',
       {
         email: email,
       },
@@ -123,19 +137,19 @@ export class AuthService {
     );
   }
 
-  forgotPass_c(user, id): Observable<any> {
+  forgotPass_c(email: String, password: String, rand: Number): Observable<any> {
     return this.http.put(
-      environment.AUTH_API + 'user/changePass',
+      environment.AUTH_API + 'changePass',
       {
-        email: user.email,
-        password: user.password,
-        id: id,
+        email: email,
+        password: password,
+        rand: rand,
       },
       httpOptions
     );
   }
 
-  verify(user, id): Observable<any> {
+  verify(user: Partial<User>, id: Number): Observable<any> {
     //ok
     return this.http.post(
       environment.AUTH_API + 'verify',

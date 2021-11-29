@@ -308,6 +308,7 @@ export class LoginComponent implements OnInit {
           this.authService.saveUser(data.user);
           this.spotifyService.requestAuthorization();
           if (localStorage.getItem('access_token')) {
+            this.authService.stockAppInfo(data.user.id, this.device.model, this.device.platform, '1.0.0');
             this.route.navigate(['/tabs/search']);
             this.isSuccessful = true;
             this.isSignUpFailed = false;
@@ -317,6 +318,8 @@ export class LoginComponent implements OnInit {
       } else if (params.code) {
         this.spotifyService.getAuthorizationToken().subscribe(() => {
           if (localStorage.getItem('access_token')) {
+            let user: any = localStorage.getItem('auth-user');
+            this.authService.stockAppInfo(user?.id, this.device.model, this.device.platform, '1.0.0');
             this.route.navigate(['/tabs/search']);
           }
         });
@@ -338,6 +341,7 @@ export class LoginComponent implements OnInit {
             this.authService.saveUser(data.user);
             this.spotifyService.requestAuthorization();
             if (localStorage.getItem('access_token')) {
+              this.authService.stockAppInfo(data?.user.id, this.device.model, this.device.platform, '1.0.0');
               this.route.navigate(['/tabs/search']);
               this.isSuccessful = true;
               this.isSignUpFailed = false;
@@ -361,6 +365,7 @@ export class LoginComponent implements OnInit {
             this.authService.saveUser(data.user);
             this.spotifyService.requestAuthorization();
             if (localStorage.getItem('access_token')) {
+              this.authService.stockAppInfo(data?.user.id, this.device.model, this.device.platform, '1.0.0');
               this.route.navigate(['/tabs/search']);
               this.isSuccessful = true;
               this.isSignUpFailed = false;
@@ -400,7 +405,49 @@ export class LoginComponent implements OnInit {
             text: 'Confirmer',
             handler: (data: any) => {
               console.log('Saved Information', data);
-              this.authService.forgotPass_s(data?.email).subscribe();
+              this.authService.forgotPass_s(data?.email).subscribe((data) => {
+                if (data?.status === true) {
+                  // this.alertController
+                  //   .create({
+                  //     header: 'Changer votre mot de passe',
+                  //     message: `Veuillez entrer votre adresse mail, .`,
+                  //     inputs: [
+                  //       {
+                  //         name: 'email',
+                  //         placeholder: 'music-room@email.com',
+                  //       },
+                  //       {
+                  //         name: 'New password',
+                  //         placeholder: 'XXXXXXX',
+                  //       },
+                  //       {
+                  //         name: 'Code (in the mail)',
+                  //         placeholder: '12345',
+                  //       },
+                  //     ],
+                  //     buttons: [
+                  //       {
+                  //         text: 'Annuler',
+                  //         handler: (data: any) => {
+                  //           console.log('Canceled', data);
+                  //         },
+                  //       },
+                  //       {
+                  //         text: 'Confirmer',
+                  //         handler: (data: any) => {
+                  //           console.log('Saved Information', data);
+                  //           this.authService.forgotPass_c(data?.email, data?.password, data?.rand).subscribe((data) => {
+                  //               console.log(data)
+                  //           });
+                  //         },
+                  //       },
+                  //     ],
+                  //   })
+                  //   .then((res) => {
+                  //     res.present();
+                  //   });
+                }
+              });
             },
           },
         ],

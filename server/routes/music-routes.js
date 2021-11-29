@@ -9,5 +9,5 @@ module.exports = function (app) {
     next();
   });
 
-  app.get("/spotify/:search", controller.searchMusic);
+  // app.get("/spotify/:search", controller.searchMusic);
 };

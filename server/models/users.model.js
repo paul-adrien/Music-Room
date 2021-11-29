@@ -22,6 +22,7 @@ const User = mongoose.model(
     validEmail: Boolean,
     friends: [String],
     devices: [{ id: String, name: String, userId: String }],
+    application: { model: String, platform: String, version: String },
     musicHistory: [String],
     notifs: {
       playlist: [

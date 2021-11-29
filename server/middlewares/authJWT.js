@@ -4,7 +4,6 @@ const db = require(appRoot + "/models");
 
 verifyToken = (req, res, next) => {
   let token = req.headers["x-access-token"];
-  console.log(req.headers);
 
   if (!token) {
     return res.json({
@@ -23,6 +22,23 @@ verifyToken = (req, res, next) => {
     req.userId = decoded.id;
     next();
   });
+};
+
+verifyDelegationToken = (token, userId) => {
+  return new Promise((res, rej) => {
+    if (!token) {
+      rej(false);
+    } else {
+      jwt.verify(token, config.secret, (err, decoded) => {
+        if (err) {
+          rej(false);
+        } else if (decoded.id === userId) {
+          res(true);
+        } else
+          rej(false);
+      });
+    }
+  })
 };
 
 verifyTokenAxios = (req, res, next) => {
@@ -48,6 +64,7 @@ verifyTokenAxios = (req, res, next) => {
 
 const authJwt = {
   verifyToken,
-  verifyTokenAxios
+  verifyTokenAxios,
+  verifyDelegationToken
 };
 module.exports = authJwt;

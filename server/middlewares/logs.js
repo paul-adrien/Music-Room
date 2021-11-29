@@ -1,7 +1,10 @@
 const fs = require('fs');
 
+//recupérer les infos dans le user avec le user Id
+
 logsHTTP = (req, res) => {
     let log = "";
+    let userId = req.userId;
 
     let fileName = "/logs/" + req.headers["x-access-token"] + ".logs"
     log = "date=" + new Date().toISOString() + ";"
@@ -22,6 +25,8 @@ logsHTTP = (req, res) => {
     })
     // console.log(log)
 };
+
+//soit on récupère les infos avec le token -> userId, soit on les mets dans la query a coté du token
 
 logsSOCKS = (message, status, token) => {
     let log = "";
