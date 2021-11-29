@@ -1,26 +1,42 @@
 const fs = require('fs');
-
-//recupérer les infos dans le user avec le user Id
+const db = require(appRoot + "/models");
+const User = db.user;
 
 logsHTTP = (req, res) => {
     let log = "";
     let userId = req.userId;
 
-    let fileName = "/logs/" + req.headers["x-access-token"] + ".logs"
-    log = "date=" + new Date().toISOString() + ";"
-    // log += "deviceModel=" + req.headers.devicemodel + ";"
-    // log += "deviceOSVersion=" + req.headers.deviceosversion + ";"
-    // log += "musicRoomVersion=" + req.headers.musicroomversion + ";"
-    log += "root=" + req.protocol + '://' + req.get('host') + req.originalUrl + ";"
-    log += "status=" + res.statusCode.toString() + ";"
-    if (res.message)
-        log += "message=" + res.message + "\r\n";
-    fs.appendFile(__dirname + fileName, log, (err) => {
+    User.findOne({ _id: userId }).exec((user) => {
         if (err) {
-            console.log(err)
-            console.log("Error when trying to write log!")
+        } else if (!user){
+            let fileName = "/logs/" + req.headers["x-access-token"] + ".logs"
+            log = "date=" + new Date().toISOString() + ";"
+            log += "root=" + req.protocol + '://' + req.get('host') + req.originalUrl + ";"
+            log += "status=" + res.statusCode.toString() + ";"
+            if (res.message)
+                log += "message=" + res.message + "\r\n";
+            fs.appendFile(__dirname + fileName, log, (err) => {
+                if (err) {
+                    // console.log(err)
+                    // console.log("Error when trying to write log!")
+                }
+            })
         } else {
-            // console.log("correctly written logs!")
+            let fileName = "/logs/" + req.headers["x-access-token"] + ".logs"
+            log = "date=" + new Date().toISOString() + ";"
+            log += "device=" + user.application?.model + ";"
+            log += "platform=" + user.application?.platform + ";"
+            log += "musicRoomVersion=" + user.application?.version + ";"
+            log += "root=" + req.protocol + '://' + req.get('host') + req.originalUrl + ";"
+            log += "status=" + res.statusCode.toString() + ";"
+            if (res.message)
+                log += "message=" + res.message + "\r\n";
+            fs.appendFile(__dirname + fileName, log, (err) => {
+                if (err) {
+                    // console.log(err)
+                    // console.log("Error when trying to write log!")
+                }
+            })
         }
     })
     // console.log(log)

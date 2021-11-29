@@ -24,7 +24,7 @@ verifyToken = (req, res, next) => {
   });
 };
 
-verifyDelegationToken = (token, userId) => {
+verifyDelegationToken = (token, userId, friendId) => {
   return new Promise((res, rej) => {
     if (!token) {
       rej(false);
@@ -32,7 +32,7 @@ verifyDelegationToken = (token, userId) => {
       jwt.verify(token, config.secret, (err, decoded) => {
         if (err) {
           rej(false);
-        } else if (decoded.id === userId) {
+        } else if (decoded.id === friendId && decoded.friendId === userId) {
           res(true);
         } else
           rej(false);

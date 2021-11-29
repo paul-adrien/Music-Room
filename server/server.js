@@ -734,7 +734,7 @@ io.use(function (socket, next) {
 
   socket.on("give delegation permission", (data) => {
     if (data?.userId && data?.friendId) {
-      music_controller.giveDelegationPermission(data.friendId).then((res) => {
+      music_controller.giveDelegationPermission(data.userId, data.friendId).then((res) => {
         if (res?.token) {
           logs.logsSOCKS(
             `${data.friendId} give delegation permission to ${data.friendId}`,
@@ -752,7 +752,7 @@ io.use(function (socket, next) {
 
   socket.on("action delegation", async (data) => {
     if (data?.userId && data?.action && data?.userId && data.friendId) {
-      if (await authJwt.verifyDelegationToken(data.token, data.userId) === true) {
+      if (await authJwt.verifyDelegationToken(data.token, data.userId, data.friendId) === true) {
         logs.logsSOCKS(
           `${data.userId} send delegation action to ${data.friendId}`,
           200,

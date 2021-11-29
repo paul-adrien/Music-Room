@@ -218,28 +218,35 @@ exports.forgotPass_check = async (req, res, next) => {
       } else if (!data) {
         res.status(201).json({
           status: true,
-          message: "no code",
+          message: "No code",
         });
       } else {
-        user.password = bcrypt.hashSync(password, 8);
-        if (rand === data.rand) {
-          if (await updateUser(user.id, user)) {
-            ForgotPass.deleteOne({ email: email }).exec();
-            res.status(200).json({
-              status: true,
-              message: "Your passward was changed",
-            });
+        if (user.password === password) {//pas le même que l'ancien
+          res.status(200).json({
+            status: false,
+            message: "Same password",
+          });
+        } else {
+          user.password = bcrypt.hashSync(password, 8);
+          if (rand === data.rand) {
+            if (await updateUser(user.id, user)) {
+              ForgotPass.deleteOne({ email: email }).exec();
+              res.status(200).json({
+                status: true,
+                message: "Your passward was changed",
+              });
+            } else {
+              res.status(200).json({
+                status: false,
+                message: "user doesn't exist",
+              });
+            }
           } else {
             res.status(200).json({
               status: false,
-              message: "user doesn't exist",
+              message: "Wrong code, please take the last code send by mail",
             });
           }
-        } else {
-          res.status(200).json({
-            status: false,
-            message: "wrong code, please take the last code send by mail",
-          });
         }
       }
     });
