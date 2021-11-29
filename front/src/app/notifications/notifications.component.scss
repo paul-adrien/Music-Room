@@ -41,14 +41,9 @@
     }
   }
 
-  .notif-none {
+  .no-notification {
     display: flex;
-    justify-content: flex-start;
-    margin: 0 1rem;
-    margin-bottom: 1rem;
-
-    &.me {
-      justify-content: flex-end;
-    }
+    margin: auto;
+    padding-top: 50%;
   }
 }

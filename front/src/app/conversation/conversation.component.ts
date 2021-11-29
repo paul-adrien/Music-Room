@@ -25,22 +25,20 @@ import { AuthService } from '../_services/auth_service';
     />
     <div *ngIf="this.conv" class="conv-container">
       <p class="title">{{ conv.name }}</p>
-      <div *ngIf="this.user" class="messages" #convContainer>
-        <div *ngIf="this.conv.messages?.length > 0; else noMsg">
-          <div
-            [class.me]="this.user?.id === msg.userId"
-            class="message-container"
-            *ngFor="let msg of this.conv.messages"
-          >
-            <div [class.me]="this.user?.id === msg.userId" class="message-bulb">
-              {{ msg.message }}
-            </div>
+      <div *ngIf="this.user && this.conv.messages?.length > 0; else noMsg" class="messages" #convContainer>
+        <div
+          [class.me]="this.user?.id === msg.userId"
+          class="message-container"
+          *ngFor="let msg of this.conv.messages"
+        >
+          <div [class.me]="this.user?.id === msg.userId" class="message-bulb">
+            {{ msg.message }}
           </div>
         </div>
-        <ng-template #noMsg>
-          <div class="message-container">Aucun message pour l'instant</div>
-        </ng-template>
       </div>
+      <ng-template #noMsg>
+        <div class="no-message">Aucun message pour l'instant</div>
+      </ng-template>
     </div>
     <div class="bottom-container">
       <input class="search-container" #input />

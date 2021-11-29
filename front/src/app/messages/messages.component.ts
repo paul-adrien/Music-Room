@@ -30,34 +30,32 @@ import { Location } from '@angular/common';
         src="./assets/add-outline.svg"
       />
     </div>
-    <div *ngIf="this.convList" class="messages-container">
-      <div *ngIf="this.convList?.length > 0; else noConv">
-        <div
-          (click)="this.openConversation(conv._id)"
-          *ngFor="let conv of this.convList"
-          class="conv-container"
-        >
-          <img
-            class="picture"
-            [src]="this.user?.picture ? this.user.picture : './assets/person.svg'"
-          />
-          <div class="info-container">
-            <div class="conv-title">
-              {{ conv.name }}
-            </div>
-            <div class="last-message">
-              {{
-                conv?.messages[conv?.messages?.length - 1]?.message ||
-                  'Envoyez un message !'
-              }}
-            </div>
+    <div *ngIf="this.convList?.length > 0; else noConv" class="messages-container">
+      <div
+        (click)="this.openConversation(conv._id)"
+        *ngFor="let conv of this.convList"
+        class="conv-container"
+      >
+        <img
+          class="picture"
+          [src]="this.user?.picture ? this.user.picture : './assets/person.svg'"
+        />
+        <div class="info-container">
+          <div class="conv-title">
+            {{ conv.name }}
+          </div>
+          <div class="last-message">
+            {{
+              conv?.messages[conv?.messages?.length - 1]?.message ||
+                'Envoyez un message !'
+            }}
           </div>
         </div>
       </div>
-      <ng-template #noConv>
-        <div>Aucune conversation pour l'instant</div>
-      </ng-template>
     </div>
+    <ng-template #noConv>
+      <div class="no-conversation">Aucune conversation pour l'instant</div>
+    </ng-template>
   `,
   styleUrls: ['./messages.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

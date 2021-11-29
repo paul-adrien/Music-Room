@@ -50,7 +50,7 @@ import { SearchComponent } from './../search/search.component';
       <div *ngIf="this.musicsHistory?.length > 0" class="title-category">
         Écoutés récemment
       </div>
-      <div class="playlists" *ngIf="this.musicsHistory?.length > 0">
+      <div class="playlists" *ngIf="this.musicsHistory?.length > 0; else noHistory">
         <div class="result-item" *ngFor="let music of this.musicsHistory">
           <img
             (click)="this.play(music)"
@@ -63,11 +63,14 @@ import { SearchComponent } from './../search/search.component';
           </div>
         </div>
       </div>
+      <ng-template #noHistory>
+        <div class="no-hist-pl-or-room">Aucun historique à afficher pour l'instant</div>
+      </ng-template>
       <div *ngIf="this.playlists?.length > 0" class="title-category">
         Playlists
       </div>
 
-      <div class="playlists" *ngIf="this.playlists?.length > 0">
+      <div class="playlists" *ngIf="this.playlists?.length > 0; else noPlaylist">
         <div class="result-item" *ngFor="let playlist of this.playlists">
           <img
             (click)="
@@ -96,8 +99,11 @@ import { SearchComponent } from './../search/search.component';
           />
         </div>
       </div>
+      <ng-template #noPlaylist>
+        <div class="no-hist-pl-or-room">Aucune playlist à afficher pour l'instant</div>
+      </ng-template>
       <div *ngIf="this.rooms?.length > 0" class="title-category">Rooms</div>
-      <div class="rooms" *ngIf="this.rooms?.length > 0">
+      <div class="rooms" *ngIf="this.rooms?.length > 0; else noRoom">
         <div class="result-item" *ngFor="let room of this.rooms">
           <img
             (click)="this.openRoom(room._id)"
@@ -115,6 +121,9 @@ import { SearchComponent } from './../search/search.component';
           />
         </div>
       </div>
+      <ng-template #noRoom>
+        <div class="no-hist-pl-or-room">Aucune room à afficher pour l'instant</div>
+      </ng-template>
     </div>
   `,
   styleUrls: ['./profile.component.scss'],

@@ -52,7 +52,7 @@ import { Playlist } from 'libs/playlist';
         />
       </div>
     </div>
-    <div class="rooms" *ngIf="this.rooms">
+    <div class="rooms" *ngIf="this.rooms?.length > 0; else noRoom">
       <div
         class="room-container"
         (click)="this.openRoom(room._id)"
@@ -64,6 +64,9 @@ import { Playlist } from 'libs/playlist';
         </div>
       </div>
     </div>
+    <ng-template #noRoom>
+      <div class="no-room-or-pl">Aucune room à afficher pour l'instant</div>
+    </ng-template>
     <div class="title-container">
       <div>Playlists</div>
       <div class="buttons">
@@ -76,7 +79,7 @@ import { Playlist } from 'libs/playlist';
         />
       </div>
     </div>
-    <div class="rooms" *ngIf="this.playlists">
+    <div class="rooms" *ngIf="this.playlists?.length > 0; else noPlaylist">
       <div
         class="room-container"
         (click)="
@@ -92,6 +95,10 @@ import { Playlist } from 'libs/playlist';
         </div>
       </div>
     </div>
+    <ng-template #noPlaylist>
+      <div class="no-room-or-pl">Aucune playlist à afficher pour l'instant</div>
+    </ng-template>
+
     <!-- <div class="primary-button" (click)="this.createRoom()">Créer une room</div> -->
   `,
   styleUrls: ['./home.component.scss'],

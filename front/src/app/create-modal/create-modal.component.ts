@@ -28,7 +28,7 @@ import { SearchComponent } from '../search/search.component';
       <div class="user-container" *ngFor="let user of this.users">
         <img
           class="logo round"
-          [src]="user.picture || './assets/test-profile.jpg'"
+          [src]="user.picture || './assets/person.svg'"
         />
         <div class="user-info">
           <div class="info-top">{{ user.userName }}</div>
