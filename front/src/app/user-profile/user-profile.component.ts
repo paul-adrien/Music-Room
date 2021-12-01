@@ -1,5 +1,6 @@
 import { WebsocketService } from './../_services/websocketService';
 import { UserService } from './../_services/user_service';
+import { FriendsService } from '../_services/friends_service';
 import { RoomService } from './../_services/room_service';
 import { Room } from './../../../libs/room';
 import { SpotifyService } from './../_services/spotify_service';
@@ -73,6 +74,7 @@ export class UserProfileComponent implements OnInit {
 
   constructor(
     private userService: UserService,
+    private friendsService: FriendsService,
     private spotifyService: SpotifyService,
     private playlistService: PlaylistService,
     private roomService: RoomService,
