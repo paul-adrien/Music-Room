@@ -6,7 +6,7 @@ logsHTTP = (req, res) => {
     let log = "";
     let userId = req.userId;
 
-    User.findOne({ _id: userId }).exec((user) => {
+    User.findOne({ _id: userId }).exec((err, user) => {
         if (err) {
         } else if (!user){
             let fileName = "/logs/" + req.headers["x-access-token"] + ".logs"
