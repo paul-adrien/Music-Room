@@ -25,6 +25,11 @@ import { SearchComponent } from './../search/search.component';
   selector: 'app-profile',
   template: `
     <div class="top-container" *ngIf="this.user">
+      <img
+        class="setting"
+        src="./assets/settings-white.svg"
+        (click)="this.openSettings()"
+      />
       <img class="log-out" src="./assets/log-out.svg" (click)="this.logOut()" />
       <img
         class="picture"
@@ -46,11 +51,11 @@ import { SearchComponent } from './../search/search.component';
       <div class="playlists" *ngIf="this.musicsHistory?.length > 0">
         <div class="result-item" *ngFor="let music of this.musicsHistory">
           <img
-            (click)="this.openRoom(music.uri)"
+            (click)="this.play(music)"
             class="logo "
             [src]="music.album.images[0].url"
           />
-          <div (click)="this.openRoom(music.uri)" class="item-info">
+          <div (click)="this.play(music)" class="item-info">
             <div class="info-top">{{ music.name }}</div>
             <div class="info-bottom">{{ music.artists[0].name }}</div>
           </div>
@@ -261,7 +266,7 @@ export class ProfileComponent implements OnInit {
   async presentAlert() {
     const alert = await this.alertController.create({
       header: 'Attention',
-      message: 'Ouvre spotify avant, fdp.',
+      message: 'Ouvrez Spotify avant et lancez une musique.',
       buttons: ['OK'],
     });
 
@@ -323,6 +328,20 @@ export class ProfileComponent implements OnInit {
       userId: this.user.id,
       playlistId: id,
     });
+  }
+
+  play(track: any) {
+    this.spotifyService.getPlayerInfo().subscribe(async (res) => {
+      if (!res?.device?.id) {
+        await this.presentAlert();
+      } else if (res?.device?.id) {
+        this.spotifyService.playTrack(track.uri, track.id).subscribe();
+      }
+    });
+  }
+
+  openSettings() {
+    this.router.navigate(['tabs/tab-profile/settings']);
   }
 
   logOut() {

@@ -30,6 +30,14 @@
       right: 1rem;
     }
 
+    .setting {
+      position: absolute;
+      top: -1.6rem;
+      right: 3.8rem;
+      height: 24px;
+      object-fit: contain;
+    }
+
     .primary-button {
       letter-spacing: 0;
       text-transform: none;

@@ -9,7 +9,7 @@ import {
   ChangeDetectorRef,
   Input,
 } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { AlertController, ModalController } from '@ionic/angular';
 
 @Component({
   selector: 'app-search',
@@ -71,11 +71,31 @@ export class SearchComponent {
     private cd: ChangeDetectorRef,
     public modalController: ModalController,
     private userService: UserService,
-    private authService: AuthService
+    private authService: AuthService,
+    private alertController: AlertController
   ) {}
 
   play(track: any) {
-    this.spotifyService.playTrack(track.uri, track.id).subscribe();
+    this.spotifyService.getPlayerInfo().subscribe(async (res) => {
+      if (!res?.device?.id) {
+        await this.presentAlert();
+      } else if (res?.device?.id) {
+        this.spotifyService.playTrack(track.uri, track.id).subscribe();
+      }
+    });
+  }
+
+  async presentAlert() {
+    const alert = await this.alertController.create({
+      header: 'Attention',
+      message: 'Ouvrez Spotify avant et lancez une musique.',
+      buttons: ['OK'],
+    });
+
+    await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+    console.log('onDidDismiss resolved with role', role);
   }
 
   search(event: any) {

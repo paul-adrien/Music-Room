@@ -1,0 +1,59 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+
+  .back-img {
+    height: 1.8rem;
+    width: 1.8rem;
+    margin-top: 1rem;
+    margin-left: 0.5rem;
+  }
+
+  .title {
+    font-family: "Circular-bold";
+    font-size: 1.6rem;
+    margin: 1rem 1rem;
+  }
+
+  .item-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    background-color: var(--background-color-grey);
+    padding: 0.5rem 1rem;
+    padding-left: 0;
+    align-items: center;
+    min-height: 3.2rem;
+    border-bottom: 1px solid var(--background-color-dark-grey);
+
+    .text {
+      padding-left: 1rem;
+    }
+
+    &.last {
+      border-bottom: none;
+    }
+
+    .img {
+      height: 24px;
+      object-fit: contain;
+    }
+
+    &.delete {
+      justify-content: center;
+      margin-bottom: 2rem;
+      margin-top: auto;
+      color: red;
+      font-family: "Circular-medium";
+    }
+  }
+
+  ion-toggle {
+    --background: #fff;
+    --background-checked: var(--green-color);
+
+    // --handle-background: #7a49a5;
+    // --handle-background-checked: #000;
+  }
+}

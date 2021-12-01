@@ -125,14 +125,14 @@ export class EditProfileComponent implements OnInit {
 
   constructor(
     private modalController: ModalController,
-    private authSercive: AuthService,
+    private authService: AuthService,
     private camera: Camera,
     private platform: Platform,
     private cd: ChangeDetectorRef,
     private userService: UserService,
     private socketService: WebsocketService
   ) {
-    this.user = this.authSercive.getUser();
+    this.user = this.authService.getUser();
 
     this.socketService
       .listenToServer(`user update ${this.user?.id}`)
@@ -156,7 +156,7 @@ export class EditProfileComponent implements OnInit {
   public toggle = false;
 
   ngOnInit() {
-    this.user = this.authSercive.getUser();
+    this.user = this.authService.getUser();
     if (this.user.type === 'premium') {
       this.toggle = true;
     }
@@ -244,6 +244,7 @@ export class EditProfileComponent implements OnInit {
         });
     } else {
       stop = true;
+      this.dismiss(false);
     }
 
     if (this.uploadPicture.has('file') && !stop) {

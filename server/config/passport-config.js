@@ -48,14 +48,21 @@ passport.use(
 );
 
 passport.use(
+  "google",
   new GoogleStrategy(
     {
       clientID: keys["google"].clientID,
       clientSecret: keys["google"].clientSecret,
-      callbackURL: `https://musicroom.site./user/authenticate/google/callback`,
+      callbackURL: `http://localhost:8080/user/authenticate/google/callback`,
+      //`https://musicroom.site./user/authenticate/google/callback`,
     },
     async function (accessToken, refreshToken, profile, done) {
-      const user = await getUser({ id: `google_${profile.id}` });
+      const user = await getUser({
+        $or: [
+          { id: `google_${profile.id}` },
+          { "google_account.id": `google_${profile.id}` },
+        ],
+      });
       if (user && user !== null) return done(null, user.id);
       if (
         profile &&
@@ -82,6 +89,42 @@ passport.use(
           return done(null, `google_${profile.id}`);
         });
       } else return done(null, false);
+    }
+  )
+);
+
+passport.use(
+  "google-link",
+  new GoogleStrategy(
+    {
+      clientID: keys["google"].clientID,
+      clientSecret: keys["google"].clientSecret,
+      passReqToCallback: true,
+      callbackURL: `http://localhost:8080/user/authenticate/google/callback-link`,
+      //`https://musicroom.site./user/authenticate/google/callback-link`,
+    },
+    async function (req, accessToken, refreshToken, profile, done) {
+      const user = await getUser({
+        $or: [
+          { id: `google_${profile.id}` },
+          { "google_account.id": `google_${profile.id}` },
+        ],
+      });
+      const userId = req.query.state;
+      if (user && user !== null) {
+        return done(null, false);
+      } else {
+        await User.updateOne(
+          { _id: userId },
+          {
+            google_account: {
+              id: `google_${profile.id}`,
+              email: profile._json.email,
+            },
+          }
+        ).exec();
+        return done(null, userId);
+      }
     }
   )
 );

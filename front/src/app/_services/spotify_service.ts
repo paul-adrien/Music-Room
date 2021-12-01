@@ -84,10 +84,12 @@ export class SpotifyService {
     position_ms?: number
   ) {
     const user = this.authService.getUser();
-    this.socketService.emitToServer('user update history', {
-      userId: user.id,
-      trackId: trackId,
-    });
+    if (trackId) {
+      this.socketService.emitToServer('user update history', {
+        userId: user.id,
+        trackId: trackId,
+      });
+    }
     console.log(deviceId);
     const payload = { uris: [uri], position_ms };
     console.log(payload);
@@ -405,6 +407,8 @@ export class SpotifyService {
         catchError((err) => {
           if (err?.status === 401) {
             return this.getRefreshToken();
+          } else if (err?.status === 403) {
+            return this.seek(0);
           } else {
             return;
           }

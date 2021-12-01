@@ -39,7 +39,7 @@ import { SearchComponent } from '../search/search.component';
       </div>
     </div>
     <ng-template #noUser>
-      <div>Aucun utilisateur</div>
+      <div *ngIf="this.isConv">Aucun utilisateur</div>
     </ng-template>
     <div
       class="primary-button add"

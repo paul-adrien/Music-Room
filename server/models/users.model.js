@@ -7,6 +7,7 @@ const User = mongoose.model(
     email: String,
     lastName: String,
     firstName: String,
+    google_account: { id: String, email: String },
     password: String,
     id: String,
     picture:

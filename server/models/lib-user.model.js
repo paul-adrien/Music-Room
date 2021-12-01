@@ -14,13 +14,25 @@ const getUsers = async function (query) {
   } else return null;
 };
 
-const checkUserExist = async function (userId) {
+const checkUserExist = async function (userId, type) {
   if (userId === null) {
     return false;
   }
-  const user = await User.findOne({
-    id: userId,
-  }).exec();
+  let user;
+  if (type === "google") {
+    user = await User.findOne({
+      $or: [
+        {
+          id: userId,
+        },
+        { "google_account.id": userId },
+      ],
+    }).exec();
+  } else {
+    user = await User.findOne({
+      id: userId,
+    }).exec();
+  }
   return !!user;
 };
 

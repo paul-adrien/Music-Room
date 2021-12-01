@@ -17,18 +17,18 @@ module.exports = function (app) {
   app.use(multer().any());
 
   app.get("/token", [authJwt.verifyToken], controller.userBoard);
-  app.post(
-    "/forgotPass",
-    controller.forgotPass_send
-  );
-  app.put(
-    "/changePass",
-    controller.forgotPass_check
-  );
+  app.post("/forgotPass", controller.forgotPass_send);
+  app.put("/changePass", controller.forgotPass_check);
   app.get(
     "/user/:id",
     [authJwt.verifyToken],
     controller.getProfile,
+    logs.logsHTTP
+  );
+  app.delete(
+    "/user/:id",
+    [authJwt.verifyToken],
+    controller.deleteUser,
     logs.logsHTTP
   );
   app.get(

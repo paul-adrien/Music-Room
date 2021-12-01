@@ -86,16 +86,13 @@ export class UserProfileComponent implements OnInit {
     private route: ActivatedRoute
   ) {
     const userId = this.route.snapshot.params.id;
-    console.log('user id ==> ', userId);
-    const user = this.userService.getUser(userId);
-    console.log('this.friends 1==> ', this.friends, userId, this.user);
     this.friends = this.user?.friends?.indexOf(userId) >= 0 ? true : false;
-    console.log('this.friends 2==> ', this.friends);
 
     this.socketService
       .listenToServer(`user update ${userId}`)
       .subscribe((data) => {
         this.user = data;
+        this.friends = this.user?.friends?.indexOf(userId) >= 0 ? true : false;
         if (typeof this.user.picture !== 'string' && this.user.picture) {
           this.user.picture = 'data:image/jpeg;base64,' + data.picture.buffer;
         } else {
@@ -189,7 +186,7 @@ export class UserProfileComponent implements OnInit {
   async presentAlert() {
     const alert = await this.alertController.create({
       header: 'Attention',
-      message: 'Ouvre spotify avant, fdp.',
+      message: 'Ouvrez Spotify avant et lancez une musique.',
       buttons: ['OK'],
     });
 

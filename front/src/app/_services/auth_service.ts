@@ -113,15 +113,20 @@ export class AuthService {
     });
   }
 
-  stockAppInfo(userId: String, model: String, platform: String, version: String): Observable<any> {
-    console.log(userId,model,platform,version)
+  stockAppInfo(
+    userId: String,
+    model: String,
+    platform: String,
+    version: String
+  ): Observable<any> {
+    console.log(userId, model, platform, version);
     return this.http.post(
       environment.AUTH_API + 'user/application',
       {
         userId,
         model,
         platform,
-        version
+        version,
       },
       httpOptions
     );
@@ -157,6 +162,13 @@ export class AuthService {
         id: id,
         email: user.email,
       },
+      httpOptions
+    );
+  }
+
+  deleteAccount(userId: string) {
+    return this.http.delete(
+      environment.AUTH_API + `user/${userId}`,
       httpOptions
     );
   }

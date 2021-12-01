@@ -33,11 +33,12 @@ import { EditProfileComponent } from './edit-profile/edit-profile.component';
 // import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { environment } from 'src/environments/environment';
 import { VerifyComponent } from './verify/verify.component';
+import { SettingsProfileComponent } from './settings-profile/settings-profile.component';
 
 // const config: SocketIoConfig = { url: environment.AUTH_API, options: {} };
 
 @NgModule({
-  declarations: [
+  declarations: [	
     AppComponent,
     LoginComponent,
     SearchComponent,
@@ -54,7 +55,8 @@ import { VerifyComponent } from './verify/verify.component';
     EditProfileComponent,
     VerifyComponent,
     UserProfileComponent,
-  ],
+      SettingsProfileComponent
+   ],
   entryComponents: [],
   imports: [
     FormsModule,

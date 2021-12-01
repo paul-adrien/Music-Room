@@ -4,6 +4,7 @@ export interface User {
   lastName: string;
   firstName: string;
   password: string;
+  google_account: { id: string; email: string };
   id: string;
   picture:
     | string

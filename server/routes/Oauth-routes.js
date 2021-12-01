@@ -29,12 +29,12 @@ module.exports = function (app) {
 
         return res.redirect(
           "http://localhost:8100/login?data=" +
-          encodeURI(
-            JSON.stringify({
-              user: userDb,
-              token: token,
-            })
-          )
+            encodeURI(
+              JSON.stringify({
+                user: userDb,
+                token: token,
+              })
+            )
         );
       }
     )(req, res, next);
@@ -42,7 +42,9 @@ module.exports = function (app) {
 
   app.get(
     "/user/authenticate/google",
-    passport.authenticate("google", { scope: ["profile", "email"] })
+    passport.authenticate("google", {
+      scope: ["profile", "email"],
+    })
   );
   app.get("/user/authenticate/google/callback", (req, res, next) => {
     passport.authenticate(
@@ -60,13 +62,49 @@ module.exports = function (app) {
 
         return res.redirect(
           "http://localhost:8100/login?data=" +
-          encodeURI(
-            JSON.stringify({
-              user: userDb,
-              token: token,
-            })
-          )
+            encodeURI(
+              JSON.stringify({
+                user: userDb,
+                token: token,
+              })
+            )
         );
+      }
+    )(req, res, next);
+  });
+
+  app.get("/user/authenticate/google-link/:userId", (req, res, next) => {
+    req.userId = req.params.userId;
+    passport.authenticate("google-link", {
+      scope: ["profile", "email"],
+      state: req.params.userId,
+    })(req, res, next);
+  });
+
+  app.get("/user/authenticate/google/callback-link", (req, res, next) => {
+    passport.authenticate(
+      "google-link",
+      {
+        failureRedirect: "http://localhost:8100/login",
+      },
+      async (err, userId) => {
+        if (userId) {
+          const userDb = await getUser({ id: userId });
+
+          return res.redirect(
+            "http://localhost:8100/tabs/tab-profile/settings?data=" +
+              encodeURI(
+                JSON.stringify({
+                  user: userDb,
+                })
+              )
+          );
+        } else {
+          return res.redirect(
+            "http://localhost:8100/tabs/tab-profile/settings?data=" +
+              encodeURI(JSON.stringify(undefined))
+          );
+        }
       }
     )(req, res, next);
   });

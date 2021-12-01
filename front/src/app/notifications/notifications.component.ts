@@ -1,12 +1,7 @@
-import { PlaylistService } from './../_services/playlist_service';
-import { async } from '@angular/core/testing';
-import { UserService } from './../_services/user_service';
-import { RoomService } from './../_services/room_service';
 import { User } from './../../../libs/user';
 import { AuthService } from './../_services/auth_service';
 import { Location } from '@angular/common';
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { map } from 'rxjs/operators';
 import { SpotifyService } from '../_services/spotify_service';
 import { Device } from '@ionic-native/device/ngx';
 import { Router } from '@angular/router';
@@ -87,9 +82,6 @@ export class NotificationsComponent implements OnInit {
     private readonly location: Location,
     private readonly authService: AuthService,
     private readonly cd: ChangeDetectorRef,
-    private readonly roomService: RoomService,
-    private readonly playlistService: PlaylistService,
-    private readonly userService: UserService,
     private readonly spotifyService: SpotifyService,
     private readonly device: Device,
     private readonly router: Router,
@@ -224,7 +216,7 @@ export class NotificationsComponent implements OnInit {
   async presentAlert() {
     const alert = await this.alertController.create({
       header: 'Attention',
-      message: 'Ouvre spotify avant, fdp.',
+      message: 'Ouvrez Spotify avant et lancez une musique.',
       buttons: ['OK'],
     });
 

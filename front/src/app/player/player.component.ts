@@ -11,7 +11,7 @@ import {
   Input,
   OnInit,
 } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { AlertController, ModalController } from '@ionic/angular';
 import { Options } from '@angular-slider/ngx-slider';
 import { SpotifyService } from '../_services/spotify_service';
 import { DelegationComponent } from '../delegation/delegation.component';
@@ -137,7 +137,8 @@ export class PlayerComponent {
     public modalController: ModalController,
     private router: Router,
     private socketService: WebsocketService,
-    private authService: AuthService
+    private authService: AuthService,
+    private alertController: AlertController
   ) {
     const user = this.authService.getUser();
     this.socketService
@@ -177,17 +178,42 @@ export class PlayerComponent {
   }
 
   play() {
-    this.spotifyService.play().subscribe((data) => {
-      this.playerInfo.is_playing = true;
-      this.cd.detectChanges();
+    this.spotifyService.getPlayerInfo().subscribe(async (res) => {
+      if (!res?.device?.id) {
+        await this.presentAlert();
+      } else if (res?.device?.id) {
+        this.spotifyService.play().subscribe((data) => {
+          this.playerInfo.is_playing = true;
+          this.cd.detectChanges();
+        });
+      }
     });
   }
 
   pause() {
-    this.spotifyService.pause().subscribe((data) => {
-      this.playerInfo.is_playing = false;
-      this.cd.detectChanges();
+    this.spotifyService.getPlayerInfo().subscribe(async (res) => {
+      if (!res?.device?.id) {
+        await this.presentAlert();
+      } else if (res?.device?.id) {
+        this.spotifyService.pause().subscribe((data) => {
+          this.playerInfo.is_playing = false;
+          this.cd.detectChanges();
+        });
+      }
     });
+  }
+
+  async presentAlert() {
+    const alert = await this.alertController.create({
+      header: 'Attention',
+      message: 'Ouvrez Spotify avant et lancez une musique.',
+      buttons: ['OK'],
+    });
+
+    await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+    console.log('onDidDismiss resolved with role', role);
   }
 
   async presentModal() {
@@ -240,15 +266,33 @@ export class PlayerComponent {
   }
 
   seekTrack(position: any) {
+    this.spotifyService.getPlayerInfo().subscribe(async (res) => {
+      if (!res?.device?.id) {
+        await this.presentAlert();
+      } else if (res?.device?.id) {
+      }
+    });
     this.spotifyService.seek(position.value * 1000).subscribe();
   }
 
   nextTrack() {
-    this.spotifyService.next().subscribe();
+    this.spotifyService.getPlayerInfo().subscribe(async (res) => {
+      if (!res?.device?.id) {
+        await this.presentAlert();
+      } else if (res?.device?.id) {
+        this.spotifyService.next().subscribe();
+      }
+    });
   }
 
   previousTrack() {
-    this.spotifyService.previous().subscribe();
+    this.spotifyService.getPlayerInfo().subscribe(async (res) => {
+      if (!res?.device?.id) {
+        await this.presentAlert();
+      } else if (res?.device?.id) {
+        this.spotifyService.previous().subscribe();
+      }
+    });
   }
   ngOnDestroy() {
     // if (!this.isModal) {

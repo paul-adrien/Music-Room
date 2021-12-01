@@ -3,6 +3,9 @@ const { updateUser, getUser, getUsers } = require(appRoot +
 var nodemailer = require("nodemailer");
 const db = require(appRoot + "/models");
 const User = db.user;
+const Room = db.room;
+const Playlist = db.playlist;
+const Conversation = db.conversation;
 const ForgotPass = db.forgotPass;
 var bcrypt = require("bcryptjs");
 const path = require("path");
@@ -221,7 +224,8 @@ exports.forgotPass_check = async (req, res, next) => {
           message: "No code",
         });
       } else {
-        if (user.password === password) {//pas le même que l'ancien
+        if (user.password === password) {
+          //pas le même que l'ancien
           res.status(200).json({
             status: false,
             message: "Same password",
@@ -419,5 +423,64 @@ exports.verifyEmail = async (req, res, next) => {
     }
   } else {
     res.sendFile(path.join(appRoot, "/html/errorVerifEmail.html"));
+  }
+};
+
+exports.deleteUser = async (req, res, next) => {
+  const userId = req.params.id;
+
+  const user = await getUser({ id: userId });
+  if (user) {
+    User.deleteOne({ id: userId }).exec(async (err, user) => {
+      if (err) {
+        res.message = err;
+        res.status(400).json({
+          status: false,
+          message: err,
+        });
+      } else {
+        await User.updateMany(
+          { friends: userId },
+          { $pull: { friends: userId } }
+        ).exec();
+        await Room.deleteMany({ created_by: userId }).exec();
+        await Playlist.deleteMany({ created_by: userId }).exec();
+        await Room.updateMany(
+          {
+            $or: [{ invited: userId }, { "users.id": userId }],
+          },
+          { $pull: { invited: userId, users: { id: userId } } }
+        ).exec();
+        await Playlist.updateMany(
+          {
+            $or: [{ invited: userId }, { "users.id": userId }],
+          },
+          { $pull: { invited: userId, users: { id: userId } } }
+        ).exec();
+        await Conversation.deleteMany({
+          $and: [{ "users.userId": userId }, { "users.2": { $exists: false } }],
+        }).exec();
+        await Conversation.updateMany(
+          {
+            $and: [
+              { "users.userId": userId },
+              { "users.2": { $exists: true } },
+            ],
+          },
+          { $pull: { users: { userId: userId } } }
+        ).exec();
+
+        res.message = "user delete";
+        res.status(200).json({
+          status: true,
+          message: "user delete",
+        });
+      }
+    });
+  } else {
+    res.status(400).json({
+      status: false,
+      message: "user doesn't exist",
+    });
   }
 };

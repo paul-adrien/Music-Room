@@ -1,3 +1,4 @@
+import { SettingsProfileComponent } from './../settings-profile/settings-profile.component';
 import { NgModule, Component } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ProfileComponent } from '../profile/profile.component';
@@ -14,6 +15,12 @@ const routes: Routes = [
     path: 'profile',
     canActivate: [AuthGuard],
     component: ProfileComponent,
+    pathMatch: 'full',
+  },
+  {
+    path: 'settings',
+    canActivate: [AuthGuard],
+    component: SettingsProfileComponent,
     pathMatch: 'full',
   },
   {
