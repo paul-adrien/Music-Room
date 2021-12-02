@@ -309,12 +309,12 @@ export class LoginComponent implements OnInit {
           this.authService.saveUser(data.user);
           this.spotifyService.requestAuthorization();
           if (localStorage.getItem('access_token')) {
-            this.authService.stockAppInfo(
-              data.user.id,
-              this.device.model,
-              this.device.platform,
-              '1.0.0'
-            );
+            // this.authService.stockAppInfo(
+            //   data.user._id,
+            //   this.device.model,
+            //   this.device.platform,
+            //   '1.0.0'
+            // );
             this.route.navigate(['/tabs/search']);
             this.isSuccessful = true;
             this.isSignUpFailed = false;
@@ -325,12 +325,6 @@ export class LoginComponent implements OnInit {
         this.spotifyService.getAuthorizationToken().subscribe(() => {
           if (localStorage.getItem('access_token')) {
             let user: any = localStorage.getItem('auth-user');
-            this.authService.stockAppInfo(
-              user?.id,
-              this.device.model,
-              this.device.platform,
-              '1.0.0'
-            );
             this.route.navigate(['/tabs/search']);
           }
         });
@@ -345,19 +339,13 @@ export class LoginComponent implements OnInit {
   onSubmit() {
     if (this.loginMode === false) {
       const form: Partial<User> = this.registerForm.getRawValue();
-      this.authService.register(form).subscribe(
+      this.authService.register(form, this.device.model, this.device.platform, '1.0.0').subscribe(
         (data) => {
           if (data?.user && data?.token) {
             this.authService.saveToken(data.token);
             this.authService.saveUser(data.user);
             this.spotifyService.requestAuthorization();
             if (localStorage.getItem('access_token')) {
-              this.authService.stockAppInfo(
-                data?.user.id,
-                this.device.model,
-                this.device.platform,
-                '1.0.0'
-              );
               this.route.navigate(['/tabs/search']);
               this.isSuccessful = true;
               this.isSignUpFailed = false;
@@ -374,19 +362,13 @@ export class LoginComponent implements OnInit {
       );
     } else {
       const form: Partial<User> = this.loginForm.getRawValue();
-      this.authService.login(form).subscribe(
+      this.authService.login(form, this.device.model, this.device.platform, '1.0.0').subscribe(
         (data) => {
           if (data?.user && data?.token) {
             this.authService.saveToken(data.token);
             this.authService.saveUser(data.user);
             this.spotifyService.requestAuthorization();
             if (localStorage.getItem('access_token')) {
-              this.authService.stockAppInfo(
-                data?.user.id,
-                this.device.model,
-                this.device.platform,
-                '1.0.0'
-              );
               this.route.navigate(['/tabs/search']);
               this.isSuccessful = true;
               this.isSignUpFailed = false;
@@ -552,10 +534,10 @@ export class LoginComponent implements OnInit {
       location: 'no',
     };
     if (this.device?.platform === null) {
-      location.href = 'http://localhost:8080/user/authenticate/42';
+      location.href = 'http://localhost:8080/user/authenticate/42?model=PC&platform=PC&version=1.0.0';
     } else {
       const browser = this.iab.create(
-        environment.AUTH_API + 'user/authenticate/42',
+        environment.AUTH_API + 'user/authenticate/42?model='+this.device.model+'&platform='+this.device.platform+'&version=1.0.0',
         'defaults',
         options
       );
@@ -587,10 +569,10 @@ export class LoginComponent implements OnInit {
       location: 'no',
     };
     if (this.device?.platform === null) {
-      location.href = 'http://localhost:8080/user/authenticate/google';
+      location.href = 'http://localhost:8080/user/authenticate/google?model=PC&platform=PC&version=1.0.0';
     } else {
       const browser = this.iab.create(
-        environment.AUTH_API + 'user/authenticate/google',
+        environment.AUTH_API + 'user/authenticate/google?model='+this.device.model+'&platform='+this.device.platform+'&version=1.0.0',
         'defaults',
         options
       );

@@ -2,7 +2,7 @@ const { verifySignUp } = require(appRoot + "/middlewares");
 const passport = require(appRoot + "/config/passport-config");
 const config = require(appRoot + "/config/auth");
 var jwt = require("jsonwebtoken");
-const { getUser } = require(appRoot + "/models/lib-user.model");
+const { getUser, updateUser } = require(appRoot + "/models/lib-user.model");
 const db = require(appRoot + "/models");
 const Token = db.token;
 
@@ -16,18 +16,25 @@ module.exports = function (app) {
     next();
   });
 
-  app.get("/user/authenticate/42", passport.authenticate("42"));
+  app.get("/user/authenticate/42", (req, res, next) => {
+    passport.authenticate("42", {
+      state: JSON.stringify(req.query)
+    })(req, res, next);
+  });
   app.get("/user/authenticate/42/callback", (req, res, next) => {
     passport.authenticate(
       "42",
       {
         failureRedirect: "http://localhost:8100/login",
       },
-      async (err, userId) => {
-        const userDb = await getUser({ id: userId });
+      async (err, data) => {
+        const userDb = await getUser({ id: data.userId });
         const token = jwt.sign({ id: userDb._id }, config.secret, {
           expiresIn: 86400, // 24 hours
         });
+
+        userDb.application = data.application;
+        await updateUser(data.userId, user);
 
         await Token.insertMany([
           {
@@ -51,24 +58,28 @@ module.exports = function (app) {
   });
 
   app.get(
-    "/user/authenticate/google",
-    passport.authenticate("google", {
-      scope: ["profile", "email"],
-    })
-  );
+    "/user/authenticate/google", (req, res, next) => {
+      passport.authenticate("google", {
+        scope: ["profile", "email"],
+        state: JSON.stringify(req.query)
+      })(req, res, next);
+    });
   app.get("/user/authenticate/google/callback", (req, res, next) => {
     passport.authenticate(
       "google",
       {
         failureRedirect: "http://localhost:8100/login",
       },
-      async (err, userId) => {
+      async (err, data) => {
         // Successful authentication, redirect home.
-        const userDb = await getUser({ id: userId });
+        const userDb = await getUser({ id: data.userId });
 
         const token = jwt.sign({ id: userDb._id }, config.secret, {
           expiresIn: 86400, // 24 hours
         });
+
+        userDb.application = data.application;
+        await updateUser(data.userId, userDb);
 
         await Token.insertMany([
           {

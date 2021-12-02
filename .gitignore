@@ -1,5 +1,5 @@
 # Logs
-middlewares/logs/*
+server/middlewares/logs/*
 *.log
 npm-debug.log*
 yarn-debug.log*

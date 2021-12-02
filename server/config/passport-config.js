@@ -13,11 +13,17 @@ passport.use(
     {
       clientID: keys["42"].clientID,
       clientSecret: keys["42"].clientSecret,
+      passReqToCallback: true,
       callbackURL: `https://musicroom.site./user/authenticate/42/callback`,
     },
-    async function (accessToken, refreshToken, profile, done) {
+    async function (req, accessToken, refreshToken, profile, done) {
       const user = await getUser({ id: `42_${profile._json.id}` });
-      if (user && user !== null) return done(null, user.id);
+      if (user && user !== null) {
+        return done(null, {
+          userId: user.id,
+          application: JSON.parse(req.query.state)
+        });
+      };
       if (
         profile &&
         profile._json &&
@@ -40,7 +46,10 @@ passport.use(
               message: err,
             });
           }
-          return done(null, `42_${profile._json.id}`);
+          return done(null, {
+            userId: `42_${profile._json.id}`,
+            application: JSON.parse(req.query.state)
+          });
         });
       } else return done(null, false);
     }
@@ -53,17 +62,23 @@ passport.use(
     {
       clientID: keys["google"].clientID,
       clientSecret: keys["google"].clientSecret,
+      passReqToCallback: true,
       callbackURL: `http://localhost:8080/user/authenticate/google/callback`,
       //`https://musicroom.site./user/authenticate/google/callback`,
     },
-    async function (accessToken, refreshToken, profile, done) {
+    async function (req, accessToken, refreshToken, profile, done) {
       const user = await getUser({
         $or: [
           { id: `google_${profile.id}` },
           { "google_account.id": `google_${profile.id}` },
         ],
       });
-      if (user && user !== null) return done(null, user.id);
+      if (user && user !== null) {
+        return done(null, {
+          userId: user.id,
+          application: JSON.parse(req.query.state)
+        });
+      }
       if (
         profile &&
         profile._json &&
@@ -86,7 +101,10 @@ passport.use(
               message: err,
             });
           }
-          return done(null, `google_${profile.id}`);
+          return done(null, {
+            userId: `google_${profile.id}`,
+            application: JSON.parse(req.query.state)
+          });
         });
       } else return done(null, false);
     }

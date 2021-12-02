@@ -21,13 +21,16 @@ export class AuthService {
     public navCtrl: NavController
   ) {}
 
-  login(user: Partial<User>): Observable<any> {
+  login(user: Partial<User>, model, platform, version): Observable<any> {
     return this.http
       .post(
         environment.AUTH_API + 'user/authenticate',
         {
           userName: user.userName,
           password: user.password,
+          model: model,
+          platform: platform,
+          version: version,
         },
         httpOptions
       )
@@ -55,7 +58,7 @@ export class AuthService {
     this.navCtrl.navigateRoot('/login');
   }
 
-  register(user: Partial<User>): Observable<any> {
+  register(user: Partial<User>, model, platform, version): Observable<any> {
     return this.http
       .post(
         environment.AUTH_API + 'user/register',
@@ -65,6 +68,9 @@ export class AuthService {
           password: user.password,
           lastName: user.lastName,
           firstName: user.firstName,
+          model: model,
+          platform: platform,
+          version: version,
         },
         httpOptions
       )
@@ -140,25 +146,6 @@ export class AuthService {
     return this.http.get(environment.AUTH_API + 'token', {
       responseType: 'text',
     });
-  }
-
-  stockAppInfo(
-    userId: String,
-    model: String,
-    platform: String,
-    version: String
-  ): Observable<any> {
-    console.log(userId, model, platform, version);
-    return this.http.post(
-      environment.AUTH_API + 'user/application',
-      {
-        userId,
-        model,
-        platform,
-        version,
-      },
-      httpOptions
-    );
   }
 
   forgotPass_s(email: string): Observable<any> {

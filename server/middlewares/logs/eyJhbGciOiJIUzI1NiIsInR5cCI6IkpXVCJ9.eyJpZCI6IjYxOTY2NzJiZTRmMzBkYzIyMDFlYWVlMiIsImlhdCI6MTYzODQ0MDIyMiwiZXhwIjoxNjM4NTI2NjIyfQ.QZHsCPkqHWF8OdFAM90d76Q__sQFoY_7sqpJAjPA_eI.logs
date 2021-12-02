@@ -1,9 +1,0 @@
-date=2021-12-02T10:17:02.125Z;device=undefined;platform=undefined;musicRoomVersion=undefined;root=http://localhost:8080/user/6196672be4f30dc2201eaee2;status=304;message=send user
-date=2021-12-02T10:17:06.939Z;device=undefined;platform=undefined;musicRoomVersion=undefined;root=http://localhost:8080/room?userId=undefined;status=304;message=rooms success
-date=2021-12-02T10:17:06.941Z;device=undefined;platform=undefined;musicRoomVersion=undefined;root=http://localhost:8080/playlist?userId=undefined;status=304;message=playlists success
-date=2021-12-02T10:17:10.449Z;device=undefined;platform=undefined;musicRoomVersion=undefined;root=http://localhost:8080/user/6196672be4f30dc2201eaee2;status=304;message=send user
-date=2021-12-02T10:17:10.449Z;device=undefined;platform=undefined;musicRoomVersion=undefined;root=http://localhost:8080/room?userId=undefined;status=304;message=rooms success
-date=2021-12-02T10:17:10.450Z;device=undefined;platform=undefined;musicRoomVersion=undefined;root=http://localhost:8080/playlist?userId=undefined;status=304;message=playlists success
-date=2021-12-02T10:33:23.031Z;device=undefined;platform=undefined;musicRoomVersion=undefined;root=http://localhost:8080/user/6196672be4f30dc2201eaee2;status=304;message=send user
-date=2021-12-02T10:33:23.032Z;device=undefined;platform=undefined;musicRoomVersion=undefined;root=http://localhost:8080/playlist?userId=undefined;status=304;message=playlists success
-date=2021-12-02T10:33:23.034Z;device=undefined;platform=undefined;musicRoomVersion=undefined;root=http://localhost:8080/room?userId=undefined;status=304;message=rooms success

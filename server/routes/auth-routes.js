@@ -12,5 +12,5 @@ module.exports = function (app) {
 
     app.post("/user/register", verifySignUp.checkDuplicateUsernameOrEmail, controller.signup);
     app.post("/user/authenticate", controller.signin);
-    app.post("/user/application", controller.stockAppInfo);
+    // app.put("/user/application/test/test/test/test", controller.stockAppInfo);
 };

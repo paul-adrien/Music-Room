@@ -60,6 +60,11 @@ exports.signup = (req, res) => {
       console.log("an email was send");
     }
   });
+  if (req.body.model === null || req.body.platform === null) {
+    var application = { model: 'PC', platform: 'PC', version: req.body.version };
+  } else {
+    var application = { model: req.body.model, platform: req.body.platform, version: req.body.version };
+  }
 
   const user = new User({
     userName: req.body.userName,
@@ -68,7 +73,8 @@ exports.signup = (req, res) => {
     firstName: req.body.firstName,
     password: bcrypt.hashSync(req.body.password, 8),
     rand: rand,
-    validEmail: false
+    validEmail: false,
+    application: application
   });
 
   user.id = user._id;
@@ -122,83 +128,83 @@ exports.signin = (req, res) => {
         status: false,
         message: err,
       });
-    }
-
-    // console.log(user);
-
-    if (user === null) {
+    } else if (user === null) {
       return res.json({
         status: false,
         message: "User Not found.",
       });
-    }
-
-    var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
-
-    if (!passwordIsValid) {
-      return res.json({
-        accessToken: null,
-        message: "Invalid Password!",
-      });
-    }
-
-    var token = jwt.sign({ id: user._id }, config.secret, {
-      expiresIn: 86400, // 24 hours
-    });
-
-    await Token.insertMany([
-      {
-        token: token,
-        userId: user.id,
-        date: Date.now()
-      },
-    ]);
-
-    res.json({
-      status: true,
-      id: user.id,
-      userName: user.userName,
-      email: user.email,
-      lastName: user.lastName,
-      firstName: user.firstName,
-      accessToken: token,
-    });
-  });
-};
-
-exports.stockAppInfo = (req, res, next) => {
-  const { userId, model, platform, version} = req.body;
-
-  console.log(userId, model, platform, version);
-
-  User.findOne({ _id: userId }).exec(async (user) => {
-    if (err) {
-      res.message = err;
-      res.status(400).json({
-        status: false,
-        message: err,
-      });
-    } else if (!user) {
-      res.message = "user doesn't exist";
-      res.status(200).json({
-        status: false,
-        message: "user doesn't exist",
-      });
     } else {
-      user.application = { model: model, platform: platform, version: version };
-      if (await updateUser(userId)) {
-        res.message = "user application update";
-        res.status(200).json({
-          status: false,
-          message: "user application update",
+      var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
+      if (!passwordIsValid) {
+        return res.json({
+          accessToken: null,
+          message: "Invalid Password!",
         });
       } else {
-        res.message = "error when update application information";
-        res.status(200).json({
-          status: false,
-          message: "error when update application information",
+        if (req.body.model === null || req.body.platform === null) {
+          user.application = { model: 'PC', platform: 'PC', version: req.body.version };
+        } else {
+          user.application = { model: req.body.model, platform: req.body.platform, version: req.body.version };
+        }
+        await updateUser(user._id, user);
+        var token = jwt.sign({ id: user._id }, config.secret, {
+          expiresIn: 86400, // 24 hours
+        });
+        await Token.insertMany([
+          {
+            token: token,
+            userId: user.id,
+            date: Date.now()
+          },
+        ]);
+    
+        return res.json({
+          status: true,
+          id: user.id,
+          userName: user.userName,
+          email: user.email,
+          lastName: user.lastName,
+          firstName: user.firstName,
+          accessToken: token,
         });
       }
     }
-  })
-}
+  });
+};
+
+// exports.stockAppInfo = (req, res) => {
+//   const { userId, model, platform, version} = req.body;
+
+//   console.log('userId, model, platform, version');
+
+//   User.findOne({ _id: userId }).exec(async (user) => {
+//     if (err) {
+//       res.message = err;
+//       res.status(400).json({
+//         status: false,
+//         message: err,
+//       });
+//     } else if (!user) {
+//       res.message = "user doesn't exist";
+//       res.status(200).json({
+//         status: false,
+//         message: "user doesn't exist",
+//       });
+//     } else {
+//       user.application = { model: model, platform: platform, version: version };
+//       if (await updateUser(userId)) {
+//         res.message = "user application update";
+//         res.status(200).json({
+//           status: false,
+//           message: "user application update",
+//         });
+//       } else {
+//         res.message = "error when update application information";
+//         res.status(200).json({
+//           status: false,
+//           message: "error when update application information",
+//         });
+//       }
+//     }
+//   })
+// }
