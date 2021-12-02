@@ -153,12 +153,7 @@ exports.deleteFriendSocket = (userId, friendId) => {
       };
     } else {
       return User.findOne({ id: friendId }).then(async (friend) => {
-        if (err) {
-          return {
-            status: false,
-            message: err,
-          };
-        } else if (!friend) {
+        if (!friend) {
           return {
             status: false,
             message: "this friend doesn't exist",
@@ -232,10 +227,10 @@ exports.inviteFriend = (req, res, next) => {
               })
               .indexOf(friendId) != -1
           ) {
-            res.message = "already sending invite";
+            res.message = "this user already invite you";
             res.status(200).json({
               status: false,
-              message: "already sending invite",
+              message: "this user already invite you",
             });
           } else if (
             friend.notifs !== undefined &&
@@ -246,10 +241,10 @@ exports.inviteFriend = (req, res, next) => {
               })
               .indexOf(userId) != -1
           ) {
-            res.message = "this user already invite you";
+            res.message = "already sending invite";
             res.status(200).json({
               status: false,
-              message: "this user already invite you",
+              message: "already sending invite",
             });
           } else {
             User.updateOne(
@@ -311,7 +306,7 @@ exports.inviteFriendSocket = (userId, friendId) => {
           ) {
             return {
               status: false,
-              message: "already sending invite",
+              message: "this user already invite you",
             };
           } else if (
             friend.notifs !== undefined &&
@@ -324,7 +319,7 @@ exports.inviteFriendSocket = (userId, friendId) => {
           ) {
             return {
               status: false,
-              message: "this user already invite you",
+              message: "already sending invite",
             };
           } else {
             return User.updateOne(

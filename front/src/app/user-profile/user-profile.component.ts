@@ -1,6 +1,7 @@
 import { WebsocketService } from './../_services/websocketService';
 import { UserService } from './../_services/user_service';
 import { FriendsService } from '../_services/friends_service';
+import { AuthService } from '../_services/auth_service';
 import { RoomService } from './../_services/room_service';
 import { Room } from './../../../libs/room';
 import { SpotifyService } from './../_services/spotify_service';
@@ -31,18 +32,31 @@ import { ActivatedRoute } from '@angular/router';
       />
       <div class="name">{{ this.user.userName }}</div>
       <div
-        *ngIf="this.friends == false"
+        *ngIf="this.friends == false && this.invitSended == false && this.invitToAccept == false"
         class="primary-button"
-        (click)="this.addFriend()"
+        (click)="this.inviteFriend()"
       >
         Ajouter en ami
       </div>
       <div
         *ngIf="this.friends == true"
         class="primary-button"
-        (click)="this.removeFriend()"
+        (click)="this.deleteFriend()"
       >
         Enlever des amis
+      </div>
+      <div
+        *ngIf="this.friends == false && this.invitSended == true"
+        class="primary-button"
+      >
+        Demande d'ami envoyée
+      </div>
+      <div
+        *ngIf="this.friends == false && this.invitToAccept == true"
+        class="primary-button"
+        (click)="this.acceptFriend()"
+      >
+        Accepter l'invitation
       </div>
     </div>
     <div class="bottom-container">
@@ -68,9 +82,12 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class UserProfileComponent implements OnInit {
   public user: User;
+  public loggedUser: User;
   public playlists: Playlist[];
   public rooms: Room[];
   public friends: boolean;
+  public invitSended: boolean;
+  public invitToAccept: boolean;
 
   constructor(
     private userService: UserService,
@@ -82,13 +99,29 @@ export class UserProfileComponent implements OnInit {
     private router: Router,
     private alertController: AlertController,
     private modalController: ModalController,
+    private authService: AuthService,
     private socketService: WebsocketService,
     private cd: ChangeDetectorRef,
     private location: Location,
     private route: ActivatedRoute
   ) {
     const userId = this.route.snapshot.params.id;
-    this.friends = this.user?.friends?.indexOf(userId) >= 0 ? true : false;
+    const loggedUser = this.authService.getUser();
+
+    this.socketService
+      .listenToServer(`user update ${loggedUser.id}`)
+      .subscribe((data) => {
+        this.loggedUser = data;
+        this.friends = this.loggedUser.friends?.includes({id: userId});
+        this.invitToAccept = this.loggedUser.notifs?.friends?.map((f) => {
+          return f.id;
+        })
+        .indexOf(userId) != -1? true : false;
+        console.log("this.friends ==> ", this.friends);
+        console.log("this.invitSended ==> ", this.invitSended);
+        console.log("this.invitToAccept ==> ", this.invitToAccept);
+        this.cd.detectChanges();
+      });
 
     this.socketService
       .listenToServer(`user update ${userId}`)
@@ -100,32 +133,23 @@ export class UserProfileComponent implements OnInit {
         } else {
           this.user.picture = data.picture;
         }
+        this.invitSended = this.user.notifs?.friends?.map((f) => {
+          return f.id;
+        })
+        .indexOf(loggedUser.id) != -1? true : false;
+        console.log("this.friends ==> ", this.friends);
+        console.log("this.invitSended ==> ", this.invitSended);
+        console.log("this.invitToAccept ==> ", this.invitToAccept);
         this.cd.detectChanges();
       });
-
-    this.socketService.listenToServer(`playlist create`).subscribe((data) => {
-      this.playlists = data.filter((playlist: Playlist) => {
-        if (playlist.created_by === this.user.id)
-          if (this.friends == false && playlist.type == 'private') return false;
-          else return true;
-        else return false;
-      });
-      this.cd.detectChanges();
-    });
-
-    this.socketService.listenToServer(`room create`).subscribe((data) => {
-      this.rooms = data.filter((room: Room) => {
-        if (room.created_by === this.user.id) return true;
-        else return false;
-      });
-      this.cd.detectChanges();
-    });
   }
 
   public base64data: string;
 
   ngOnInit() {
     const userId = this.route.snapshot.params.id;
+    const loggedUser = this.authService.getUser();
+
     this.userService.getUser(userId).subscribe(async (res) => {
       this.user = res;
       console.log(res);
@@ -134,9 +158,26 @@ export class UserProfileComponent implements OnInit {
       } else {
         this.user.picture = res?.picture;
       }
+      this.invitSended = this.user.notifs?.friends?.map((f) => {
+        return f.id;
+      })
+      .indexOf(loggedUser.id) != -1? true : false;
+      console.log("invitSended ==> ", this.invitSended);
       this.cd.detectChanges();
     });
-    this.friends = this.user?.friends?.indexOf(userId) >= 0 ? true : false;
+
+    this.userService.getUser(loggedUser.id).subscribe(async (res) => {
+      this.loggedUser = res;
+      console.log(res);
+      this.friends = this.loggedUser.friends?.includes({id: userId});
+      console.log("friends ==> ", this.friends);
+      this.invitToAccept = this.loggedUser.notifs?.friends?.map((f) => {
+        return f.id;
+      })
+      .indexOf(userId) != -1? true : false;
+      console.log("invitToAccept ==> ", this.invitToAccept);
+      this.cd.detectChanges();
+    });
 
     forkJoin([
       this.roomService.getAllRoom(),
@@ -158,14 +199,28 @@ export class UserProfileComponent implements OnInit {
     this.cd.detectChanges();
   }
 
-  addFriend() {
-    console.log('addFriend called !');
-    this.friends = true;
+  inviteFriend() {
+    console.log('inviteFriend called !');
+    this.socketService.emitToServer('friend invite', {
+      userId: this.loggedUser.id,
+      friendId: this.user.id,
+    });
   }
 
-  removeFriend() {
-    console.log('removeFriend called !');
-    this.friends = false;
+  deleteFriend() {
+    console.log('deleteFriend called !');
+    this.socketService.emitToServer('friend delete', {
+      userId: this.loggedUser.id,
+      frienId: this.user.id,
+    });
+  }
+
+  acceptFriend() {
+    console.log('acceptFriend called !');
+    this.socketService.emitToServer('friend accept invite', {
+      userId: this.loggedUser.id,
+      friendId: this.user.id,
+    });
   }
 
   openPlaylist(playlistId: string) {
