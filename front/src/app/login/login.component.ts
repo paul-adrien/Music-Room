@@ -308,7 +308,12 @@ export class LoginComponent implements OnInit {
           this.authService.saveUser(data.user);
           this.spotifyService.requestAuthorization();
           if (localStorage.getItem('access_token')) {
-            this.authService.stockAppInfo(data.user.id, this.device.model, this.device.platform, '1.0.0');
+            this.authService.stockAppInfo(
+              data.user.id,
+              this.device.model,
+              this.device.platform,
+              '1.0.0'
+            );
             this.route.navigate(['/tabs/search']);
             this.isSuccessful = true;
             this.isSignUpFailed = false;
@@ -319,7 +324,12 @@ export class LoginComponent implements OnInit {
         this.spotifyService.getAuthorizationToken().subscribe(() => {
           if (localStorage.getItem('access_token')) {
             let user: any = localStorage.getItem('auth-user');
-            this.authService.stockAppInfo(user?.id, this.device.model, this.device.platform, '1.0.0');
+            this.authService.stockAppInfo(
+              user?.id,
+              this.device.model,
+              this.device.platform,
+              '1.0.0'
+            );
             this.route.navigate(['/tabs/search']);
           }
         });
@@ -341,7 +351,12 @@ export class LoginComponent implements OnInit {
             this.authService.saveUser(data.user);
             this.spotifyService.requestAuthorization();
             if (localStorage.getItem('access_token')) {
-              this.authService.stockAppInfo(data?.user.id, this.device.model, this.device.platform, '1.0.0');
+              this.authService.stockAppInfo(
+                data?.user.id,
+                this.device.model,
+                this.device.platform,
+                '1.0.0'
+              );
               this.route.navigate(['/tabs/search']);
               this.isSuccessful = true;
               this.isSignUpFailed = false;
@@ -365,7 +380,12 @@ export class LoginComponent implements OnInit {
             this.authService.saveUser(data.user);
             this.spotifyService.requestAuthorization();
             if (localStorage.getItem('access_token')) {
-              this.authService.stockAppInfo(data?.user.id, this.device.model, this.device.platform, '1.0.0');
+              this.authService.stockAppInfo(
+                data?.user.id,
+                this.device.model,
+                this.device.platform,
+                '1.0.0'
+              );
               this.route.navigate(['/tabs/search']);
               this.isSuccessful = true;
               this.isSignUpFailed = false;

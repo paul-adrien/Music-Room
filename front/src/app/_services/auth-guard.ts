@@ -17,7 +17,8 @@ const httpOptions = {
 export class AuthGuard implements CanActivate {
   constructor(
     private authenticationService: AuthService,
-  ) { }
+    private router: Router
+  ) {}
 
   canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     let res: boolean;
@@ -27,11 +28,13 @@ export class AuthGuard implements CanActivate {
       .toPromise()
       .then(
         (data) => {
-          if (
-            JSON.parse(data)['status'] === true &&
-            this.authenticationService.getUser()
-          ) {
-            return true;
+          const user = this.authenticationService.getUser();
+          if (JSON.parse(data)['status'] === true && user) {
+            if (user.validEmail) {
+              return true;
+            } else {
+              this.router.navigate(['/verify-email']);
+            }
           } else {
             this.authenticationService.logOut();
             return false;

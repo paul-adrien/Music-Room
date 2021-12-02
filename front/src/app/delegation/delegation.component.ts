@@ -2,7 +2,7 @@ import { WebsocketService } from './../_services/websocketService';
 import { AuthService } from './../_services/auth_service';
 import { User } from 'libs/user';
 import { ModalController } from '@ionic/angular';
-import { Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { SearchComponent } from '../search/search.component';
 
 @Component({
@@ -15,11 +15,11 @@ import { SearchComponent } from '../search/search.component';
     <div class="sub-title">Autres appareils</div>
     <div class="devices">
       <div
-        (click)="this.dismiss(device.id)"
-        *ngFor="let device of this.user?.devices"
+        (click)="this.dismiss(device.userId)"
+        *ngFor="let device of this.devices"
         class="device-container"
       >
-        {{ device.name }}
+        {{ device?.userName }}
       </div>
     </div>
   `,
@@ -31,13 +31,26 @@ export class DelegationComponent implements OnInit {
   constructor(
     private modalController: ModalController,
     private authService: AuthService,
-    private socketService: WebsocketService
-  ) {}
+    private socketService: WebsocketService,
+    private cd: ChangeDetectorRef
+  ) {
+    this.user = this.authService.getUser();
+
+    this.socketService
+      .listenToServer(`user update ${this.user?.id}`)
+      .subscribe((data) => {
+        this.user = data;
+        this.authService.saveUser(data);
+        this.cd.detectChanges();
+      });
+  }
 
   public user: User;
+  public devices: any;
 
   ngOnInit() {
     this.user = this.authService.getUser();
+    this.devices = this.authService.getDelegation();
   }
 
   async delegateControl() {
@@ -55,16 +68,9 @@ export class DelegationComponent implements OnInit {
       if (res?.data?.user) {
         const user = res.data.user;
         console.log(user);
-        this.socketService.emitToServer('user edit', {
-          userId: user.id,
-          user: {
-            ...user,
-            devices: {
-              id: this.deviceId,
-              name: this.deviceName,
-              userId: user.id,
-            },
-          },
+        this.socketService.emitToServer('give delegation permission', {
+          userId: this.user.id,
+          friend: user.id,
         });
       }
     });

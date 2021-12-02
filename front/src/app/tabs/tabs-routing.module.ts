@@ -21,16 +21,6 @@ const routes: Routes = [
         loadChildren: () =>
           import('../tab-home/tab-home.module').then((m) => m.TabHomeModule),
       },
-      {
-        path: 'tab2',
-        loadChildren: () =>
-          import('../tab2/tab2.module').then((m) => m.Tab2PageModule),
-      },
-      {
-        path: 'tab3',
-        loadChildren: () =>
-          import('../tab3/tab3.module').then((m) => m.Tab3PageModule),
-      },
       { path: 'search', canActivate: [AuthGuard], component: SearchComponent },
       {
         path: 'tab-profile',

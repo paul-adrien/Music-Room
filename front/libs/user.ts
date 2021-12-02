@@ -18,7 +18,7 @@ export interface User {
       };
   rand: number;
   validEmail: boolean;
-  devices: { id: string; name: string; userId: string }[];
+  devices: { name: string; userId: string }[];
   friends: { id: string }[];
   musicHistory: string[];
   notifs: {

@@ -29,7 +29,10 @@ import { AlertController } from '@ionic/angular';
         (click)="this.upgradeAccount($event)"
       ></ion-toggle>
     </div>
-    <div *ngIf="!this.user?.google_account?.id" class="item-container last">
+    <div
+      *ngIf="!this.user?.google_account?.id && !isGoogleId"
+      class="item-container last"
+    >
       <div class="text">Lier un compte Google</div>
       <img
         (click)="this.linkGoogle()"
@@ -67,14 +70,19 @@ export class SettingsProfileComponent implements OnInit {
     this.socketService
       .listenToServer(`user update ${this.user?.id}`)
       .subscribe((data) => {
+        this.isGoogleId = this.user.id.includes('google');
+
         this.toggle = data.type === 'premium' ? true : false;
         this.cd.detectChanges();
       });
   }
   public toggle = false;
 
+  public isGoogleId = false;
+
   ngOnInit() {
     this.user = this.authService.getUser();
+    this.isGoogleId = this.user.id.includes('google');
     if (this.user.type === 'premium') {
       this.toggle = true;
     }

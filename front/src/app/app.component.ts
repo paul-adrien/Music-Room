@@ -21,14 +21,6 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    let scheme;
-    console.log(this.device);
-    if (this.device.platform === 'iOS') {
-      scheme = 'twitter://';
-    } else if (this.device.platform === 'Android') {
-      scheme = 'com.twitter.android';
-    }
-
     this.platform.ready().then(() => {
       console.log(this.platform);
       if (this.platform.is('mobile') && !this.platform.is('mobileweb')) {

@@ -14,7 +14,7 @@ const routes: Routes = [
       import('./tabs/tabs.module').then((m) => m.TabsPageModule),
   },
   { path: 'login', component: LoginComponent },
-  { path: 'verify/:id', component: VerifyComponent },
+  { path: 'verify-email', component: VerifyComponent },
   // { path: 'search', component: SearchComponent },
   // {
   //   path: '',

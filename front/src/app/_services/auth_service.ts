@@ -98,7 +98,36 @@ export class AuthService {
     window.localStorage.setItem('auth-user', JSON.stringify(user));
   }
 
-  getUser(): any {
+  saveDelegation(token: string, userId: string, userName: string): void {
+    const tmp = JSON.parse(window.localStorage.getItem('delegation'));
+    if (tmp === null) {
+      window.localStorage.setItem(
+        'delegation',
+        JSON.stringify([{ token, userId, userName }])
+      );
+    } else {
+      tmp.push({ token, userId, userName });
+      window.localStorage.setItem('delegation', JSON.stringify(tmp));
+    }
+  }
+
+  getDelegation(): string | null {
+    return window.localStorage.getItem('delegation');
+  }
+
+  savePlayerId(userId?: string): void {
+    if (userId) {
+      window.localStorage.setItem('playerId', JSON.stringify(userId));
+    } else {
+      window.localStorage.removeItem('playerId');
+    }
+  }
+
+  getPlayerId(): string | null {
+    return window.localStorage.getItem('playerId');
+  }
+
+  getUser(): User {
     const user = window.localStorage.getItem('auth-user');
     if (user) {
       return JSON.parse(user);
@@ -154,13 +183,11 @@ export class AuthService {
     );
   }
 
-  verify(user: Partial<User>, id: Number): Observable<any> {
-    //ok
+  sendMailVerify(email: string): Observable<any> {
     return this.http.post(
-      environment.AUTH_API + 'verify',
+      environment.AUTH_API + 'verify-email',
       {
-        id: id,
-        email: user.email,
+        email: email,
       },
       httpOptions
     );

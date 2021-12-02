@@ -153,6 +153,26 @@ export class PlayerComponent {
         }
         this.cd.detectChanges();
       });
+    this.socketService
+      .listenToServer(`give delegation permission to ${user?.id}`)
+      .subscribe((data) => {
+        console.log(data);
+        if ((data?.token, data?.userId, data?.userName)) {
+          this.authService.saveDelegation(
+            data.token,
+            data.userId,
+            data.userName
+          );
+        }
+        this.cd.detectChanges();
+      });
+    this.socketService
+      .listenToServer(`action delegation ${user?.id}`)
+      .subscribe((data) => {
+        console.log(data, 'ça marche');
+
+        this.cd.detectChanges();
+      });
   }
 
   ngAfterContentInit() {
@@ -242,16 +262,9 @@ export class PlayerComponent {
     modal.onWillDismiss().then((res: any) => {
       console.log(res);
       if (res?.data?.deviceId) {
-        this.spotifyService
-          .playTrack(
-            'spotify:track:4RZ0ebWAxiQbMySXcFhGCk',
-            undefined,
-            res?.data?.deviceId
-          )
-          .subscribe((data) => {
-            this.playerInfo.is_playing = true;
-            this.cd.detectChanges();
-          });
+        this.authService.savePlayerId(res?.data?.deviceId);
+      } else {
+        this.authService.savePlayerId();
       }
     });
     return await modal.present();

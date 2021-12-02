@@ -733,26 +733,35 @@ io.use(function (socket, next) {
   // DELEGATION ///////////////////////////////////////////////////////////////////////////////
 
   socket.on("give delegation permission", (data) => {
-    if (data?.userId && data?.friendId) {
-      music_controller.giveDelegationPermission(data.userId, data.friendId).then((res) => {
-        if (res?.token) {
-          logs.logsSOCKS(
-            `${data.friendId} give delegation permission to ${data.friendId}`,
-            200,
-            socket.handshake.query.token
-          );
-          io.emit(`give delegation permission ${data.friendId}`, { 
-            token: res.token,
-            userId: data.userId
-          });
-        }
-      })
-    } 
+    if (data?.userId && data?.friendId && data?.userName) {
+      music_controller
+        .giveDelegationPermission(data.userId, data.friendId)
+        .then((res) => {
+          if (res?.token) {
+            logs.logsSOCKS(
+              `${data.friendId} give delegation permission to ${data.friendId}`,
+              200,
+              socket.handshake.query.token
+            );
+            io.emit(`give delegation permission to ${data.friendId}`, {
+              token: res.token,
+              userId: data.userId,
+              userName: data.userName,
+            });
+          }
+        });
+    }
   });
 
   socket.on("action delegation", async (data) => {
-    if (data?.userId && data?.action && data?.userId && data.friendId) {
-      if (await authJwt.verifyDelegationToken(data.token, data.userId, data.friendId) === true) {
+    if (data?.userId && data?.action && data?.token && data.friendId) {
+      if (
+        (await authJwt.verifyDelegationToken(
+          data.token,
+          data.userId,
+          data.friendId
+        )) === true
+      ) {
         logs.logsSOCKS(
           `${data.userId} send delegation action to ${data.friendId}`,
           200,
@@ -760,10 +769,10 @@ io.use(function (socket, next) {
         );
         io.emit(`action delegation ${data.friendId}`, {
           userId: data.userId,
-          action: data.action
+          action: data.action,
         });
       }
-    } 
+    }
   });
 });
 
