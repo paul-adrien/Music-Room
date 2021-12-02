@@ -150,13 +150,13 @@ exports.signin = (req, res) => {
         var token = jwt.sign({ id: user._id }, config.secret, {
           expiresIn: 86400, // 24 hours
         });
-        await Token.insertMany([
-          {
-            token: token,
-            userId: user.id,
-            date: Date.now()
-          },
-        ]);
+        // await Token.insertMany([
+        //   {
+        //     token: token,
+        //     userId: user.id,
+        //     date: Date.now()
+        //   },
+        // ]);
     
         return res.json({
           status: true,

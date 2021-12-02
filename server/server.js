@@ -147,7 +147,7 @@ io.use(function (socket, next) {
                 res.status,
                 socket.handshake.query.token
               );
-              io.emit(`user update ${data.user}`, resUser);
+              io.emit(`user update ${data.userId}`, resUser);
 
               io.emit(`user update ${data.friendId}`, resFriend);
             } else {
@@ -183,7 +183,7 @@ io.use(function (socket, next) {
                 res.status,
                 socket.handshake.query.token
               );
-              io.emit(`user update ${data.user}`, resUser);
+              io.emit(`user update ${data.userId}`, resUser);
 
               io.emit(`user update ${data.friendId}`, resFriend);
             } else {

@@ -1,29 +1,27 @@
 config:
-  target: 'http://localhost:8080'
-  # target: 'http://54.38.243.206:8080'
+  # target: 'http://localhost:8080'
+  target: "http://54.38.243.206"
   tls:
     rejectUnauthorized: false
   phases:
-    # - duration: 10
-    #   arrivalRate: 1
-    #   name: "Phase 1"
+    - duration: 10
+      arrivalRate: 1
+      name: "Phase 1"
     # - duration: 10
     #   arrivalRate: 40
     #   rampTo: 10
     #   name: "Phase 2"
-    - duration: 20
-      arrivalRate: 80
-      rampTo: 40
-      name: "Phase 3"
+    # - duration: 30
+    #   arrivalRate: 10
+    #   name: "Phase 3"
   http:
-    # Responses have to be sent within 10 seconds, or an `ETIMEDOUT` error gets raised.
     timeout: 20
     pool: 10
     maxSockets: 5
   socketio:
     transports: ["websocket"]
   engines:
-   socketio-v3: {}
+    socketio-v3: {}
   processor: "./artillery_func.js"
 before:
   flow:
@@ -45,7 +43,7 @@ before:
     - post:
         url: "/user/authenticate"
         json:
-          userName: "test"
+          userName: "test2"
           password: "Password76@"
         capture:
           - json: "$.accessToken"
@@ -54,48 +52,42 @@ before:
             as: id
         expect:
           - status: true
-    - think: 1
-    # - log: "Emitting captured values: {{ id }}, {{ accessToken }}"
-    - post:
-        url: "/room"
-        headers:
-            x-access-token: '{{ accessToken }}'
-        json:
-          name: "test"
-          userId: "{{ id }}"
-        capture:
-          - json: "$.room"
-            as: room
-        expect:
-          - status: true
-    - think: 1
-    # - log: "Emitting captured values: {{ room }}"
-    - post:
-        url: "/playlist"
-        headers:
-            x-access-token: '{{ accessToken }}'
-        json:
-          name: "test"
-          userId: "{{ id }}"
-        capture:
-          - json: "$.playlist"
-            as: playlist
-        expect:
-          - status: true
-    - think: 1
-    # - log: "Emitting captured values: {{ playlist }}"
-after:
-  flow:
-    - delete:
-        url: "/room/{{room._id}}/user/{{id}}"
-        headers:
-            x-access-token: '{{ accessToken }}'
-    # - log: "delete room: {{ room }}"
-    - delete:
-        url: "/playlist/{{playlist._id}}/{{id}}"
-        headers:
-            x-access-token: '{{ accessToken }}'
-    # - log: "delete playlist: {{ playlist }}"
+    # - think: 1
+    # - post:
+    #     url: "/room"
+    #     headers:
+    #       x-access-token: "{{ accessToken }}"
+    #     json:
+    #       name: "test"
+    #       userId: "{{ id }}"
+    #     capture:
+    #       - json: "$.room"
+    #         as: room
+    #     expect:
+    #       - status: true
+    # - post:
+    #     url: "/playlist"
+    #     headers:
+    #       x-access-token: "{{ accessToken }}"
+    #     json:
+    #       name: "test"
+    #       userId: "{{ id }}"
+    #     capture:
+    #       - json: "$.playlist"
+    #         as: playlist
+    #     expect:
+    #       - status: true
+    # - think: 1
+# after:
+#   flow:
+# - delete:
+#     url: "/room/{{room._id}}/user/{{id}}"
+#     headers:
+#       x-access-token: "{{ accessToken }}"
+# - delete:
+#     url: "/playlist/{{playlist._id}}/{{id}}"
+#     headers:
+#       x-access-token: "{{ accessToken }}"
 scenarios:
   - name: "1"
   - engine: "socketio-v3"
@@ -103,51 +95,76 @@ scenarios:
       - get:
           url: "/token"
           headers:
-              x-access-token: '{{ accessToken }}'
-      # - emit: ["test", { data: "test" }]
+            x-access-token: "{{ accessToken }}"
+      # - get:
+      #     url: "/room"
+      #     qs:
+      #       userId: "{{ id }}"
+      #     headers:
+      #       x-access-token: "{{ accessToken }}"
+      # - emit:
+      #     [
+      #       "room add music",
+      #       { roomId: "{{ room._id }}", userId: "{{ id }}", trackId: "test" },
+      #     ]
       #   response:
-      #     on: "test"
+      #     on: "room update {{room._id}}"
+      # - emit:
+      #     [
+      #       "room vote music",
+      #       { roomId: "{{ room._id }}", userId: "{{ id }}", trackId: "test" },
+      #     ]
+      #   response:
+      #     on: "room update {{room._id}}"
+      # - emit:
+      #     [
+      #       "room enter",
+      #       { roomId: "{{ room._id }}", userId: "{{ id }}", deviceId: "test" },
+      #     ]
+      #   response:
+      #     on: "room update {{room._id}}"
+      # - emit:
+      #     [
+      #       "room change type",
+      #       { roomId: "{{ room._id }}", userId: "{{ id }}", type: "private" },
+      #     ]
+      #   response:
+      #     on: "room update {{room._id}}"
+      # - get:
+      #     url: "/playlist"
+      #     qs:
+      #       userId: "{{ id }}"
+      #     headers:
+      #       x-access-token: "{{ accessToken }}"
+      # - emit:
+      #     [
+      #       "playlist add music",
+      #       {
+      #         playlistId: "{{ playlist._id }}",
+      #         userId: "{{ id }}",
+      #         trackId: "test",
+      #       },
+      #     ]
+      #   response:
+      #     on: "playlist update {{playlist._id}}"
+      # #     capture:
+      # #       json: "$"
+      # #       as: "data"
+      # # - log: "Emitting captured values: {{ data }}"
+      # - emit:
+      #     [
+      #       "playlist change type",
+      #       {
+      #         playlistId: "{{ playlist._id }}",
+      #         userId: "{{ id }}",
+      #         type: "private",
+      #       },
+      #     ]
+      #   response:
+      #     on: "playlist update {{playlist._id}}"
       #     capture:
       #       json: "$"
       #       as: "data"
-      # - log: "Emitting captured values: {{ data }}"
-      - get:
-          url: "/room"
-          qs:
-            userId: "{{ id }}"
-          headers:
-              x-access-token: '{{ accessToken }}'
-      - emit: ["room add music", { roomId: "{{ room._id }}", userId: "{{ id }}", trackId: 'test' }]
-        response:
-          on: "room update {{room._id}}"
-      - emit: ["room vote music", { roomId: "{{ room._id }}", userId: "{{ id }}", trackId: 'test' }]
-        response:
-          on: "room update {{room._id}}"
-      - emit: ["room enter", { roomId: "{{ room._id }}", userId: "{{ id }}", deviceId: 'test' }]
-        response:
-          on: "room update {{room._id}}"
-      - emit: ["room change type", { roomId: "{{ room._id }}", userId: "{{ id }}", type: 'private' }]
-        response:
-          on: "room update {{room._id}}"
-      - get:
-          url: "/playlist"
-          qs:
-            userId: "{{ id }}"
-          headers:
-              x-access-token: '{{ accessToken }}'
-      - emit: ["playlist add music", { playlistId: "{{ playlist._id }}", userId: "{{ id }}", trackId: 'test' }]
-        response:
-          on: "playlist update {{playlist._id}}"
-      #     capture:
-      #       json: "$"
-      #       as: "data"
-      # - log: "Emitting captured values: {{ data }}"
-      - emit: ["playlist change type", { playlistId: "{{ playlist._id }}", userId: "{{ id }}", type: 'private' }]
-        response:
-          on: "playlist update {{playlist._id}}"
-          capture:
-            json: "$"
-            as: "data"
       # - log: "Emitting captured values: {{ data }}"
       # - function: "getRoomId"
       # - log: "Emitting captured values: {{ roomId }}"

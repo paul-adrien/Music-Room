@@ -16,7 +16,8 @@
         crossorigin="anonymous"></script>
     <style>
         .main {
-            margin: 5%;
+            padding: 5%;
+            background-color: #7b7b7b2c;
         }
 
         .p {
@@ -48,6 +49,11 @@
         .playlist {
             background-color: #E0D9FF;
             border: 0.1rem solid #6E4FF6;
+        }
+
+        .friend {
+            background-color: #7e5b5b6b;
+            border: 0.1rem solid #805b5b;
         }
     </style>
 </head>
@@ -362,6 +368,97 @@
                 <p class="font-weight-bold">Callback:</p>
                 <p>EMIT: "playlist create"</p>
                 <p class="font-italic text-secondary">send playlist list without the playlist delete</p>
+            </div>
+        </div>
+        <h5 class="font-weight-bold" style="margin: 3%;">Friends:</h5>
+        <div class="row friend">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "friend invite"</p>
+                <p class="font-italic text-secondary">send invite</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>userId: string</p>
+                <p>friendId: string</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "user update ${friendId}"</p>
+                <p class="font-italic text-secondary">receive invite</p>
+            </div>
+        </div>
+        <div class="row friend">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "friend accept invite"</p>
+                <p class="font-italic text-secondary"></p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>userId: string</p>
+                <p>friendId: string</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "user update ${data.userId}"</p>
+                <p class="font-italic text-secondary">Send user updated after invite accepted at you</p>
+                <p>EMIT: "user update ${data.friendId}"</p>
+                <p class="font-italic text-secondary">Send user updated after invite accepted at friend</p>
+            </div>
+        </div>
+        <div class="row friend">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "friend delete"</p>
+                <p class="font-italic text-secondary">Delete the link with your friend and you</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>userId: string</p>
+                <p>friendId: string</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "user update ${data.userId}"</p>
+                <p class="font-italic text-secondary">Send user updated after invite accepted at you</p>
+                <p>EMIT: "user update ${data.friendId}"</p>
+                <p class="font-italic text-secondary">Send user updated after invite accepted at friend</p>
+            </div>
+        </div>
+        <h5 class="font-weight-bold" style="margin: 3%;">Délégation:</h5>
+        <div class="row chat">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "give delegation permission"</p>
+                <p class="font-italic text-secondary"></p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>userId: string</p>
+                <p>friendId: string</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "give delegation permission to ${data.friendId}"</p>
+                <p class="font-italic text-secondary">Send message</p>
+                <p>EMIT: "delegation convs ${user.userId}"</p>
+                <p class="font-italic text-secondary">Send delegation token at your friend</p>
+            </div>
+        </div>
+        <div class="row delegation">
+            <div class="col-sm">
+                <p class="font-weight-bold">ON: "action delegation"</p>
+                <p class="font-italic text-secondary">Send action to the player of your friend</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Data: </p>
+                <p>token: string</p>
+                <p>userId: string</p>
+                <p>friendId: string</p>
+                <p>trackId: string</p>
+            </div>
+            <div class="col-sm">
+                <p class="font-weight-bold">Callback:</p>
+                <p>EMIT: "action delegation ${data.friendId}"</p>
+                <p class="font-italic text-secondary">Send conversation informations for each user in the conversation
+                </p>
             </div>
         </div>
     </div>
