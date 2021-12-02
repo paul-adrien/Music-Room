@@ -118,7 +118,7 @@ export class AuthService {
   }
 
   getDelegation(): string | null {
-    return window.localStorage.getItem('delegation');
+    return JSON.parse(window.localStorage.getItem('delegation'));
   }
 
   savePlayerId(device?: any): void {
