@@ -151,7 +151,7 @@ export class RoomService {
     this.socketService.emitToServer('add geo/hours limit', {
       roomId,
       userId,
-      radius: circleData.radius,
+      radius: form.radius,
       center: circleData.center,
       start: form.start,
       end: form.end,
