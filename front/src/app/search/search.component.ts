@@ -114,7 +114,13 @@ export class SearchComponent {
         this.searchRes = data.filter((el) => el.id !== user.id);
         if (this.onlyFriend) {
           this.searchRes = data.filter((el) =>
-            user.friends.includes({ id: el.id })
+            user?.friends
+              ?.map((f) => {
+                return f.id;
+              })
+              .indexOf(el.id) != -1
+              ? true
+              : false
           );
         }
         this.cd.detectChanges();

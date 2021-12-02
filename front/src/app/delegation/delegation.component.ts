@@ -94,7 +94,8 @@ export class DelegationComponent implements OnInit {
         console.log(user);
         this.socketService.emitToServer('give delegation permission', {
           userId: this.user.id,
-          friend: user.id,
+          friendId: user.id,
+          userName: this.user.id,
         });
       }
     });
