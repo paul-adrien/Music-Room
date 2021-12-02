@@ -97,11 +97,8 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
       <div class="buttons-middle">
         <div
           *ngIf="
-            !(
-              this.room.onlyInvited &&
-              !this.isInvited &&
-              this.zone !== false
-            ) ||
+            (!(this.room.onlyInvited && !this.isInvited) &&
+              this.zone !== false) ||
             this.room?.created_by === this.user?.id ||
             this.zone
           "
@@ -147,11 +144,8 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
             <div>{{ this.track?.nb_vote }}</div>
             <img
               *ngIf="
-                !(
-                  this.room.onlyInvited &&
-                  !this.isInvited &&
-                  this.zone !== false
-                ) ||
+                (!(this.room.onlyInvited && !this.isInvited) &&
+                  this.zone !== false) ||
                 this.room?.created_by === this.user?.id ||
                 this.zone
               "
