@@ -339,49 +339,53 @@ export class LoginComponent implements OnInit {
   onSubmit() {
     if (this.loginMode === false) {
       const form: Partial<User> = this.registerForm.getRawValue();
-      this.authService.register(form, this.device.model, this.device.platform, '1.0.0').subscribe(
-        (data) => {
-          if (data?.user && data?.token) {
-            this.authService.saveToken(data.token);
-            this.authService.saveUser(data.user);
-            this.spotifyService.requestAuthorization();
-            if (localStorage.getItem('access_token')) {
-              this.route.navigate(['/tabs/search']);
-              this.isSuccessful = true;
-              this.isSignUpFailed = false;
+      this.authService
+        .register(form, this.device.model, this.device.platform, '1.0.0')
+        .subscribe(
+          (data) => {
+            if (data?.user && data?.token) {
+              this.authService.saveToken(data.token);
+              this.authService.saveUser(data.user);
+              this.spotifyService.requestAuthorization();
+              if (localStorage.getItem('access_token')) {
+                this.route.navigate(['/tabs/search']);
+                this.isSuccessful = true;
+                this.isSignUpFailed = false;
+              }
+              this.cd.detectChanges();
+            } else {
+              this.errorMessageReg = data.message;
+              this.cd.detectChanges();
             }
-            this.cd.detectChanges();
-          } else {
-            this.errorMessageReg = data.message;
-            this.cd.detectChanges();
+          },
+          (err) => {
+            this.isSignUpFailed = true;
           }
-        },
-        (err) => {
-          this.isSignUpFailed = true;
-        }
-      );
+        );
     } else {
       const form: Partial<User> = this.loginForm.getRawValue();
-      this.authService.login(form, this.device.model, this.device.platform, '1.0.0').subscribe(
-        (data) => {
-          if (data?.user && data?.token) {
-            this.authService.saveToken(data.token);
-            this.authService.saveUser(data.user);
-            this.spotifyService.requestAuthorization();
-            if (localStorage.getItem('access_token')) {
-              this.route.navigate(['/tabs/search']);
-              this.isSuccessful = true;
-              this.isSignUpFailed = false;
+      this.authService
+        .login(form, this.device.model, this.device.platform, '1.0.0')
+        .subscribe(
+          (data) => {
+            if (data?.user && data?.token) {
+              this.authService.saveToken(data.token);
+              this.authService.saveUser(data.user);
+              this.spotifyService.requestAuthorization();
+              if (localStorage.getItem('access_token')) {
+                this.route.navigate(['/tabs/search']);
+                this.isSuccessful = true;
+                this.isSignUpFailed = false;
+              }
+            } else {
+              this.errorMessageLog = data.message;
             }
-          } else {
-            this.errorMessageLog = data.message;
+            this.cd.detectChanges();
+          },
+          (err) => {
+            this.isLoginFailed = true;
           }
-          this.cd.detectChanges();
-        },
-        (err) => {
-          this.isLoginFailed = true;
-        }
-      );
+        );
     }
   }
 
@@ -432,18 +436,18 @@ export class LoginComponent implements OnInit {
         this.alertController
           .create({
             header: 'Changer votre mot de passe',
-            message: `Veuillez entrer votre adresse mail, .`,
+            message: `Veuillez entrer votre adresse mail, mot de passe et le code recu par mail.`,
             inputs: [
               {
                 name: 'email',
                 placeholder: 'music-room@email.com',
               },
               {
-                name: 'New password',
+                name: 'NewPassword',
                 placeholder: 'XXXXXXX',
               },
               {
-                name: 'Code (in the mail)',
+                name: 'rand',
                 placeholder: '123456',
               },
             ],
@@ -456,10 +460,10 @@ export class LoginComponent implements OnInit {
               },
               {
                 text: 'Confirmer',
-                handler: (data: any) => {
+                handler: async (data: any) => {
                   console.log('Saved Information', data);
                   const validEmail = this.validEmail(data?.email);
-                  const validPass = this.validPass(data?.password);
+                  const validPass = this.validPass(data?.NewPassword);
                   if (validEmail !== true) {
                     this.showErrorToast(validEmail);
                     return false;
@@ -467,27 +471,32 @@ export class LoginComponent implements OnInit {
                   if (validPass !== true) {
                     this.showErrorToast(validPass);
                     return false;
+                  } else {
+                    return await this.authService
+                      .forgotPass_c(data?.email, data?.NewPassword, data?.rand)
+                      .toPromise()
+                      .then((data) => {
+                        if (data.status) {
+                          this.showErrorToast(
+                            'Votre mot de passe à été modifié.'
+                          );
+                          return true;
+                        } else if (
+                          !data.status &&
+                          data?.message === 'Same password'
+                        ) {
+                          this.showErrorToast(
+                            'Vous ne pouvez pas utiliser votre ancien mot de passe.'
+                          );
+                          return false;
+                        } else {
+                          this.showErrorToast(
+                            "Ce compte n'existe pas ou votre code est incorrect"
+                          );
+                          return false;
+                        }
+                      });
                   }
-                  this.authService
-                    .forgotPass_c(data?.email, data?.password, data?.rand)
-                    .subscribe((data) => {
-                      if (data.status) {
-                        return true;
-                      } else if (
-                        !data.status &&
-                        data?.message === 'Same password'
-                      ) {
-                        this.showErrorToast(
-                          'Vous ne pouvez pas utiliser votre ancien mot de passe.'
-                        );
-                        return false;
-                      } else {
-                        this.showErrorToast(
-                          "Ce compte n'existe pas ou votre code est incorrect"
-                        );
-                        return false;
-                      }
-                    });
                 },
               },
             ],
@@ -511,6 +520,7 @@ export class LoginComponent implements OnInit {
   }
 
   validPass(password: string) {
+    console.log(password);
     const re = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
     if (!re.test(String(password).toLowerCase())) {
       return 'le mot de passe doit comporter minimum 8 caractères, un chiffre et un caractère spéciale';
@@ -534,10 +544,16 @@ export class LoginComponent implements OnInit {
       location: 'no',
     };
     if (this.device?.platform === null) {
-      location.href = 'http://localhost:8080/user/authenticate/42?model=PC&platform=PC&version=1.0.0';
+      location.href =
+        'http://localhost:8080/user/authenticate/42?model=PC&platform=PC&version=1.0.0';
     } else {
       const browser = this.iab.create(
-        environment.AUTH_API + 'user/authenticate/42?model='+this.device.model+'&platform='+this.device.platform+'&version=1.0.0',
+        environment.AUTH_API +
+          'user/authenticate/42?model=' +
+          this.device.model +
+          '&platform=' +
+          this.device.platform +
+          '&version=1.0.0',
         'defaults',
         options
       );
@@ -569,10 +585,16 @@ export class LoginComponent implements OnInit {
       location: 'no',
     };
     if (this.device?.platform === null) {
-      location.href = 'http://localhost:8080/user/authenticate/google?model=PC&platform=PC&version=1.0.0';
+      location.href =
+        'http://localhost:8080/user/authenticate/google?model=PC&platform=PC&version=1.0.0';
     } else {
       const browser = this.iab.create(
-        environment.AUTH_API + 'user/authenticate/google?model='+this.device.model+'&platform='+this.device.platform+'&version=1.0.0',
+        environment.AUTH_API +
+          'user/authenticate/google?model=' +
+          this.device.model +
+          '&platform=' +
+          this.device.platform +
+          '&version=1.0.0',
         'defaults',
         options
       );

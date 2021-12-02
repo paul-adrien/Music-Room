@@ -209,6 +209,7 @@ exports.forgotPass_send = async (req, res) => {
 
 exports.forgotPass_check = async (req, res, next) => {
   const { email, password, rand } = req.body;
+  console.log(req.body)
   const user = await getUser({ email: email });
   if (user) {
     ForgotPass.findOne({ email: email }).exec(async (err, data) => {
@@ -224,15 +225,15 @@ exports.forgotPass_check = async (req, res, next) => {
           message: "No code",
         });
       } else {
-        if (user.password === password) {
-          //pas le même que l'ancien
+        console.log(bcrypt.compareSync(password, user.password))
+        if (bcrypt.compareSync(password, user.password) === true) {
           res.status(200).json({
             status: false,
             message: "Same password",
           });
         } else {
           user.password = bcrypt.hashSync(password, 8);
-          if (rand === data.rand) {
+          if (parseInt(rand) === data.rand) {
             if (await updateUser(user.id, user)) {
               ForgotPass.deleteOne({ email: email }).exec();
               res.status(200).json({

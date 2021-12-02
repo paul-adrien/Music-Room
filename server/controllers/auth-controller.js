@@ -29,7 +29,7 @@ exports.signup = (req, res) => {
   });
 
   var rand = Math.floor(Math.random() * 100000 + 54);
-  var link = "http://54.38.243.206/verify/" + rand + '/email/' + req.body.email;
+  var link = "http://localhost:8080/verify/" + rand + '/email/' + req.body.email;
 
   const transporter = nodemailer.createTransport({
     service: "gmail",
