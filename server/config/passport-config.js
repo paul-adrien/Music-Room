@@ -14,16 +14,16 @@ passport.use(
       clientID: keys["42"].clientID,
       clientSecret: keys["42"].clientSecret,
       passReqToCallback: true,
-      callbackURL: `https://musicroom.site./user/authenticate/42/callback`,
+      callbackURL: `https://music.room.projet42web.fr/user/authenticate/42/callback`,
     },
     async function (req, accessToken, refreshToken, profile, done) {
       const user = await getUser({ id: `42_${profile._json.id}` });
       if (user && user !== null) {
         return done(null, {
           userId: user.id,
-          application: JSON.parse(req.query.state)
+          application: JSON.parse(req.query.state),
         });
-      };
+      }
       if (
         profile &&
         profile._json &&
@@ -48,7 +48,7 @@ passport.use(
           }
           return done(null, {
             userId: `42_${profile._json.id}`,
-            application: JSON.parse(req.query.state)
+            application: JSON.parse(req.query.state),
           });
         });
       } else return done(null, false);
@@ -64,7 +64,7 @@ passport.use(
       clientSecret: keys["google"].clientSecret,
       passReqToCallback: true,
       callbackURL: `http://localhost:8080/user/authenticate/google/callback`,
-      //`https://musicroom.site./user/authenticate/google/callback`,
+      //`https://music.room.projet42web.fr/user/authenticate/google/callback`,
     },
     async function (req, accessToken, refreshToken, profile, done) {
       const user = await getUser({
@@ -76,7 +76,7 @@ passport.use(
       if (user && user !== null) {
         return done(null, {
           userId: user.id,
-          application: JSON.parse(req.query.state)
+          application: JSON.parse(req.query.state),
         });
       }
       if (
@@ -103,7 +103,7 @@ passport.use(
           }
           return done(null, {
             userId: `google_${profile.id}`,
-            application: JSON.parse(req.query.state)
+            application: JSON.parse(req.query.state),
           });
         });
       } else return done(null, false);
@@ -119,7 +119,7 @@ passport.use(
       clientSecret: keys["google"].clientSecret,
       passReqToCallback: true,
       callbackURL: `http://localhost:8080/user/authenticate/google/callback-link`,
-      //`https://musicroom.site./user/authenticate/google/callback-link`,
+      //`https://music.room.projet42web.fr/user/authenticate/google/callback-link`,
     },
     async function (req, accessToken, refreshToken, profile, done) {
       const user = await getUser({
