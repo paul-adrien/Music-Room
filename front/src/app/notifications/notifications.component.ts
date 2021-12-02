@@ -175,6 +175,12 @@ export class NotificationsComponent implements OnInit {
         playlistId: id,
       });
       this.openNotif(id, type);
+    } else if (type === 'friends') {
+      this.socketService.emitToServer('friend accept invite', {
+        userId: this.user.id,
+        friendId: id,
+      });
+      this.openNotif(id, type);
     }
   }
 
@@ -191,6 +197,8 @@ export class NotificationsComponent implements OnInit {
           this.router.navigate([`tabs/tab-home/room/${id}`]);
         } else if (type === 'playlist') {
           this.router.navigate([`tabs/tab-home/playlist/${id}`]);
+        } else if (type === 'friends') {
+          this.router.navigate([`tabs/tab-profile/user-profile/${id}`]);
         }
       } else if (this.device.platform === null && !res?.device?.id) {
         await this.presentAlert();
