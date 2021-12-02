@@ -15,7 +15,7 @@ import { SearchComponent } from '../search/search.component';
     <div class="sub-title">Autres appareils</div>
     <div class="devices">
       <div
-        (click)="this.dismiss(device.userId)"
+        (click)="this.dismiss(device)"
         *ngFor="let device of this.devices"
         class="device-container"
       >
@@ -78,12 +78,12 @@ export class DelegationComponent implements OnInit {
     return await modal.present();
   }
 
-  dismiss(deviceId?: string) {
+  dismiss(device: any) {
     // using the injected ModalController this page
     // can "dismiss" itself and optionally pass back data
     this.modalController.dismiss({
       dismissed: true,
-      deviceId: deviceId,
+      device: device,
     });
   }
 }

@@ -770,6 +770,8 @@ io.use(function (socket, next) {
         io.emit(`action delegation ${data.friendId}`, {
           userId: data.userId,
           action: data.action,
+          trackId: data?.trackId,
+          uri: data?.uri,
         });
       }
     }

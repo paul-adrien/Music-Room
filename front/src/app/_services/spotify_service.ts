@@ -81,7 +81,8 @@ export class SpotifyService {
     uri: string,
     trackId: string,
     deviceId?: string,
-    position_ms?: number
+    position_ms?: number,
+    isDeleg: boolean = false
   ) {
     const user = this.authService.getUser();
     if (trackId) {
@@ -90,28 +91,38 @@ export class SpotifyService {
         trackId: trackId,
       });
     }
-    console.log(deviceId);
-    const payload = { uris: [uri], position_ms };
-    console.log(payload);
-    return this.http
-      .put<any>(
-        deviceId
-          ? `https://api.spotify.com/v1/me/player/play?device_id=${encodeURI(
-              deviceId
-            )}`
-          : `https://api.spotify.com/v1/me/player/play`,
-        { uris: [uri], position_ms },
-        httpApiSpotifyOptions
-      )
-      .pipe(
-        catchError((err) => {
-          if (err?.status === 401) {
-            return this.getRefreshToken();
-          } else {
-            return;
-          }
-        })
-      );
+
+    if (isDeleg) {
+      const deleg = this.authService.getPlayerId();
+      this.socketService.emitToServer('action delegation', {
+        userId: user.id,
+        friendId: deleg.userId,
+        token: deleg.token,
+        uri: uri,
+        trackId: trackId,
+        action: 'MUSIC',
+      });
+    } else {
+      return this.http
+        .put<any>(
+          deviceId
+            ? `https://api.spotify.com/v1/me/player/play?device_id=${encodeURI(
+                deviceId
+              )}`
+            : `https://api.spotify.com/v1/me/player/play`,
+          { uris: [uri], position_ms },
+          httpApiSpotifyOptions
+        )
+        .pipe(
+          catchError((err) => {
+            if (err?.status === 401) {
+              return this.getRefreshToken();
+            } else {
+              return;
+            }
+          })
+        );
+    }
   }
 
   getCode() {
@@ -297,49 +308,71 @@ export class SpotifyService {
     // });
   }
 
-  play(deviceId?: string) {
-    return this.http
-      .put<any>(
-        deviceId
-          ? `https://api.spotify.com/v1/me/player/play?device_id=${encodeURI(
-              deviceId
-            )}`
-          : `https://api.spotify.com/v1/me/player/play`,
-        {},
-        httpApiSpotifyOptions
-      )
-      .pipe(
-        catchError((err) => {
-          if (err?.status === 401) {
-            return this.getRefreshToken();
-          } else {
-            return;
-          }
-        })
-      );
+  play(deviceId?: string, isDeleg: boolean = false) {
+    if (isDeleg) {
+      const user = this.authService.getUser();
+      const deleg = this.authService.getPlayerId();
+      this.socketService.emitToServer('action delegation', {
+        userId: user.id,
+        friendId: deleg.userId,
+        token: deleg.token,
+        action: 'PLAY',
+      });
+    } else {
+      return this.http
+        .put<any>(
+          deviceId
+            ? `https://api.spotify.com/v1/me/player/play?device_id=${encodeURI(
+                deviceId
+              )}`
+            : `https://api.spotify.com/v1/me/player/play`,
+          {},
+          httpApiSpotifyOptions
+        )
+        .pipe(
+          catchError((err) => {
+            if (err?.status === 401) {
+              return this.getRefreshToken();
+            } else {
+              return;
+            }
+          })
+        );
+    }
   }
 
-  pause(deviceId?: string) {
-    return this.http
-      .put<any>(
-        deviceId
-          ? `https://api.spotify.com/v1/me/player/pause?device_id=${encodeURI(
-              deviceId
-            )}`
-          : `https://api.spotify.com/v1/me/player/pause`,
-        {},
-        httpApiSpotifyOptions
-      )
-      .pipe(
-        catchError((err) => {
-          console.log('ici petit cul');
-          if (err?.status === 401) {
-            return this.getRefreshToken();
-          } else {
-            return;
-          }
-        })
-      );
+  pause(deviceId?: string, isDeleg: boolean = false) {
+    if (isDeleg) {
+      const user = this.authService.getUser();
+      const deleg = this.authService.getPlayerId();
+      this.socketService.emitToServer('action delegation', {
+        userId: user.id,
+        friendId: deleg.userId,
+        token: deleg.token,
+        action: 'PAUSE',
+      });
+    } else {
+      return this.http
+        .put<any>(
+          deviceId
+            ? `https://api.spotify.com/v1/me/player/pause?device_id=${encodeURI(
+                deviceId
+              )}`
+            : `https://api.spotify.com/v1/me/player/pause`,
+          {},
+          httpApiSpotifyOptions
+        )
+        .pipe(
+          catchError((err) => {
+            console.log('ici petit cul');
+            if (err?.status === 401) {
+              return this.getRefreshToken();
+            } else {
+              return;
+            }
+          })
+        );
+    }
   }
 
   changeDevice(deviceId: string) {
@@ -378,41 +411,63 @@ export class SpotifyService {
       );
   }
 
-  next() {
-    return this.http
-      .post<any>(
-        `https://api.spotify.com/v1/me/player/next`,
-        {},
-        httpApiSpotifyOptions
-      )
-      .pipe(
-        catchError((err) => {
-          if (err?.status === 401) {
-            return this.getRefreshToken();
-          } else {
-            return;
-          }
-        })
-      );
+  next(isDeleg: boolean = false) {
+    if (isDeleg) {
+      const user = this.authService.getUser();
+      const deleg = this.authService.getPlayerId();
+      this.socketService.emitToServer('action delegation', {
+        userId: user.id,
+        friendId: deleg.userId,
+        token: deleg.token,
+        action: 'NEXT',
+      });
+    } else {
+      return this.http
+        .post<any>(
+          `https://api.spotify.com/v1/me/player/next`,
+          {},
+          httpApiSpotifyOptions
+        )
+        .pipe(
+          catchError((err) => {
+            if (err?.status === 401) {
+              return this.getRefreshToken();
+            } else {
+              return;
+            }
+          })
+        );
+    }
   }
 
-  previous() {
-    return this.http
-      .post<any>(
-        `https://api.spotify.com/v1/me/player/previous`,
-        {},
-        httpApiSpotifyOptions
-      )
-      .pipe(
-        catchError((err) => {
-          if (err?.status === 401) {
-            return this.getRefreshToken();
-          } else if (err?.status === 403) {
-            return this.seek(0);
-          } else {
-            return;
-          }
-        })
-      );
+  previous(isDeleg: boolean = false) {
+    if (isDeleg) {
+      const user = this.authService.getUser();
+      const deleg = this.authService.getPlayerId();
+      this.socketService.emitToServer('action delegation', {
+        userId: user.id,
+        friendId: deleg.userId,
+        token: deleg.token,
+        action: 'PREVIOUS',
+      });
+    } else {
+      return this.http
+        .post<any>(
+          `https://api.spotify.com/v1/me/player/previous`,
+          {},
+          httpApiSpotifyOptions
+        )
+        .pipe(
+          catchError((err) => {
+            if (err?.status === 401) {
+              return this.getRefreshToken();
+            } else if (err?.status === 403) {
+              return this.seek(0);
+            } else {
+              return;
+            }
+          })
+        );
+    }
   }
 }

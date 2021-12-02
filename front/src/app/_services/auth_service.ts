@@ -121,16 +121,16 @@ export class AuthService {
     return window.localStorage.getItem('delegation');
   }
 
-  savePlayerId(userId?: string): void {
-    if (userId) {
-      window.localStorage.setItem('playerId', JSON.stringify(userId));
+  savePlayerId(device?: any): void {
+    if (device) {
+      window.localStorage.setItem('playerId', JSON.stringify(device));
     } else {
       window.localStorage.removeItem('playerId');
     }
   }
 
-  getPlayerId(): string | null {
-    return window.localStorage.getItem('playerId');
+  getPlayerId(): any | null {
+    return JSON.parse(window.localStorage.getItem('playerId'));
   }
 
   getUser(): User {

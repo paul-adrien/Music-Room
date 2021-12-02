@@ -171,6 +171,18 @@ export class PlayerComponent {
       .subscribe((data) => {
         console.log(data, 'ça marche');
 
+        if (data?.action === 'PLAY') {
+          this.play();
+        } else if (data?.action === 'PAUSE') {
+          this.pause();
+        } else if (data?.action === 'NEXT') {
+          this.nextTrack();
+        } else if (data?.action === 'PREVIOUS') {
+          this.previousTrack();
+        } else if (data?.action === 'MUSIC' && data?.trackId) {
+          this.playTrack(data?.trackId, data?.uri);
+        }
+
         this.cd.detectChanges();
       });
   }
@@ -198,11 +210,13 @@ export class PlayerComponent {
   }
 
   play() {
+    const isDeleg = this.authService.getPlayerId() !== null ? true : false;
+    console.log(isDeleg);
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
       if (!res?.device?.id) {
         await this.presentAlert();
       } else if (res?.device?.id) {
-        this.spotifyService.play().subscribe((data) => {
+        this.spotifyService.play(undefined, isDeleg).subscribe((data) => {
           this.playerInfo.is_playing = true;
           this.cd.detectChanges();
         });
@@ -210,12 +224,29 @@ export class PlayerComponent {
     });
   }
 
-  pause() {
+  playTrack(trackId: string, uri: string) {
+    const isDeleg = this.authService.getPlayerId() !== null ? true : false;
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
       if (!res?.device?.id) {
         await this.presentAlert();
       } else if (res?.device?.id) {
-        this.spotifyService.pause().subscribe((data) => {
+        this.spotifyService
+          .playTrack(uri, trackId, undefined, undefined, isDeleg)
+          .subscribe((data) => {
+            this.playerInfo.is_playing = true;
+            this.cd.detectChanges();
+          });
+      }
+    });
+  }
+
+  pause() {
+    const isDeleg = this.authService.getPlayerId() !== null ? true : false;
+    this.spotifyService.getPlayerInfo().subscribe(async (res) => {
+      if (!res?.device?.id) {
+        await this.presentAlert();
+      } else if (res?.device?.id) {
+        this.spotifyService.pause(undefined, isDeleg).subscribe((data) => {
           this.playerInfo.is_playing = false;
           this.cd.detectChanges();
         });
@@ -261,8 +292,8 @@ export class PlayerComponent {
 
     modal.onWillDismiss().then((res: any) => {
       console.log(res);
-      if (res?.data?.deviceId) {
-        this.authService.savePlayerId(res?.data?.deviceId);
+      if (res?.data?.device) {
+        this.authService.savePlayerId(res?.data?.device);
       } else {
         this.authService.savePlayerId();
       }
@@ -289,21 +320,23 @@ export class PlayerComponent {
   }
 
   nextTrack() {
+    const isDeleg = this.authService.getPlayerId() !== null ? true : false;
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
       if (!res?.device?.id) {
         await this.presentAlert();
       } else if (res?.device?.id) {
-        this.spotifyService.next().subscribe();
+        this.spotifyService.next(isDeleg).subscribe();
       }
     });
   }
 
   previousTrack() {
+    const isDeleg = this.authService.getPlayerId() !== null ? true : false;
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
       if (!res?.device?.id) {
         await this.presentAlert();
       } else if (res?.device?.id) {
-        this.spotifyService.previous().subscribe();
+        this.spotifyService.previous(isDeleg).subscribe();
       }
     });
   }
