@@ -35,7 +35,7 @@ import { WebsocketService } from '../_services/websocketService';
         <span class="font-medium">
           {{ notif?.name }}
         </span>
-        s'est abonné(e) à vous
+        vous a envoyé une demande d'ami
       </div>
       <div class="buttons">
         <img
@@ -90,6 +90,7 @@ export class NotificationsComponent implements OnInit {
   ) {
     const user = this.authService.getUser();
 
+    console.log(`user update ${user?.id}`);
     this.socketService
       .listenToServer(`user update ${user?.id}`)
       .subscribe((data) => {
@@ -175,27 +176,37 @@ export class NotificationsComponent implements OnInit {
         playlistId: id,
       });
       this.openNotif(id, type);
+    } else if (type === 'friends') {
+      this.socketService.emitToServer('friend accept invite', {
+        userId: this.user.id,
+        friendId: id,
+      });
+      this.openNotif(id, type);
     }
   }
 
   openNotif(id: string, type: string) {
-    this.spotifyService.getPlayerInfo().subscribe(async (res) => {
-      console.log(this.device.platform, res);
-      if (this.device.platform === null && res?.device?.id) {
-        if (type === 'rooms') {
-          this.socketService.emitToServer('room enter', {
-            userId: this.user.id,
-            roomId: id,
-            device: res?.device?.id,
-          });
-          this.router.navigate([`tabs/tab-home/room/${id}`]);
-        } else if (type === 'playlist') {
-          this.router.navigate([`tabs/tab-home/playlist/${id}`]);
+    if (type === 'friends') {
+      this.router.navigate([`tabs/tab-profile/user-profile/${id}`]);
+    } else {
+      this.spotifyService.getPlayerInfo().subscribe(async (res) => {
+        console.log(this.device.platform, res);
+        if (this.device.platform === null && res?.device?.id) {
+          if (type === 'rooms') {
+            this.socketService.emitToServer('room enter', {
+              userId: this.user.id,
+              roomId: id,
+              device: res?.device?.id,
+            });
+            this.router.navigate([`tabs/tab-home/room/${id}`]);
+          } else if (type === 'playlist') {
+            this.router.navigate([`tabs/tab-home/playlist/${id}`]);
+          }
+        } else if (this.device.platform === null && !res?.device?.id) {
+          await this.presentAlert();
         }
-      } else if (this.device.platform === null && !res?.device?.id) {
-        await this.presentAlert();
-      }
-    });
+      });
+    }
     // this.roomService.enterRoom(this.user.id, roomId);
     //com.spotify.music
   }

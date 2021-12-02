@@ -102,7 +102,7 @@ exports.deleteFriend = (req, res, next) => {
             { id: friendId },
             {
               $pull: {
-                friends: userId,
+                friends: { id: userId },
               },
             }
           ).exec(async (err, friend) => {
@@ -114,10 +114,10 @@ exports.deleteFriend = (req, res, next) => {
               });
             } else {
               User.updateOne(
-                { id: friendId },
+                { id: userId },
                 {
                   $pull: {
-                    friends: friendId,
+                    friends: { id: friendId },
                   },
                 }
               ).exec(async (err, user) => {
@@ -153,12 +153,7 @@ exports.deleteFriendSocket = (userId, friendId) => {
       };
     } else {
       return User.findOne({ id: friendId }).then(async (friend) => {
-        if (err) {
-          return {
-            status: false,
-            message: err,
-          };
-        } else if (!friend) {
+        if (!friend) {
           return {
             status: false,
             message: "this friend doesn't exist",
@@ -168,15 +163,15 @@ exports.deleteFriendSocket = (userId, friendId) => {
             { id: friendId },
             {
               $pull: {
-                friends: userId,
+                friends: { id: userId },
               },
             }
           ).then(async (friend) => {
             return User.updateOne(
-              { id: friendId },
+              { id: userId },
               {
                 $pull: {
-                  friends: friendId,
+                  friends: { id: friendId },
                 },
               }
             ).then(async (user) => {
@@ -232,10 +227,10 @@ exports.inviteFriend = (req, res, next) => {
               })
               .indexOf(friendId) != -1
           ) {
-            res.message = "already sending invite";
+            res.message = "this user already invite you";
             res.status(200).json({
               status: false,
-              message: "already sending invite",
+              message: "this user already invite you",
             });
           } else if (
             friend.notifs !== undefined &&
@@ -246,10 +241,10 @@ exports.inviteFriend = (req, res, next) => {
               })
               .indexOf(userId) != -1
           ) {
-            res.message = "this user already invite you";
+            res.message = "already sending invite";
             res.status(200).json({
               status: false,
-              message: "this user already invite you",
+              message: "already sending invite",
             });
           } else {
             User.updateOne(
@@ -311,7 +306,7 @@ exports.inviteFriendSocket = (userId, friendId) => {
           ) {
             return {
               status: false,
-              message: "already sending invite",
+              message: "this user already invite you",
             };
           } else if (
             friend.notifs !== undefined &&
@@ -324,7 +319,7 @@ exports.inviteFriendSocket = (userId, friendId) => {
           ) {
             return {
               status: false,
-              message: "this user already invite you",
+              message: "already sending invite",
             };
           } else {
             return User.updateOne(
@@ -332,6 +327,7 @@ exports.inviteFriendSocket = (userId, friendId) => {
               {
                 $push: {
                   "notifs.friends": {
+                    name: user.userName,
                     id: userId,
                     date: new Date(),
                   },
@@ -385,7 +381,7 @@ exports.acceptInvitation = (req, res, next) => {
             { id: friendId },
             {
               $push: {
-                friends: userId,
+                friends: { id: userId },
               },
             }
           ).exec(async (err, friend) => {
@@ -397,15 +393,17 @@ exports.acceptInvitation = (req, res, next) => {
               });
             } else {
               User.updateOne(
-                { id: friendId },
+                { id: userId },
                 {
-                  $pull: {
-                    "notifs.friends": {
-                      id: friendId,
+                  notifs: {
+                    $pull: {
+                      friends: {
+                        id: friendId,
+                      },
                     },
                   },
                   $push: {
-                    friends: friendId,
+                    friends: { id: friendId },
                   },
                 }
               ).exec(async (err, user) => {
@@ -451,20 +449,22 @@ exports.acceptInvitationSocket = (userId, friendId) => {
             { id: friendId },
             {
               $push: {
-                friends: userId,
+                friends: { id: userId },
               },
             }
           ).then(async (friend) => {
             return User.updateOne(
-              { id: friendId },
+              { id: userId },
               {
-                $pull: {
-                  "notifs.friends": {
-                    id: friendId,
+                notifs: {
+                  $pull: {
+                    friends: {
+                      id: friendId,
+                    },
                   },
                 },
                 $push: {
-                  friends: friendId,
+                  friends: { id: friendId },
                 },
               }
             ).then(async (user) => {
