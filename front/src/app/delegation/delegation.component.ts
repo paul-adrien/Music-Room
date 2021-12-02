@@ -1,7 +1,8 @@
+import { SpotifyService } from './../_services/spotify_service';
 import { WebsocketService } from './../_services/websocketService';
 import { AuthService } from './../_services/auth_service';
 import { User } from 'libs/user';
-import { ModalController } from '@ionic/angular';
+import { ModalController, AlertController } from '@ionic/angular';
 import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { SearchComponent } from '../search/search.component';
 
@@ -15,12 +16,32 @@ import { SearchComponent } from '../search/search.component';
     <div class="sub-title">Autres appareils</div>
     <div class="devices">
       <div
-        (click)="this.dismiss(device)"
+        (click)="this.selectPlayer(device)"
         *ngFor="let device of this.devices"
         class="device-container"
       >
         {{ device?.userName }}
       </div>
+    </div>
+    <div class="control-buttons-container">
+      <img
+        (click)="this.previousTrack()"
+        class="next-previous"
+        src="./assets/previous.svg"
+      />
+      <div class="play-pause-container">
+        <img (click)="this.play()" class="play-pause" src="./assets/play.svg" />
+        <img
+          (click)="this.pause()"
+          class="play-pause"
+          src="./assets/pause.svg"
+        />
+      </div>
+      <img
+        (click)="this.nextTrack()"
+        class="next-previous"
+        src="./assets/next.svg"
+      />
     </div>
   `,
   styleUrls: ['./delegation.component.scss'],
@@ -32,7 +53,9 @@ export class DelegationComponent implements OnInit {
     private modalController: ModalController,
     private authService: AuthService,
     private socketService: WebsocketService,
-    private cd: ChangeDetectorRef
+    private cd: ChangeDetectorRef,
+    private spotifyService: SpotifyService,
+    private alertController: AlertController
   ) {
     this.user = this.authService.getUser();
 
@@ -78,6 +101,58 @@ export class DelegationComponent implements OnInit {
     return await modal.present();
   }
 
+  play() {
+    const isDeleg = this.authService.getPlayerId() !== null ? true : false;
+    console.log(isDeleg);
+
+    this.spotifyService.play(undefined, isDeleg).subscribe((data) => {
+      this.cd.detectChanges();
+    });
+  }
+
+  playTrack(trackId: string, uri: string) {
+    const isDeleg = this.authService.getPlayerId() !== null ? true : false;
+
+    this.spotifyService
+      .playTrack(uri, trackId, undefined, undefined, isDeleg)
+      .subscribe((data) => {
+        this.cd.detectChanges();
+      });
+  }
+
+  pause() {
+    const isDeleg = this.authService.getPlayerId() !== null ? true : false;
+
+    this.spotifyService.pause(undefined, isDeleg).subscribe((data) => {
+      this.cd.detectChanges();
+    });
+  }
+
+  nextTrack() {
+    const isDeleg = this.authService.getPlayerId() !== null ? true : false;
+
+    this.spotifyService.next(isDeleg).subscribe();
+  }
+
+  previousTrack() {
+    const isDeleg = this.authService.getPlayerId() !== null ? true : false;
+
+    this.spotifyService.previous(isDeleg).subscribe();
+  }
+
+  async presentAlert() {
+    const alert = await this.alertController.create({
+      header: 'Attention',
+      message: 'Ouvrez Spotify avant et lancez une musique.',
+      buttons: ['OK'],
+    });
+
+    await alert.present();
+
+    const { role } = await alert.onDidDismiss();
+    console.log('onDidDismiss resolved with role', role);
+  }
+
   dismiss(device: any) {
     // using the injected ModalController this page
     // can "dismiss" itself and optionally pass back data
@@ -85,5 +160,9 @@ export class DelegationComponent implements OnInit {
       dismissed: true,
       device: device,
     });
+  }
+
+  selectPlayer(device: any) {
+    this.authService.savePlayerId(device);
   }
 }

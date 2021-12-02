@@ -210,13 +210,11 @@ export class PlayerComponent {
   }
 
   play() {
-    const isDeleg = this.authService.getPlayerId() !== null ? true : false;
-    console.log(isDeleg);
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
       if (!res?.device?.id) {
         await this.presentAlert();
       } else if (res?.device?.id) {
-        this.spotifyService.play(undefined, isDeleg).subscribe((data) => {
+        this.spotifyService.play().subscribe((data) => {
           this.playerInfo.is_playing = true;
           this.cd.detectChanges();
         });
@@ -225,28 +223,24 @@ export class PlayerComponent {
   }
 
   playTrack(trackId: string, uri: string) {
-    const isDeleg = this.authService.getPlayerId() !== null ? true : false;
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
       if (!res?.device?.id) {
         await this.presentAlert();
       } else if (res?.device?.id) {
-        this.spotifyService
-          .playTrack(uri, trackId, undefined, undefined, isDeleg)
-          .subscribe((data) => {
-            this.playerInfo.is_playing = true;
-            this.cd.detectChanges();
-          });
+        this.spotifyService.playTrack(uri, trackId).subscribe((data) => {
+          this.playerInfo.is_playing = true;
+          this.cd.detectChanges();
+        });
       }
     });
   }
 
   pause() {
-    const isDeleg = this.authService.getPlayerId() !== null ? true : false;
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
       if (!res?.device?.id) {
         await this.presentAlert();
       } else if (res?.device?.id) {
-        this.spotifyService.pause(undefined, isDeleg).subscribe((data) => {
+        this.spotifyService.pause().subscribe((data) => {
           this.playerInfo.is_playing = false;
           this.cd.detectChanges();
         });
@@ -320,23 +314,21 @@ export class PlayerComponent {
   }
 
   nextTrack() {
-    const isDeleg = this.authService.getPlayerId() !== null ? true : false;
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
       if (!res?.device?.id) {
         await this.presentAlert();
       } else if (res?.device?.id) {
-        this.spotifyService.next(isDeleg).subscribe();
+        this.spotifyService.next().subscribe();
       }
     });
   }
 
   previousTrack() {
-    const isDeleg = this.authService.getPlayerId() !== null ? true : false;
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
       if (!res?.device?.id) {
         await this.presentAlert();
       } else if (res?.device?.id) {
-        this.spotifyService.previous(isDeleg).subscribe();
+        this.spotifyService.previous().subscribe();
       }
     });
   }

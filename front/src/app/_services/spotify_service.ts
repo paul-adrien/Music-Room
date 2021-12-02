@@ -7,6 +7,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import * as querystring from 'querystring';
 import { catchError, tap } from 'rxjs/operators';
 import { Device } from '@ionic-native/device/ngx';
+import { of } from 'rxjs';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
@@ -102,6 +103,7 @@ export class SpotifyService {
         trackId: trackId,
         action: 'MUSIC',
       });
+      return of(undefined);
     } else {
       return this.http
         .put<any>(
@@ -318,6 +320,7 @@ export class SpotifyService {
         token: deleg.token,
         action: 'PLAY',
       });
+      return of(undefined);
     } else {
       return this.http
         .put<any>(
@@ -351,6 +354,7 @@ export class SpotifyService {
         token: deleg.token,
         action: 'PAUSE',
       });
+      return of(undefined);
     } else {
       return this.http
         .put<any>(
@@ -421,6 +425,7 @@ export class SpotifyService {
         token: deleg.token,
         action: 'NEXT',
       });
+      return of(undefined);
     } else {
       return this.http
         .post<any>(
@@ -450,6 +455,7 @@ export class SpotifyService {
         token: deleg.token,
         action: 'PREVIOUS',
       });
+      return of(undefined);
     } else {
       return this.http
         .post<any>(
