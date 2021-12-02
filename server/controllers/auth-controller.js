@@ -144,22 +144,22 @@ exports.signin = (req, res) => {
           message: "Invalid Password!",
         });
       } else {
-        if (req.body.model === null || req.body.platform === null) {
+        if (req.body?.model === null || req.body?.platform === null) {
           user.application = { model: 'PC', platform: 'PC', version: req.body?.version };
         } else {
-          user.application = { model: req.body.model, platform: req.body.platform, version: req.body.version };
+          user.application = { model: req.body?.model, platform: req.body?.platform, version: req.body?.version };
         }
         await updateUser(user._id, user);
         var token = jwt.sign({ id: user._id }, config.secret, {
           expiresIn: 86400, // 24 hours
         });
-        // await Token.insertMany([
-        //   {
-        //     token: token,
-        //     userId: user.id,
-        //     date: Date.now()
-        //   },
-        // ]);
+        await Token.insertMany([
+          {
+            token: token,
+            userId: user.id,
+            date: Date.now()
+          },
+        ]);
     
         console.log('user connected')
         return res.json({

@@ -13,3 +13,8 @@ module.exports = {
         console.log('test after' + context.vars.room)
       return next();
   }
+  
+  function setToken(context, userEvents, next) {
+    context.extraHeaders = { 'token': 'context.vars.accessToken' };
+    return next();  
+  }

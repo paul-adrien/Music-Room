@@ -5,7 +5,9 @@ const config = require(appRoot + "/config/auth.js");
 
 
 exports.giveDelegationPermission = (userId, friendId) => {
-  return (token = jwt.sign({ id: userId, friendId }, config.secret, {
-    expiresIn: 3600, // 1 hours
-  }));
+  return new Promise((res, rej) => {
+    res(jwt.sign({ id: userId, friendId }, config.secret, {
+      expiresIn: 3600, // 1 hours
+    }));
+  })
 };
