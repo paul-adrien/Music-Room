@@ -31,7 +31,7 @@ export class VerifyComponent implements OnInit {
   ngOnInit(): void {
     this.user = this.authService.getUser();
     if (this.user.validEmail) {
-      this.router.navigate(['/tabs/tab-home/home']);
+      this.router.navigate(['tabs/tab-home/']);
     } else if (!this.user) {
       this.router.navigate(['/login']);
     }
@@ -39,7 +39,7 @@ export class VerifyComponent implements OnInit {
       this.user = res;
       this.authService.saveUser(res);
       if (this.user.validEmail) {
-        this.router.navigate(['/tabs/tab-home/home']);
+        this.router.navigate(['tabs/tab-home/']);
       } else if (!this.user) {
         this.router.navigate(['/login']);
       }

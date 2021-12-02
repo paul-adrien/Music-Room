@@ -26,6 +26,11 @@ import { SearchComponent } from './../search/search.component';
   template: `
     <div class="top-container" *ngIf="this.user">
       <img
+        class="add"
+        src="./assets/person-add-outline.svg"
+        (click)="this.presentModalUserProfile()"
+      />
+      <img
         class="setting"
         src="./assets/settings-white.svg"
         (click)="this.openSettings()"
@@ -39,9 +44,6 @@ import { SearchComponent } from './../search/search.component';
       <div>{{ this.user.userName }}</div>
       <div class="primary-button" (click)="this.presentModalEdit()">
         Modifier le profil
-      </div>
-      <div class="primary-button" (click)="this.presentModalUserProfile()">
-        Chercher un profil
       </div>
     </div>
     <div class="bottom-container">

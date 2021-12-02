@@ -61,6 +61,7 @@ export class DelegationComponent implements OnInit {
       componentProps: {
         isModal: true,
         isUser: true,
+        onlyFriend: true,
       },
     });
     modal.onWillDismiss().then((res) => {

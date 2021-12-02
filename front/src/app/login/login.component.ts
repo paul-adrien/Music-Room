@@ -10,7 +10,7 @@ import {
   InAppBrowserOptions,
 } from '@ionic-native/in-app-browser/ngx';
 import { Device } from '@ionic-native/device/ngx';
-import { AlertController } from '@ionic/angular';
+import { AlertController, ToastController } from '@ionic/angular';
 
 function ValidatorUserNameLength(control: FormControl) {
   const test = /^(?=.{3,20}$)[a-zA-Z0-9]+(?:[-' ][a-zA-Z0-9]+)*$/;
@@ -295,6 +295,7 @@ export class LoginComponent implements OnInit {
     private device: Device,
     private ngZone: NgZone,
     private alertController: AlertController,
+    private toastCtrl: ToastController,
     private cd: ChangeDetectorRef //public translate: TranslateService
   ) {}
 
@@ -403,78 +404,146 @@ export class LoginComponent implements OnInit {
   }
 
   async forgotPassword() {
-    this.alertController
-      .create({
-        header: 'Mot passe oublié',
-        message: `Veuillez entrer votre adresse mail.
+    let isSend = false;
+    const alert = await this.alertController.create({
+      header: 'Mot passe oublié',
+      message: `Veuillez entrer votre adresse mail.
         Vous allez recevoir un mail pour changer votre mot de passe.`,
-        inputs: [
-          {
-            name: 'email',
-            placeholder: 'music-room@email.com',
+      inputs: [
+        {
+          name: 'email',
+          placeholder: 'music-room@email.com',
+        },
+      ],
+      buttons: [
+        {
+          text: 'Annuler',
+          handler: (data: any) => {
+            console.log('Canceled', data);
           },
-        ],
-        buttons: [
-          {
-            text: 'Annuler',
-            handler: (data: any) => {
-              console.log('Canceled', data);
-            },
-          },
-          {
-            text: 'Confirmer',
-            handler: (data: any) => {
-              console.log('Saved Information', data);
+        },
+        {
+          text: 'Confirmer',
+          handler: (data: any) => {
+            console.log('Saved Information', data);
+            const validEmail = this.validEmail(data?.email);
+            if (validEmail === true) {
               this.authService.forgotPass_s(data?.email).subscribe((data) => {
                 if (data?.status === true) {
-                  // this.alertController
-                  //   .create({
-                  //     header: 'Changer votre mot de passe',
-                  //     message: `Veuillez entrer votre adresse mail, .`,
-                  //     inputs: [
-                  //       {
-                  //         name: 'email',
-                  //         placeholder: 'music-room@email.com',
-                  //       },
-                  //       {
-                  //         name: 'New password',
-                  //         placeholder: 'XXXXXXX',
-                  //       },
-                  //       {
-                  //         name: 'Code (in the mail)',
-                  //         placeholder: '12345',
-                  //       },
-                  //     ],
-                  //     buttons: [
-                  //       {
-                  //         text: 'Annuler',
-                  //         handler: (data: any) => {
-                  //           console.log('Canceled', data);
-                  //         },
-                  //       },
-                  //       {
-                  //         text: 'Confirmer',
-                  //         handler: (data: any) => {
-                  //           console.log('Saved Information', data);
-                  //           this.authService.forgotPass_c(data?.email, data?.password, data?.rand).subscribe((data) => {
-                  //               console.log(data)
-                  //           });
-                  //         },
-                  //       },
-                  //     ],
-                  //   })
-                  //   .then((res) => {
-                  //     res.present();
-                  //   });
+                  isSend = true;
+                  return true;
                 }
               });
-            },
+            } else {
+              this.showErrorToast(validEmail);
+              return false;
+            }
           },
-        ],
-      })
-      .then((res) => {
-        res.present();
-      });
+        },
+      ],
+    });
+    await alert.present();
+
+    alert.onDidDismiss().then((res) => {
+      console.log(isSend);
+      if (isSend) {
+        this.alertController
+          .create({
+            header: 'Changer votre mot de passe',
+            message: `Veuillez entrer votre adresse mail, .`,
+            inputs: [
+              {
+                name: 'email',
+                placeholder: 'music-room@email.com',
+              },
+              {
+                name: 'New password',
+                placeholder: 'XXXXXXX',
+              },
+              {
+                name: 'Code (in the mail)',
+                placeholder: '123456',
+              },
+            ],
+            buttons: [
+              {
+                text: 'Annuler',
+                handler: (data: any) => {
+                  console.log('Canceled', data);
+                },
+              },
+              {
+                text: 'Confirmer',
+                handler: (data: any) => {
+                  console.log('Saved Information', data);
+                  const validEmail = this.validEmail(data?.email);
+                  const validPass = this.validPass(data?.password);
+                  if (validEmail !== true) {
+                    this.showErrorToast(validEmail);
+                    return false;
+                  }
+                  if (validPass !== true) {
+                    this.showErrorToast(validPass);
+                    return false;
+                  }
+                  this.authService
+                    .forgotPass_c(data?.email, data?.password, data?.rand)
+                    .subscribe((data) => {
+                      if (data.status) {
+                        return true;
+                      } else if (
+                        !data.status &&
+                        data?.message === 'Same password'
+                      ) {
+                        this.showErrorToast(
+                          'Vous ne pouvez pas utiliser votre ancien mot de passe.'
+                        );
+                        return false;
+                      } else {
+                        this.showErrorToast(
+                          "Ce compte n'existe pas ou votre code est incorrect"
+                        );
+                        return false;
+                      }
+                    });
+                },
+              },
+            ],
+          })
+          .then((res) => {
+            res.present();
+          });
+      }
+
+      this.cd.detectChanges();
+    });
+  }
+
+  validEmail(email: string) {
+    const re =
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (!re.test(String(email).toLowerCase())) {
+      return 'Mauvais format email';
+    }
+    return true;
+  }
+
+  validPass(password: string) {
+    const re = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+    if (!re.test(String(password).toLowerCase())) {
+      return 'le mot de passe doit comporter minimum 8 caractères, un chiffre et un caractère spéciale';
+    }
+    return true;
+  }
+
+  async showErrorToast(data: any) {
+    let toast = await this.toastCtrl.create({
+      message: data,
+      duration: 3000,
+      position: 'top',
+    });
+
+    await toast.present();
   }
 
   public Oauth42() {

@@ -62,6 +62,7 @@ import { AlertController, ModalController } from '@ionic/angular';
 export class SearchComponent {
   @Input() public isModal = false;
   @Input() public isUser = false;
+  @Input() public onlyFriend = false;
   public searchRes: any;
   public progressTime = 0;
   public playerInfo: { is_playing: boolean; item: any; progress_ms: number };
@@ -111,6 +112,11 @@ export class SearchComponent {
       this.userService.searchUser(event.target.value).subscribe((data) => {
         console.log(data);
         this.searchRes = data.filter((el) => el.id !== user.id);
+        if (this.onlyFriend) {
+          this.searchRes = data.filter((el) =>
+            user.friends.includes({ id: el.id })
+          );
+        }
         this.cd.detectChanges();
       });
     }
