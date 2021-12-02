@@ -35,7 +35,7 @@ import { WebsocketService } from '../_services/websocketService';
         <span class="font-medium">
           {{ notif?.name }}
         </span>
-        s'est abonné(e) à vous
+        vous a envoyé une demande d'ami
       </div>
       <div class="buttons">
         <img
