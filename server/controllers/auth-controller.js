@@ -124,11 +124,13 @@ exports.signin = (req, res) => {
     ],
   }).exec(async (err, user) => {
     if (err) {
+      console.log(err)
       return res.json({
         status: false,
         message: err,
       });
     } else if (user === null) {
+      console.log('err user found not')
       return res.json({
         status: false,
         message: "User Not found.",
@@ -136,13 +138,14 @@ exports.signin = (req, res) => {
     } else {
       var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
       if (!passwordIsValid) {
+        console.log('notvalid pass')
         return res.json({
           accessToken: null,
           message: "Invalid Password!",
         });
       } else {
         if (req.body.model === null || req.body.platform === null) {
-          user.application = { model: 'PC', platform: 'PC', version: req.body.version };
+          user.application = { model: 'PC', platform: 'PC', version: req.body?.version };
         } else {
           user.application = { model: req.body.model, platform: req.body.platform, version: req.body.version };
         }
@@ -158,6 +161,7 @@ exports.signin = (req, res) => {
         //   },
         // ]);
     
+        console.log('user connected')
         return res.json({
           status: true,
           id: user.id,
