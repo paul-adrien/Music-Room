@@ -29,7 +29,7 @@ exports.signup = (req, res) => {
   });
 
   var rand = Math.floor(Math.random() * 100000 + 54);
-  var link = "http://localhost:8080/verify/" + rand + '/email/' + req.body.email;
+  var link = "https://music.room.projet42web.fr/verify/" + rand + '/email/' + req.body.email;
 
   const transporter = nodemailer.createTransport({
     service: "gmail",

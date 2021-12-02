@@ -356,7 +356,7 @@ exports.sendVerifyEmail = async (req, res) => {
   const user = await getUser({ email: email });
   if (user) {
     var rand = Math.floor(Math.random() * 100000 + 54);
-    var link = "http://localhost:8080/verify/" + rand + "/email/" + email;
+    var link = "https://music.room.projet42web.fr/verify/" + rand + "/email/" + email;
 
     user.rand = rand;
     await updateUser(user._id, user);
