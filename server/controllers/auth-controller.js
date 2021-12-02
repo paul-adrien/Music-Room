@@ -1,11 +1,13 @@
 const config = require(appRoot + "/config/auth");
 const db = require(appRoot + "/models");
 const User = db.user;
+const Token = db.token;
 var nodemailer = require("nodemailer");
 const { updateUser } = require(appRoot + "/models/lib-user.model");
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
+const { delRoom } = require("./room-controller");
 
 exports.signup = (req, res) => {
   User.findOne({
@@ -38,7 +40,7 @@ exports.signup = (req, res) => {
         "704787272588-v0aava438lpq06jbqkj3pkue0qv98os8.apps.googleusercontent.com",
       clientSecret: "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",
       refreshToken:
-        "1//04XMjWIzKX6A0CgYIARAAGAQSNwF-L9Ir0I2GCKZ2rOsblkUNe9saUK7u7FkRYNbRTFJUYuPnmGY6g256cB31_wTnXv3WdhY763g",
+        "1//04-vTHZ11A0NyCgYIARAAGAQSNwF-L9IrVmtV2WYGONx1m_fymv_F-_dRYAf92AyUp97Cx6wXunTDXVH4HPBNrH4D4nTMzK1xVoo",
     },
   });
 
@@ -71,7 +73,7 @@ exports.signup = (req, res) => {
 
   user.id = user._id;
 
-  user.save((err, user) => {
+  user.save(async (err, user) => {
     if (err) {
       return res.json({
         status: false,
@@ -82,6 +84,14 @@ exports.signup = (req, res) => {
     var token = jwt.sign({ id: user._id }, config.secret, {
       expiresIn: 86400, // 24 hours
     });
+
+    await Token.insertMany([
+      {
+        token: token,
+        userId: user.id,
+        date: Date.now()
+      },
+    ]);
 
     return res.json({
       status: true,
@@ -106,7 +116,7 @@ exports.signin = (req, res) => {
       { id: { $not: { $regex: /google_/ } } },
       { id: { $not: { $regex: /git_/ } } },
     ],
-  }).exec((err, user) => {
+  }).exec(async (err, user) => {
     if (err) {
       return res.json({
         status: false,
@@ -135,6 +145,14 @@ exports.signin = (req, res) => {
     var token = jwt.sign({ id: user._id }, config.secret, {
       expiresIn: 86400, // 24 hours
     });
+
+    await Token.insertMany([
+      {
+        token: token,
+        userId: user.id,
+        date: Date.now()
+      },
+    ]);
 
     res.json({
       status: true,

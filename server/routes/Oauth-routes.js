@@ -3,6 +3,8 @@ const passport = require(appRoot + "/config/passport-config");
 const config = require(appRoot + "/config/auth");
 var jwt = require("jsonwebtoken");
 const { getUser } = require(appRoot + "/models/lib-user.model");
+const db = require(appRoot + "/models");
+const Token = db.token;
 
 module.exports = function (app) {
   app.use(function (req, res, next) {
@@ -26,6 +28,14 @@ module.exports = function (app) {
         const token = jwt.sign({ id: userDb._id }, config.secret, {
           expiresIn: 86400, // 24 hours
         });
+
+        await Token.insertMany([
+          {
+            token: token,
+            userId: userDb._id,
+            date: Date.now()
+          },
+        ]);
 
         return res.redirect(
           "http://localhost:8100/login?data=" +
@@ -59,6 +69,14 @@ module.exports = function (app) {
         const token = jwt.sign({ id: userDb._id }, config.secret, {
           expiresIn: 86400, // 24 hours
         });
+
+        await Token.insertMany([
+          {
+            token: token,
+            userId: userDb._id,
+            date: Date.now()
+          },
+        ]);
 
         return res.redirect(
           "http://localhost:8100/login?data=" +

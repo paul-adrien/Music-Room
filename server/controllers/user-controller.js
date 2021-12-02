@@ -164,7 +164,7 @@ exports.forgotPass_send = async (req, res) => {
           "704787272588-v0aava438lpq06jbqkj3pkue0qv98os8.apps.googleusercontent.com",
         clientSecret: "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",
         refreshToken:
-          "1//04XMjWIzKX6A0CgYIARAAGAQSNwF-L9Ir0I2GCKZ2rOsblkUNe9saUK7u7FkRYNbRTFJUYuPnmGY6g256cB31_wTnXv3WdhY763g",
+          "1//04-vTHZ11A0NyCgYIARAAGAQSNwF-L9IrVmtV2WYGONx1m_fymv_F-_dRYAf92AyUp97Cx6wXunTDXVH4HPBNrH4D4nTMzK1xVoo",
       },
     });
 
@@ -355,7 +355,7 @@ exports.sendVerifyEmail = async (req, res) => {
   const user = await getUser({ email: email });
   if (user) {
     var rand = Math.floor(Math.random() * 100000 + 54);
-    var link = "http://54.38.243.206/verify/" + rand + "/email/" + email;
+    var link = "http://localhost:8080/verify/" + rand + "/email/" + email;
 
     user.rand = rand;
     await updateUser(user._id, user);
@@ -369,7 +369,7 @@ exports.sendVerifyEmail = async (req, res) => {
           "704787272588-v0aava438lpq06jbqkj3pkue0qv98os8.apps.googleusercontent.com",
         clientSecret: "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",
         refreshToken:
-          "1//04XMjWIzKX6A0CgYIARAAGAQSNwF-L9Ir0I2GCKZ2rOsblkUNe9saUK7u7FkRYNbRTFJUYuPnmGY6g256cB31_wTnXv3WdhY763g",
+          "1//04-vTHZ11A0NyCgYIARAAGAQSNwF-L9IrVmtV2WYGONx1m_fymv_F-_dRYAf92AyUp97Cx6wXunTDXVH4HPBNrH4D4nTMzK1xVoo",
       },
     });
 
@@ -385,6 +385,7 @@ exports.sendVerifyEmail = async (req, res) => {
 
     transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
+        console.log(error);
         res.status(200).json({
           status: true,
           message: error,

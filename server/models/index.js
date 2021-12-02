@@ -11,5 +11,6 @@ db.event = require(appRoot + "/models/event.model");
 db.room = require(appRoot + "/models/room.model");
 db.conversation = require(appRoot + "/models/messaging.model");
 db.forgotPass = require(appRoot + "/models/forgotPass.model");
+db.token = require(appRoot + "/models/token.model");
 
 module.exports = db;
