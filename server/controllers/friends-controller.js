@@ -102,7 +102,7 @@ exports.deleteFriend = (req, res, next) => {
             { id: friendId },
             {
               $pull: {
-                friends: userId,
+                friends: { id: userId },
               },
             }
           ).exec(async (err, friend) => {
@@ -114,10 +114,10 @@ exports.deleteFriend = (req, res, next) => {
               });
             } else {
               User.updateOne(
-                { id: friendId },
+                { id: userId },
                 {
                   $pull: {
-                    friends: friendId,
+                    friends: { id: friendId },
                   },
                 }
               ).exec(async (err, user) => {
@@ -163,15 +163,15 @@ exports.deleteFriendSocket = (userId, friendId) => {
             { id: friendId },
             {
               $pull: {
-                friends: userId,
+                friends: { id: userId },
               },
             }
           ).then(async (friend) => {
             return User.updateOne(
-              { id: friendId },
+              { id: userId },
               {
                 $pull: {
-                  friends: friendId,
+                  friends: { id: friendId },
                 },
               }
             ).then(async (user) => {
@@ -327,6 +327,7 @@ exports.inviteFriendSocket = (userId, friendId) => {
               {
                 $push: {
                   "notifs.friends": {
+                    name: user.userName,
                     id: userId,
                     date: new Date(),
                   },
@@ -380,7 +381,7 @@ exports.acceptInvitation = (req, res, next) => {
             { id: friendId },
             {
               $push: {
-                friends: userId,
+                friends: { id: userId },
               },
             }
           ).exec(async (err, friend) => {
@@ -392,15 +393,17 @@ exports.acceptInvitation = (req, res, next) => {
               });
             } else {
               User.updateOne(
-                { id: friendId },
+                { id: userId },
                 {
-                  $pull: {
-                    "notifs.friends": {
-                      id: friendId,
+                  notifs: {
+                    $pull: {
+                      friends: {
+                        id: friendId,
+                      },
                     },
                   },
                   $push: {
-                    friends: friendId,
+                    friends: { id: friendId },
                   },
                 }
               ).exec(async (err, user) => {
@@ -446,20 +449,22 @@ exports.acceptInvitationSocket = (userId, friendId) => {
             { id: friendId },
             {
               $push: {
-                friends: userId,
+                friends: { id: userId },
               },
             }
           ).then(async (friend) => {
             return User.updateOne(
-              { id: friendId },
+              { id: userId },
               {
-                $pull: {
-                  "notifs.friends": {
-                    id: friendId,
+                notifs: {
+                  $pull: {
+                    friends: {
+                      id: friendId,
+                    },
                   },
                 },
                 $push: {
-                  friends: friendId,
+                  friends: { id: friendId },
                 },
               }
             ).then(async (user) => {

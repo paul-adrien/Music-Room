@@ -138,12 +138,12 @@ io.use(function (socket, next) {
   socket.on("friend accept invite", (data) => {
     friends_controller
       .acceptInvitationSocket(data.userId, data.friendId)
-      .then((res) => {
+      .then(async (res) => {
         if (res.status) {
-          Promise.all(
+          Promise.all([
             getUser({ id: data.userId }),
-            getUser({ id: data.friendId })
-          ).then(([resUser, resFriend]) => {
+            getUser({ id: data.friendId }),
+          ]).then(([resUser, resFriend]) => {
             if (resUser !== null && resFriend !== null) {
               logs.logsSOCKS(
                 `friend update ${data.friendId} accepte invite`,
@@ -175,12 +175,14 @@ io.use(function (socket, next) {
     friends_controller
       .deleteFriendSocket(data.userId, data.friendId)
       .then((res) => {
+        console.log(res);
         if (res.status) {
-          Promise.all(
+          Promise.all([
             getUser({ id: data.userId }),
-            getUser({ id: data.friendId })
-          ).then(([resUser, resFriend]) => {
+            getUser({ id: data.friendId }),
+          ]).then(([resUser, resFriend]) => {
             if (resUser !== null && resFriend !== null) {
+              console.log(resUser);
               logs.logsSOCKS(
                 `friend update ${data.friendId} delete`,
                 res.status,
@@ -190,6 +192,8 @@ io.use(function (socket, next) {
 
               io.emit(`user update ${data.friendId}`, resFriend);
             } else {
+              console.log("merde");
+
               logs.logsSOCKS(
                 "Error when delete a friend",
                 res.status,

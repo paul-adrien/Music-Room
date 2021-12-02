@@ -16,6 +16,7 @@ import { AlertController, ModalController } from '@ionic/angular';
 import { forkJoin } from 'rxjs';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-profile',
@@ -32,27 +33,31 @@ import { ActivatedRoute } from '@angular/router';
       />
       <div class="name">{{ this.user.userName }}</div>
       <div
-        *ngIf="this.friends == false && this.invitSended == false && this.invitToAccept == false"
+        *ngIf="
+          this.isFriends == false &&
+          this.invitSended == false &&
+          this.invitToAccept == false
+        "
         class="primary-button"
         (click)="this.inviteFriend()"
       >
         Ajouter en ami
       </div>
       <div
-        *ngIf="this.friends == true"
+        *ngIf="this.isFriends == true"
         class="primary-button"
         (click)="this.deleteFriend()"
       >
         Enlever des amis
       </div>
       <div
-        *ngIf="this.friends == false && this.invitSended == true"
+        *ngIf="this.isFriends == false && this.invitSended == true"
         class="primary-button"
       >
         Demande d'ami envoyée
       </div>
       <div
-        *ngIf="this.friends == false && this.invitToAccept == true"
+        *ngIf="this.isFriends == false && this.invitToAccept == true"
         class="primary-button"
         (click)="this.acceptFriend()"
       >
@@ -60,6 +65,28 @@ import { ActivatedRoute } from '@angular/router';
       </div>
     </div>
     <div class="bottom-container">
+      <div
+        *ngIf="this.musicsHistory?.length > 0 && this.isFriends"
+        class="title-category"
+      >
+        Écoutés récemment
+      </div>
+      <div
+        class="playlists"
+        *ngIf="this.musicsHistory?.length > 0 && this.isFriends"
+      >
+        <div class="result-item" *ngFor="let music of this.musicsHistory">
+          <img
+            (click)="this.play(music)"
+            class="logo "
+            [src]="music.album.images[0].url"
+          />
+          <div (click)="this.play(music)" class="item-info">
+            <div class="info-top">{{ music.name }}</div>
+            <div class="info-bottom">{{ music.artists[0].name }}</div>
+          </div>
+        </div>
+      </div>
       <div *ngIf="this.playlists?.length > 0" class="title-category">
         Playlists
       </div>
@@ -85,9 +112,10 @@ export class UserProfileComponent implements OnInit {
   public loggedUser: User;
   public playlists: Playlist[];
   public rooms: Room[];
-  public friends: boolean;
+  public isFriends: boolean;
   public invitSended: boolean;
   public invitToAccept: boolean;
+  public musicsHistory: any[];
 
   constructor(
     private userService: UserService,
@@ -112,14 +140,25 @@ export class UserProfileComponent implements OnInit {
       .listenToServer(`user update ${loggedUser.id}`)
       .subscribe((data) => {
         this.loggedUser = data;
-        this.friends = this.loggedUser.friends?.includes({id: userId});
-        this.invitToAccept = this.loggedUser.notifs?.friends?.map((f) => {
-          return f.id;
-        })
-        .indexOf(userId) != -1? true : false;
-        console.log("this.friends ==> ", this.friends);
-        console.log("this.invitSended ==> ", this.invitSended);
-        console.log("this.invitToAccept ==> ", this.invitToAccept);
+        this.isFriends =
+          this.loggedUser.friends
+            ?.map((f) => {
+              return f.id;
+            })
+            .indexOf(userId) != -1
+            ? true
+            : false;
+        this.invitToAccept =
+          this.loggedUser.notifs?.friends
+            ?.map((f) => {
+              return f.id;
+            })
+            .indexOf(userId) != -1
+            ? true
+            : false;
+        console.log('this.friends ==> ', this.isFriends);
+        console.log('this.invitSended ==> ', this.invitSended);
+        console.log('this.invitToAccept ==> ', this.invitToAccept);
         this.cd.detectChanges();
       });
 
@@ -127,19 +166,30 @@ export class UserProfileComponent implements OnInit {
       .listenToServer(`user update ${userId}`)
       .subscribe((data) => {
         this.user = data;
-        this.friends = this.user?.friends?.indexOf(userId) >= 0 ? true : false;
+        this.isFriends =
+          this.user?.friends
+            ?.map((f) => {
+              return f.id;
+            })
+            .indexOf(userId) != -1
+            ? true
+            : false;
         if (typeof this.user.picture !== 'string' && this.user.picture) {
           this.user.picture = 'data:image/jpeg;base64,' + data.picture.buffer;
         } else {
           this.user.picture = data.picture;
         }
-        this.invitSended = this.user.notifs?.friends?.map((f) => {
-          return f.id;
-        })
-        .indexOf(loggedUser.id) != -1? true : false;
-        console.log("this.friends ==> ", this.friends);
-        console.log("this.invitSended ==> ", this.invitSended);
-        console.log("this.invitToAccept ==> ", this.invitToAccept);
+        this.invitSended =
+          this.user.notifs?.friends
+            ?.map((f) => {
+              return f.id;
+            })
+            .indexOf(loggedUser.id) != -1
+            ? true
+            : false;
+        console.log('this.friends ==> ', this.isFriends);
+        console.log('this.invitSended ==> ', this.invitSended);
+        console.log('this.invitToAccept ==> ', this.invitToAccept);
         this.cd.detectChanges();
       });
   }
@@ -152,30 +202,48 @@ export class UserProfileComponent implements OnInit {
 
     this.userService.getUser(userId).subscribe(async (res) => {
       this.user = res;
+      if (this.user?.musicHistory?.length > 0) {
+        this.getTracksInfo(this.user.musicHistory);
+      }
       console.log(res);
       if (typeof this.user?.picture !== 'string' && this.user?.picture) {
         this.user.picture = 'data:image/jpeg;base64,' + res.picture.buffer;
       } else {
         this.user.picture = res?.picture;
       }
-      this.invitSended = this.user.notifs?.friends?.map((f) => {
-        return f.id;
-      })
-      .indexOf(loggedUser.id) != -1? true : false;
-      console.log("invitSended ==> ", this.invitSended);
+      this.invitSended =
+        this.user.notifs?.friends
+          ?.map((f) => {
+            return f.id;
+          })
+          .indexOf(loggedUser.id) != -1
+          ? true
+          : false;
+      console.log('invitSended ==> ', this.invitSended);
       this.cd.detectChanges();
     });
 
     this.userService.getUser(loggedUser.id).subscribe(async (res) => {
       this.loggedUser = res;
       console.log(res);
-      this.friends = this.loggedUser.friends?.includes({id: userId});
-      console.log("friends ==> ", this.friends);
-      this.invitToAccept = this.loggedUser.notifs?.friends?.map((f) => {
-        return f.id;
-      })
-      .indexOf(userId) != -1? true : false;
-      console.log("invitToAccept ==> ", this.invitToAccept);
+      this.isFriends =
+        this.loggedUser?.friends
+          ?.map((f) => {
+            return f.id;
+          })
+          .indexOf(userId) != -1
+          ? true
+          : false;
+      console.log('friends ==> ', this.isFriends);
+      this.invitToAccept =
+        this.loggedUser.notifs?.friends
+          ?.map((f) => {
+            return f.id;
+          })
+          .indexOf(userId) != -1
+          ? true
+          : false;
+      console.log('invitToAccept ==> ', this.invitToAccept);
       this.cd.detectChanges();
     });
 
@@ -199,6 +267,29 @@ export class UserProfileComponent implements OnInit {
     this.cd.detectChanges();
   }
 
+  getTracksInfo(musics: string[]) {
+    this.spotifyService
+      .getTracksInfo(musics)
+      .pipe(map((res: any) => res.tracks))
+      .subscribe((res) => {
+        console.log(res);
+        if (JSON.stringify(this.musicsHistory) !== JSON.stringify(res)) {
+          this.musicsHistory = res;
+        }
+        this.cd.detectChanges();
+      });
+  }
+
+  play(track: any) {
+    this.spotifyService.getPlayerInfo().subscribe(async (res) => {
+      if (!res?.device?.id) {
+        await this.presentAlert();
+      } else if (res?.device?.id) {
+        this.spotifyService.playTrack(track.uri, track.id).subscribe();
+      }
+    });
+  }
+
   inviteFriend() {
     console.log('inviteFriend called !');
     this.socketService.emitToServer('friend invite', {
@@ -211,7 +302,7 @@ export class UserProfileComponent implements OnInit {
     console.log('deleteFriend called !');
     this.socketService.emitToServer('friend delete', {
       userId: this.loggedUser.id,
-      frienId: this.user.id,
+      friendId: this.user.id,
     });
   }
 

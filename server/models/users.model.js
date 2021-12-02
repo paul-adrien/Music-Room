@@ -21,7 +21,7 @@ const User = mongoose.model(
       } | String,
     rand: Number,
     validEmail: Boolean,
-    friends: [String],
+    friends: [{ id: String }],
     devices: [{ id: String, name: String, userId: String }],
     application: { model: String, platform: String, version: String },
     musicHistory: [String],
@@ -36,6 +36,7 @@ const User = mongoose.model(
       ],
       friends: [
         {
+          name: String,
           id: String,
           date: String,
         },
