@@ -413,7 +413,16 @@ exports.verifyEmail = async (req, res, next) => {
   const { rand, email } = req.params;
   console.log(rand, email, path.join(appRoot, "/html/verifEmail.html"));
 
-  const user = await getUser({ email: email });
+  const user = await getUser({
+    $and: [
+      {
+        email: email,
+      },
+      { id: { $not: { $regex: /42_/ } } },
+      { id: { $not: { $regex: /google_/ } } },
+      { id: { $not: { $regex: /git_/ } } },
+    ],
+  });
   console.log(user);
   if (user) {
     console.log(rand, user.rand);
