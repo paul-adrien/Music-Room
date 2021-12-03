@@ -54,7 +54,7 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
           *ngIf="this.room?.created_by === this.user?.id"
           class="buttons-controller"
         >
-          <div class="circle">
+          <!-- <div class="circle">
             <img
               *ngIf="this.playerInfo?.is_playing === false"
               (click)="!this.wait && this.play()"
@@ -68,7 +68,7 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
               class="pause"
               src="./assets/pause-black.svg"
             />
-          </div>
+          </div> -->
           <img
             (click)="this.nextTrack()"
             class="next-previous"

@@ -181,7 +181,6 @@ export class NotificationsComponent implements OnInit {
         userId: this.user.id,
         friendId: id,
       });
-      this.openNotif(id, type);
     }
   }
 
@@ -191,7 +190,7 @@ export class NotificationsComponent implements OnInit {
     } else {
       this.spotifyService.getPlayerInfo().subscribe(async (res) => {
         console.log(this.device.platform, res);
-        if (this.device.platform === null && res?.device?.id) {
+        if (this.device.platform === null && res?.device !== undefined) {
           if (type === 'rooms') {
             this.socketService.emitToServer('room enter', {
               userId: this.user.id,
@@ -202,7 +201,7 @@ export class NotificationsComponent implements OnInit {
           } else if (type === 'playlist') {
             this.router.navigate([`tabs/tab-home/playlist/${id}`]);
           }
-        } else if (this.device.platform === null && !res?.device?.id) {
+        } else if (this.device.platform === null && res?.device === undefined) {
           await this.presentAlert();
         }
       });
@@ -218,6 +217,7 @@ export class NotificationsComponent implements OnInit {
         el?.id === notif?.id && new Date(el?.date) === new Date(notif?.date)
     );
     console.log(user);
+    this.cd.detectChanges();
     this.socketService.emitToServer('user edit', {
       userId: user.id,
       user: user,

@@ -6,6 +6,11 @@
   margin-top: 2rem;
   align-items: center;
 
+  .chevron {
+    position: absolute;
+    left: 1rem;
+  }
+
   .title {
     font-family: "Circular-medium";
     font-size: 1.7rem;
@@ -16,6 +21,11 @@
   .devices {
     overflow: scroll;
     flex-grow: 1;
+
+    .device-name {
+      margin: 1rem;
+      font-size: 1.2rem;
+    }
   }
 
   .sub-title {

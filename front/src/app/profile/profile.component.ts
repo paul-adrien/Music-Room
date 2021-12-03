@@ -215,7 +215,7 @@ export class ProfileComponent implements OnInit {
       if (
         (this.device.platform === null ||
           this.device.platform.toLocaleLowerCase() === 'ios') &&
-        res?.device?.id
+        res?.device !== undefined
       ) {
         this.roomService
           .enterRoom(this.user.id, roomId, res?.device?.id)
@@ -224,7 +224,7 @@ export class ProfileComponent implements OnInit {
               this.router.navigate([`tabs/tab-home/room/${roomId}`]);
             }
           });
-      } else if (this.device.platform === null && !res?.device?.id) {
+      } else if (this.device.platform === null && res?.device === undefined) {
         await this.presentAlert();
       }
     });
@@ -238,10 +238,10 @@ export class ProfileComponent implements OnInit {
       if (
         (this.device.platform === null ||
           this.device.platform.toLocaleLowerCase() === 'ios') &&
-        res?.device?.id
+        res?.device !== undefined
       ) {
         this.router.navigate([`tabs/tab-home/playlist/${playlistId}`]);
-      } else if (this.device.platform === null && !res?.device?.id) {
+      } else if (this.device.platform === null && res?.device === undefined) {
         await this.presentAlert();
       }
     });
@@ -334,9 +334,9 @@ export class ProfileComponent implements OnInit {
 
   play(track: any) {
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
-      if (!res?.device?.id) {
+      if (res?.device === undefined) {
         await this.presentAlert();
-      } else if (res?.device?.id) {
+      } else if (res?.device !== undefined) {
         this.spotifyService.playTrack(track.uri, track.id).subscribe();
       }
     });

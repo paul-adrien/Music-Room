@@ -44,11 +44,11 @@ declare var google: any;
         (click)="this.changeTypeInvited($event)"
       ></ion-toggle>
     </div>
-    <div class="item-container">
+    <div *ngIf="this.type === 'room'" class="item-container">
       <div class="item-name">Plage horaire de la room:</div>
       <ion-toggle [(ngModel)]="this.zone" [checked]="this.zone"></ion-toggle>
     </div>
-    <div>
+    <div *ngIf="this.type === 'room'">
       <div class="time-container">
         <div>Début</div>
         <ion-datetime
@@ -120,11 +120,9 @@ declare var google: any;
         <div #mapContainer id="map"></div>
         <div id="mapError"></div>
       </div>
-      <ion-button
-        (click)="deleteZone()"
-        expand="block"
-        size="small"
-        >supprimer la zone</ion-button>
+      <ion-button (click)="deleteZone()" expand="block" size="small"
+        >supprimer la zone</ion-button
+      >
       <ion-button
         (click)="submitForm()"
         [disabled]="!formReady"
@@ -202,12 +200,18 @@ export class SettingsRoomComponent implements OnInit {
 
     this.mapInitializer();
     if (this.room?.limits) {
-      if (this.room.limits.end && this.room.limits.start){
+      if (this.room.limits.end && this.room.limits.start) {
         this.form.start = this.room.limits.start;
         this.form.end = this.room.limits.end;
       }
       if (this.room.limits.center)
-        this.pushCirc({lat: this.room.limits.center.latitude, lng: this.room.limits.center.longitude }, this.room.limits.radius)
+        this.pushCirc(
+          {
+            lat: this.room.limits.center.latitude,
+            lng: this.room.limits.center.longitude,
+          },
+          this.room.limits.radius
+        );
       this.cd.detectChanges();
     }
     $('#pac-input3').on('input', function (e) {
@@ -290,9 +294,8 @@ export class SettingsRoomComponent implements OnInit {
 
   deleteZone() {
     this.circles.map(function (circ) {
-      if (circ.getMap() != null)
-        circ.setMap(null);
-    })
+      if (circ.getMap() != null) circ.setMap(null);
+    });
     this.circlesData = [];
     this.roomService.addGeoAndHoursLimit(
       this.form,

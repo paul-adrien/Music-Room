@@ -9,6 +9,9 @@ import { SearchComponent } from '../search/search.component';
 @Component({
   selector: 'app-delegation',
   template: `
+    <div class="chevron">
+      <img (click)="this.dismiss()" src="./assets/chevron-down.svg" />
+    </div>
     <div class="title">
       Écoute sur {{ this.selectedPlayer?.userName || this.user?.userName }}
     </div>
@@ -20,7 +23,7 @@ import { SearchComponent } from '../search/search.component';
       <div
         (click)="this.selectPlayer(device)"
         *ngFor="let device of this.devices"
-        class="device-container"
+        class="device-name"
       >
         {{ device?.userName }}
       </div>
@@ -51,7 +54,11 @@ import { SearchComponent } from '../search/search.component';
         src="./assets/next.svg"
       />
     </div>
-    <div *ngIf="this.selectedPlayer" class="primary-button bottom">
+    <div
+      *ngIf="this.selectedPlayer"
+      class="primary-button bottom"
+      (click)="this.presentModalSuggestion()"
+    >
       Choisir une musique
     </div>
   `,
@@ -87,6 +94,7 @@ export class DelegationComponent implements OnInit {
   ngOnInit() {
     this.user = this.authService.getUser();
     this.devices = this.authService.getDelegation();
+    this.cd.detectChanges();
   }
 
   async delegateControl() {
@@ -167,12 +175,11 @@ export class DelegationComponent implements OnInit {
     console.log('onDidDismiss resolved with role', role);
   }
 
-  dismiss(device: any) {
+  dismiss() {
     // using the injected ModalController this page
     // can "dismiss" itself and optionally pass back data
     this.modalController.dismiss({
       dismissed: true,
-      device: device,
     });
   }
 
