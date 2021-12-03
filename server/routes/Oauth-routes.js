@@ -18,7 +18,7 @@ module.exports = function (app) {
 
   app.get("/user/authenticate/42", (req, res, next) => {
     passport.authenticate("42", {
-      state: JSON.stringify(req.query)
+      state: JSON.stringify(req.query),
     })(req, res, next);
   });
   app.get("/user/authenticate/42/callback", (req, res, next) => {
@@ -34,13 +34,13 @@ module.exports = function (app) {
         });
 
         userDb.application = data.application;
-        await updateUser(data.userId, user);
+        await updateUser(data.userId, userDb);
 
         await Token.insertMany([
           {
             token: token,
             userId: userDb._id,
-            date: Date.now()
+            date: Date.now(),
           },
         ]);
 
@@ -57,13 +57,12 @@ module.exports = function (app) {
     )(req, res, next);
   });
 
-  app.get(
-    "/user/authenticate/google", (req, res, next) => {
-      passport.authenticate("google", {
-        scope: ["profile", "email"],
-        state: JSON.stringify(req.query)
-      })(req, res, next);
-    });
+  app.get("/user/authenticate/google", (req, res, next) => {
+    passport.authenticate("google", {
+      scope: ["profile", "email"],
+      state: JSON.stringify(req.query),
+    })(req, res, next);
+  });
   app.get("/user/authenticate/google/callback", (req, res, next) => {
     passport.authenticate(
       "google",
@@ -85,7 +84,7 @@ module.exports = function (app) {
           {
             token: token,
             userId: userDb._id,
-            date: Date.now()
+            date: Date.now(),
           },
         ]);
 
