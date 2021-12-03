@@ -90,7 +90,7 @@ import { map } from 'rxjs/operators';
       <div *ngIf="this.playlists?.length > 0" class="title-category">
         Playlists
       </div>
-      <div class="playlists" *ngIf="this.playlists">
+      <div class="playlists" *ngIf="this.playlists?.length > 0; else noPlaylist">
         <div class="result-item" *ngFor="let playlist of this.playlists">
           <img
             (click)="this.openPlaylist(playlist._id)"
@@ -103,6 +103,9 @@ import { map } from 'rxjs/operators';
           </div>
         </div>
       </div>
+      <ng-template #noPlaylist>
+        <div class="no-playlist">Aucune playlist à afficher pour l'instant</div>
+      </ng-template>
     </div>
   `,
   styleUrls: ['./user-profile.component.scss'],

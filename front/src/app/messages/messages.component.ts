@@ -30,7 +30,7 @@ import { Location } from '@angular/common';
         src="./assets/add-outline.svg"
       />
     </div>
-    <div *ngIf="this.convList" class="messages-container">
+    <div *ngIf="this.convList?.length > 0; else noConv" class="messages-container">
       <div
         (click)="this.openConversation(conv._id)"
         *ngFor="let conv of this.convList"
@@ -53,6 +53,9 @@ import { Location } from '@angular/common';
         </div>
       </div>
     </div>
+    <ng-template #noConv>
+      <div class="no-conversation">Aucune conversation pour l'instant</div>
+    </ng-template>
   `,
   styleUrls: ['./messages.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,

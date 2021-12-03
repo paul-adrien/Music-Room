@@ -63,6 +63,7 @@ import { SearchComponent } from './../search/search.component';
           </div>
         </div>
       </div>
+
       <div *ngIf="this.playlists?.length > 0" class="title-category">
         Playlists
       </div>
@@ -96,6 +97,7 @@ import { SearchComponent } from './../search/search.component';
           />
         </div>
       </div>
+
       <div *ngIf="this.rooms?.length > 0" class="title-category">Rooms</div>
       <div class="rooms" *ngIf="this.rooms?.length > 0">
         <div class="result-item" *ngFor="let room of this.rooms">

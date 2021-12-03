@@ -18,38 +18,31 @@ import { WebsocketService } from '../_services/websocketService';
       src="./assets/chevron-back-outline.svg"
     />
     <div class="title">Mes notifications</div>
-    <div *ngFor="let notif of this.notifs" class="notif-container">
-      <div class="text" *ngIf="notif.type === 'rooms'">
-        Vous avez été invité à rejoindre la room
-        <span class="font-medium">
-          {{ notif?.name }}
-        </span>
-      </div>
-      <div class="text" *ngIf="notif.type === 'playlist'">
-        Vous avez été invité à rejoindre la playlist
-        <span class="font-medium">
-          {{ notif?.name }}
-        </span>
-      </div>
-      <div class="text" *ngIf="notif.type === 'friends'">
-        <span class="font-medium">
-          {{ notif?.name }}
-        </span>
-        vous a envoyé une demande d'ami
-      </div>
-      <div class="buttons">
-        <img
-          class="img"
-          (click)="this.removeNotif(notif, notif.type)"
-          src="./assets/close-outline.svg"
-        />
-        <img
-          class="img"
-          (click)="this.acceptNotif(notif.id, notif.type)"
-          src="./assets/checkmark-outline.svg"
-        />
+    <div *ngIf="this.notifs?.length > 0; else noNotifs">
+      <div *ngFor="let notif of this.notifs" class="notif-container">
+        <div class="text" *ngIf="notif.type === 'rooms'">
+          Vous avez été invité à rejoindre la room
+          <span class="font-medium">
+            {{ notif?.name }}
+          </span>
+        </div>
+        <div class="text" *ngIf="notif.type === 'playlist'">
+          Vous avez été invité à rejoindre la playlist
+          <span class="font-medium">
+            {{ notif?.name }}
+          </span>
+        </div>
+        <div class="text" *ngIf="notif.type === 'friends'">
+          <span class="font-medium">
+            {{ notif?.name }}
+          </span>
+          vous a envoyé une demande d'ami
+        </div>
       </div>
     </div>
+    <ng-template #noNotifs>
+      <div class="no-notification">Aucune notification pour l'instant</div>
+    </ng-template>
     <!-- <div *ngFor="let notif of this.user.notifs?.rooms" class="notif-container">
       <div class="text">
         Vous avez été invité à rejoindre la room
