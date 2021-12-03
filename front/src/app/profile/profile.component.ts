@@ -144,14 +144,13 @@ export class ProfileComponent implements OnInit {
       .listenToServer(`user update ${user?.id}`)
       .subscribe((data) => {
         this.user = data;
-        console.log(this.user.picture);
         this.authService.saveUser(data);
 
-        if (typeof this.user.picture !== 'string' && this.user.picture) {
-          this.user.picture = 'data:image/jpeg;base64,' + data.picture.buffer;
-        } else {
-          this.user.picture = data.picture;
-        }
+        this.userService.getUser(data.id).subscribe((res) => {
+          this.user.picture = res.picture;
+          this.cd.detectChanges();
+        });
+
         if (this.user?.musicHistory?.length > 0) {
           this.getTracksInfo(this.user.musicHistory);
         }
@@ -184,12 +183,9 @@ export class ProfileComponent implements OnInit {
       if (this.user?.musicHistory?.length > 0) {
         this.getTracksInfo(this.user.musicHistory);
       }
-      console.log(res);
-      if (typeof this.user?.picture !== 'string' && this.user?.picture) {
-        this.user.picture = 'data:image/jpeg;base64,' + res.picture.buffer;
-      } else {
-        this.user.picture = res?.picture;
-      }
+
+      this.user.picture = res?.picture;
+
       this.cd.detectChanges();
     });
 

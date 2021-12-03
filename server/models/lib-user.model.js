@@ -3,6 +3,7 @@ const User = require(appRoot + "/models/users.model");
 const getUser = async function (query) {
   if (query !== null) {
     const user = await User.findOne(query).exec();
+    // console.log(user?.picture.toString("base64"));
     return user;
   } else return null;
 };

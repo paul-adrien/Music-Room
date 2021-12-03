@@ -59,7 +59,8 @@ exports.userUpdatePicture = async (req, res, next) => {
     { id: userId },
     {
       $set: {
-        picture: "data:image/jpeg;base64," + req.files[0].buffer,
+        picture:
+          "data:image/jpeg;base64," + req.files[0].buffer.toString("base64"),
       },
     }
   ).exec((err, user) => {
