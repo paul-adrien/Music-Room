@@ -60,7 +60,7 @@ module.exports = function (app) {
   app.get("/user/authenticate/google", (req, res, next) => {
     passport.authenticate("google", {
       scope: ["profile", "email"],
-      state: JSON.stringify(req.query),
+      // state: JSON.stringify(req.query),
     })(req, res, next);
   });
   app.get("/user/authenticate/google/callback", (req, res, next) => {
