@@ -414,6 +414,7 @@ exports.verifyEmail = async (req, res, next) => {
   console.log(rand, email, path.join(appRoot, "/html/verifEmail.html"));
 
   const user = await getUser({ email: email });
+  console.log(user);
   if (user) {
     console.log(rand, user.rand);
     if (parseInt(rand) === user.rand) {
