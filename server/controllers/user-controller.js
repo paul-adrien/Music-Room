@@ -454,8 +454,8 @@ exports.deleteUser = async (req, res, next) => {
         });
       } else {
         await User.updateMany(
-          { friends: userId },
-          { $pull: { friends: userId } }
+          { friends: { id: userId } },
+          { $pull: { friends: { id: userId } } }
         ).exec();
         await Room.deleteMany({ created_by: userId }).exec();
         await Playlist.deleteMany({ created_by: userId }).exec();
