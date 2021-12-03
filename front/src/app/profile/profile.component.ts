@@ -38,7 +38,7 @@ import { SearchComponent } from './../search/search.component';
       <img class="log-out" src="./assets/log-out.svg" (click)="this.logOut()" />
       <img
         class="picture"
-        [src]="this.user?.picture ? this.user.picture : './assets/person.svg'"
+        [src]="this.user?.picture ? this.user?.picture : './assets/person.svg'"
       />
       <div class="name">{{ this.user.firstName }} {{ this.user.lastName }}</div>
       <div>{{ this.user.userName }}</div>
@@ -144,6 +144,7 @@ export class ProfileComponent implements OnInit {
       .listenToServer(`user update ${user?.id}`)
       .subscribe((data) => {
         this.user = data;
+        console.log(this.user.picture);
         this.authService.saveUser(data);
 
         if (typeof this.user.picture !== 'string' && this.user.picture) {
@@ -289,7 +290,10 @@ export class ProfileComponent implements OnInit {
       },
     });
     modal.onWillDismiss().then((res) => {
+      console.log(res);
       if (res?.data?.picture) {
+        console.log('pq ?');
+
         this.user.picture = res?.data?.picture;
       }
       this.cd.detectChanges();

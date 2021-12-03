@@ -59,7 +59,7 @@ exports.userUpdatePicture = async (req, res, next) => {
     { id: userId },
     {
       $set: {
-        picture: req.files[0],
+        picture: "data:image/jpeg;base64," + req.files[0].buffer,
       },
     }
   ).exec((err, user) => {
@@ -209,7 +209,7 @@ exports.forgotPass_send = async (req, res) => {
 
 exports.forgotPass_check = async (req, res, next) => {
   const { email, password, rand } = req.body;
-  console.log(req.body)
+  console.log(req.body);
   const user = await getUser({ email: email });
   if (user) {
     ForgotPass.findOne({ email: email }).exec(async (err, data) => {
@@ -225,7 +225,7 @@ exports.forgotPass_check = async (req, res, next) => {
           message: "No code",
         });
       } else {
-        console.log(bcrypt.compareSync(password, user.password))
+        console.log(bcrypt.compareSync(password, user.password));
         if (bcrypt.compareSync(password, user.password) === true) {
           res.status(200).json({
             status: false,
@@ -356,7 +356,8 @@ exports.sendVerifyEmail = async (req, res) => {
   const user = await getUser({ email: email });
   if (user) {
     var rand = Math.floor(Math.random() * 100000 + 54);
-    var link = "https://music.room.projet42web.fr/verify/" + rand + "/email/" + email;
+    var link =
+      "https://music.room.projet42web.fr/verify/" + rand + "/email/" + email;
 
     user.rand = rand;
     await updateUser(user._id, user);

@@ -106,15 +106,6 @@ function ValidatorEmail(control: FormControl) {
         <div class="name-input">Email</div>
       </div> -->
     </form>
-
-    <div class="premium-container">
-      <div class="premium-name">Free / Premium</div>
-      <ion-toggle
-        [(ngModel)]="this.toggle"
-        [checked]="this.user.type === 'premium'"
-        (click)="this.upgradeAccount($event)"
-      ></ion-toggle>
-    </div>
   `,
   styleUrls: ['./edit-profile.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -190,6 +181,7 @@ export class EditProfileComponent implements OnInit {
 
     this.platform.ready().then(() => {
       if (this.platform.is('cordova')) {
+        console.log('ça rentre mon con');
         this.camera.getPicture(options).then(
           async (imageData) => {
             // imageData is either a base64 encoded string or a file URI
@@ -201,9 +193,9 @@ export class EditProfileComponent implements OnInit {
             this.user.picture = base64Image;
             this.uploadPicture.append('file', blob, `myimage.jpeg`);
             this.uploadPicture.append('name', 'jsp');
-            this.userService
-              .updatePicture(this.uploadPicture, this.user.id)
-              .subscribe();
+            // this.userService
+            //   .updatePicture(this.uploadPicture, this.user.id)
+            //   .subscribe();
 
             this.cd.detectChanges();
           },
@@ -212,8 +204,54 @@ export class EditProfileComponent implements OnInit {
           }
         );
         this.cd.detectChanges();
+      } else {
+        console.log('donc ici');
+        let input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/jpeg, image/png';
+        input.onchange = (e) => {
+          this.validateAndUpload(e);
+        };
+        input.click();
       }
     });
+  }
+
+  public validateAndUpload(event) {
+    const file = event.target.files[0];
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      if (file) {
+        const img = new Image();
+
+        img.onerror = () => {};
+        img.onload = async () => {
+          const height = img.naturalHeight;
+          const width = img.naturalWidth;
+          if (height && width) {
+            let base64Image = reader.result as string;
+            const blob = await (await fetch(base64Image)).blob();
+
+            this.user.picture = base64Image;
+            this.uploadPicture.append('file', blob, `myimage.jpeg`);
+            this.uploadPicture.append('name', 'jsp');
+            // this.userService
+            //   .updatePicture(this.uploadPicture, this.user.id)
+            //   .subscribe();
+
+            this.cd.detectChanges();
+          } else {
+          }
+          this.cd.detectChanges();
+        };
+        if ((reader.result as string).length > 5) {
+          img.src = reader.result as string;
+        } else {
+        }
+      }
+    };
   }
 
   async saveProfile() {
@@ -242,18 +280,19 @@ export class EditProfileComponent implements OnInit {
             });
           }
         });
-    } else {
+    } else if (!this.userForm.valid) {
       stop = true;
       this.dismiss(false);
     }
 
     if (this.uploadPicture.has('file') && !stop) {
+      console.log('icicicicicici');
       this.userService
         .updatePicture(this.uploadPicture, this.user.id)
         .subscribe((res) => {
           this.dismiss(true);
         });
-    } else if (!stop) {
+    } else {
       this.dismiss(false);
     }
     this.cd.detectChanges();

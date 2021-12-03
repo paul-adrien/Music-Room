@@ -37,11 +37,14 @@ import { Playlist } from 'libs/playlist';
           class="img"
           src="./assets/messages.svg"
         />
-        <img
-          (click)="this.openNotifs()"
-          class="img"
-          src="./assets/notifications-outline.svg"
-        />
+        <div class="notif">
+          <img
+            (click)="this.openNotifs()"
+            class="img"
+            src="./assets/notifications-outline.svg"
+          />
+          <div class="red-dot" *ngIf="this.hasNotif"></div>
+        </div>
         <img
           (click)="this.createRoom()"
           class="img"
@@ -98,6 +101,7 @@ export class HomeComponent implements OnInit {
   public user: Partial<User>;
   public rooms: Room[];
   public playlists: Playlist[];
+  public hasNotif = false;
   constructor(
     private authService: AuthService,
     private roomService: RoomService,
@@ -152,6 +156,15 @@ export class HomeComponent implements OnInit {
       .subscribe((data) => {
         this.authService.saveUser(data);
         this.user = data;
+        if (
+          this.user.notifs.friends.length > 0 ||
+          this.user.notifs.playlist.length > 0 ||
+          this.user.notifs.rooms.length > 0
+        ) {
+          this.hasNotif = true;
+        } else {
+          this.hasNotif = false;
+        }
 
         this.cd.detectChanges();
       });
@@ -159,6 +172,15 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.user = this.authService.getUser();
+    if (
+      this.user.notifs.friends.length > 0 ||
+      this.user.notifs.playlist.length > 0 ||
+      this.user.notifs.rooms.length > 0
+    ) {
+      this.hasNotif = true;
+    } else {
+      this.hasNotif = false;
+    }
     forkJoin([
       this.roomService.getAllRoom(),
       this.playlistService.getAllPlaylist(),

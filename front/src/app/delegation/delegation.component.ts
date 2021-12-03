@@ -9,12 +9,14 @@ import { SearchComponent } from '../search/search.component';
 @Component({
   selector: 'app-delegation',
   template: `
-    <div class="title">Écoute sur {{ this.user?.userName }}</div>
+    <div class="title">
+      Écoute sur {{ this.selectedPlayer?.userName || this.user?.userName }}
+    </div>
     <div class="primary-button" (click)="this.delegateControl()">
       Déléguer le controle
     </div>
     <div class="sub-title">Autres appareils</div>
-    <div class="devices">
+    <div class="devices" *ngIf="this.devices?.length > 0; else noCase">
       <div
         (click)="this.selectPlayer(device)"
         *ngFor="let device of this.devices"
@@ -23,7 +25,13 @@ import { SearchComponent } from '../search/search.component';
         {{ device?.userName }}
       </div>
     </div>
-    <div class="control-buttons-container">
+    <ng-template #noCase>
+      <div style="text-align: center;">
+        Aucun appareil.<br />Attendez que quelqu'un vous donne le controle.
+      </div>
+    </ng-template>
+
+    <div *ngIf="this.selectedPlayer" class="control-buttons-container">
       <img
         (click)="this.previousTrack()"
         class="next-previous"
@@ -42,6 +50,9 @@ import { SearchComponent } from '../search/search.component';
         class="next-previous"
         src="./assets/next.svg"
       />
+    </div>
+    <div *ngIf="this.selectedPlayer" class="primary-button bottom">
+      Choisir une musique
     </div>
   `,
   styleUrls: ['./delegation.component.scss'],
@@ -64,12 +75,14 @@ export class DelegationComponent implements OnInit {
       .subscribe((data) => {
         this.user = data;
         this.authService.saveUser(data);
+        this.devices = this.authService.getDelegation();
         this.cd.detectChanges();
       });
   }
 
   public user: User;
   public devices: any;
+  public selectedPlayer: any = undefined;
 
   ngOnInit() {
     this.user = this.authService.getUser();
@@ -163,7 +176,28 @@ export class DelegationComponent implements OnInit {
     });
   }
 
+  async presentModalSuggestion() {
+    const modal = await this.modalController.create({
+      component: SearchComponent,
+      cssClass: ['my-custom-class', 'my-custom-modal'],
+      swipeToClose: true,
+      componentProps: {
+        isModal: true,
+      },
+    });
+    modal.onWillDismiss().then((res) => {
+      if (res?.data?.track) {
+        const track = res.data.track;
+        console.log(track);
+
+        this.playTrack(track.id, track.uri);
+      }
+    });
+    return await modal.present();
+  }
+
   selectPlayer(device: any) {
+    this.selectedPlayer = device;
     this.authService.savePlayerId(device);
   }
 }
