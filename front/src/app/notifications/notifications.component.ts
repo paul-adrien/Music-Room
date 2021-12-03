@@ -109,7 +109,7 @@ export class NotificationsComponent implements OnInit {
           ...friend,
           type: 'friends',
         }));
-        this.notifs = this.notifs
+        this.notifs = new Array()
           .concat(tmpRoom, tmpPlaylist, tmpFriend)
           .sort((a, b) => {
             if (isBefore(new Date(a.date), new Date(b.date))) {
@@ -177,6 +177,7 @@ export class NotificationsComponent implements OnInit {
       });
       this.openNotif(id, type);
     } else if (type === 'friends') {
+      console.log(id, type);
       this.socketService.emitToServer('friend accept invite', {
         userId: this.user.id,
         friendId: id,
@@ -216,6 +217,7 @@ export class NotificationsComponent implements OnInit {
       (el) =>
         el?.id === notif?.id && new Date(el?.date) === new Date(notif?.date)
     );
+    this.user = user;
     console.log(user);
     this.cd.detectChanges();
     this.socketService.emitToServer('user edit', {
