@@ -1,23 +1,23 @@
 config:
-  target: 'http://localhost:8080'
-  # target: 'http://54.38.243.206:8080'
+  # target: 'http://localhost:8080'
+  target: 'http://54.38.243.206:8080'
   tls:
     rejectUnauthorized: false
   phases:
     - duration: 10
-      arrivalRate: 1
+      arrivalRate: 10
       name: "Phase 1"
     - duration: 10
       arrivalRate: 40
-      rampTo: 10
+      # rampTo: 100
       name: "Phase 2"
-    - duration: 20
-      arrivalRate: 40
-      rampTo: 500
-      name: "Phase 3"
+    # - duration: 20
+    #   arrivalRate: 40
+    #   rampTo: 500
+    #   name: "Phase 3"
   http:
     # Responses have to be sent within 10 seconds, or an `ETIMEDOUT` error gets raised.
-    timeout: 10
+    timeout: 20
     pool: 1
     maxSockets: 5
   socketio:
@@ -47,7 +47,7 @@ before:
     - post:
         url: "/user/authenticate"
         json:
-          userName: "test"
+          userName: "test2"
           password: "Password76@"
         capture:
           - json: "$.accessToken"
