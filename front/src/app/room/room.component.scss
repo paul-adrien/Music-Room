@@ -13,6 +13,7 @@
   .room-container {
     display: flex;
     flex-direction: column;
+    overflow: scroll;
 
     .title {
       font-family: Circular-bold;

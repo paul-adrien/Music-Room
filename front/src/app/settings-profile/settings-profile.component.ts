@@ -100,7 +100,7 @@ export class SettingsProfileComponent implements OnInit {
   }
 
   public back() {
-    this.location.back();
+    this.location.historyGo(-1);
   }
 
   upgradeAccount(event: any) {

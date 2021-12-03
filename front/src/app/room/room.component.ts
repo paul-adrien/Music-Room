@@ -313,6 +313,9 @@ export class RoomComponent implements OnInit, OnDestroy {
       .getPlayerInfo()
       .toPromise()
       .then((res) => {
+        this.tracks = this.tracks?.filter(
+          (music) => music?.id !== this.trackPlaying?.id
+        );
         if (typeof res !== 'string' && res !== null) {
           if (
             res.progress_ms === 0 &&
@@ -588,7 +591,10 @@ export class RoomComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     if (this.interval) {
       clearInterval(this.interval);
-      this.quitRoom();
+      this.socketService.emitToServer('room quit', {
+        userId: this.user.id,
+        roomId: this.roomId,
+      });
     }
   }
 }

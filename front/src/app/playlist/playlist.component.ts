@@ -28,7 +28,7 @@ import { WebsocketService } from '../_services/websocketService';
     </div>
     <div class="playlist-container" *ngIf="this.playlist">
       <div *ngIf="this.tracks[0]" class="player-container">
-        <div class="player-info">
+        <!-- <div class="player-info">
           <img
             class="img-track"
             [src]="this.tracks[0]?.album?.images[0]?.url"
@@ -42,8 +42,8 @@ import { WebsocketService } from '../_services/websocketService';
             this.playerInfo?.item.duration_ms
           "
           [color]="'warn'"
-        ></mat-progress-bar>
-        <div class="timer-container">
+        ></mat-progress-bar> -->
+        <!-- <div class="timer-container">
           <div>{{ this.playerInfo?.progress_ms | date: 'm:ss' }}</div>
           <div>
             -{{
@@ -51,7 +51,7 @@ import { WebsocketService } from '../_services/websocketService';
                 | date: 'm:ss'
             }}
           </div>
-        </div>
+        </div> -->
       </div>
       <div class="buttons-middle" *ngIf="this.checkRight()">
         <div
@@ -421,6 +421,5 @@ export class PlaylistComponent implements OnInit {
 
   ngOnDestroy() {
     clearInterval(this.interval);
-    this.quitPlaylist();
   }
 }
