@@ -2,6 +2,8 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { RouterTestingModule } from "@angular/router/testing";
 import { Device } from '@ionic-native/device/ngx';
+import { WebsocketService } from './_services/websocketService';
+import { HttpClient, HttpHandler } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 
@@ -16,10 +18,10 @@ describe('AppComponent', () => {
       imports: [RouterTestingModule],
       providers: [
         Device,
-        // HttpClient,
-        // HttpHandler,
+        HttpClient,
+        HttpHandler,
         // InAppBrowser,
-        // WebsocketService,
+        WebsocketService,
         // AuthService
       ],
     }).compileComponents();

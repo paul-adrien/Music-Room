@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { WebsocketService } from './websocketService';
@@ -15,6 +15,7 @@ describe('SocketService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
+                HttpClientTestingModule,
                 SocketIoModule.forRoot(config),
                 RouterTestingModule,
             ],

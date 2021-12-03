@@ -30,18 +30,18 @@ export class VerifyComponent implements OnInit {
 
   ngOnInit(): void {
     this.user = this.authService.getUser();
-    if (this.user.validEmail) {
+    if (this.user?.validEmail) {
       this.router.navigate(['tabs/tab-home/']);
     } else if (!this.user) {
-      this.router.navigate(['/login']);
+      this.router.navigate(['login/']);
     }
-    this.userService.getUser(this.user.id).subscribe((res) => {
+    this.userService.getUser(this.user?.id).subscribe((res) => {
       this.user = res;
       this.authService.saveUser(res);
       if (this.user.validEmail) {
         this.router.navigate(['tabs/tab-home/']);
       } else if (!this.user) {
-        this.router.navigate(['/login']);
+        this.router.navigate(['login/']);
       }
       this.cd.detectChanges();
     });

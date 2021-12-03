@@ -137,7 +137,7 @@ export class UserProfileComponent implements OnInit {
     const loggedUser = this.authService.getUser();
 
     this.socketService
-      .listenToServer(`user update ${loggedUser.id}`)
+      .listenToServer(`user update ${loggedUser?.id}`)
       .subscribe((data) => {
         this.loggedUser = data;
         this.isFriends =
@@ -223,7 +223,7 @@ export class UserProfileComponent implements OnInit {
       this.cd.detectChanges();
     });
 
-    this.userService.getUser(loggedUser.id).subscribe(async (res) => {
+    this.userService.getUser(loggedUser?.id).subscribe(async (res) => {
       this.loggedUser = res;
       console.log(res);
       this.isFriends =

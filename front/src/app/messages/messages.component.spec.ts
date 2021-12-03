@@ -2,6 +2,8 @@ import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { IonicModule } from '@ionic/angular';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { WebsocketService } from '../_services/websocketService';
+import { AngularDelegate, ModalController } from '@ionic/angular';
 
 import { MessagesComponent } from './messages.component';
 
@@ -14,9 +16,12 @@ describe('MessagesComponent', () => {
       declarations: [MessagesComponent],
       imports: [
         HttpClientTestingModule,
-        RouterTestingModule
+        RouterTestingModule,
       ],
       providers: [
+        WebsocketService,
+        ModalController,
+        AngularDelegate,
         // Device,
         // InAppBrowser,
         // PopoverController,

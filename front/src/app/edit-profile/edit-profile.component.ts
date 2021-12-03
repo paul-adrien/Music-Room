@@ -148,7 +148,7 @@ export class EditProfileComponent implements OnInit {
 
   ngOnInit() {
     this.user = this.authService.getUser();
-    if (this.user.type === 'premium') {
+    if (this.user?.type === 'premium') {
       this.toggle = true;
     }
     this.userService.getUser(this.user?.id).subscribe(async (res) => {

@@ -25,7 +25,7 @@ import { AlertController } from '@ionic/angular';
       <div class="text">Free / Premium</div>
       <ion-toggle
         [(ngModel)]="this.toggle"
-        [checked]="this.user.type === 'premium'"
+        [checked]="this.user?.type === 'premium'"
         (click)="this.upgradeAccount($event)"
       ></ion-toggle>
     </div>
@@ -82,8 +82,8 @@ export class SettingsProfileComponent implements OnInit {
 
   ngOnInit() {
     this.user = this.authService.getUser();
-    this.isGoogleId = this.user.id.includes('google');
-    if (this.user.type === 'premium') {
+    this.isGoogleId = this.user?.id.includes('google');
+    if (this.user?.type === 'premium') {
       this.toggle = true;
     }
     this.router.queryParams.subscribe((params) => {

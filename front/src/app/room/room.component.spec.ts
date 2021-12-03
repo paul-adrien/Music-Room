@@ -7,6 +7,7 @@ import { AngularDelegate, ModalController, PopoverController } from '@ionic/angu
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { WebsocketService } from '../_services/websocketService';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { Geolocation } from '@ionic-native/geolocation/ngx';
 
 import { RoomComponent } from './room.component';
 import { environment } from 'src/environments/environment';
@@ -34,6 +35,7 @@ describe('RoomComponent', () => {
         AngularDelegate,
         PopoverController,
         WebsocketService,
+        Geolocation,
         // AuthService
       ]
     })

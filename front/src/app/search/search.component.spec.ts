@@ -4,6 +4,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { Device } from '@ionic-native/device/ngx';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 import { AngularDelegate, ModalController } from '@ionic/angular';
+import { WebsocketService } from '../_services/websocketService';
 
 import { SearchComponent } from './search.component';
 
@@ -21,8 +22,8 @@ describe('SearchComponent', () => {
         HttpHandler,
         InAppBrowser,
         ModalController,
-        AngularDelegate
-        // WebsocketService,
+        AngularDelegate,
+        WebsocketService,
         // AuthService
       ],
     })

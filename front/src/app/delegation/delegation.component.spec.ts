@@ -8,6 +8,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 import { AngularDelegate, ModalController } from '@ionic/angular';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { WebsocketService } from '../_services/websocketService';
+import { Device } from '@ionic-native/device/ngx';
 
 describe('DelegationComponent', () => {
   let component: DelegationComponent;
@@ -23,7 +25,9 @@ describe('DelegationComponent', () => {
       providers: [
         InAppBrowser,
         ModalController,
-        AngularDelegate
+        AngularDelegate,
+        WebsocketService,
+        Device
       ]
     })
       .compileComponents();

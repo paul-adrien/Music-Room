@@ -73,7 +73,7 @@ export class MessagesComponent implements OnInit {
     const user = this.authService.getUser();
 
     this.socketService
-      .listenToServer(`chat convs ${user.id}`)
+      .listenToServer(`chat convs ${user?.id}`)
       .subscribe((data) => {
         console.log(data);
         let index = this.convList.findIndex((conv) => conv._id === data._id);
@@ -89,7 +89,7 @@ export class MessagesComponent implements OnInit {
 
   ngOnInit() {
     this.user = this.authService.getUser();
-    this.messageService.getConvList(this.user.id).subscribe((res) => {
+    this.messageService.getConvList(this.user?.id).subscribe((res) => {
       console.log(res);
       if (res.status) {
         this.convList = res.conversations;

@@ -7,6 +7,7 @@ import { Device } from '@ionic-native/device/ngx';
 import { InAppBrowser } from '@ionic-native/in-app-browser/ngx';
 import { AngularDelegate, ModalController } from '@ionic/angular';
 import { SpotifyService } from '../_services/spotify_service';
+import { WebsocketService } from '../_services/websocketService';
 
 import { TabsPage } from './tabs.page';
 
@@ -25,7 +26,8 @@ describe('TabsPage', () => {
         HttpHandler,
         Device,
         ModalController,
-        AngularDelegate
+        AngularDelegate,
+        WebsocketService
       ],
     }).compileComponents();
   }));
