@@ -38,8 +38,8 @@ describe("action with playlist in socket", function () {
 
     beforeAll(() => {
         socket = io(base_url, {
-            auth: {
-                token: 'socketToken'
+            query: {
+                token: 'secret-token'
             }
         });
         axios.post(base_url + '/user/authenticate', {
@@ -84,7 +84,7 @@ describe("action with playlist in socket", function () {
             url: base_url + '/playlist/' + playlistData.id + '/' + userTest.id,
             headers: { 'x-access-token': userTest.accessToken },
         }).then(function (res) {
-        }).catch((err) => { console.log(err) });
+        }).catch((err) => {});
     });
 
     it('create playlist', (done) => {

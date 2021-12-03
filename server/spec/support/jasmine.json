@@ -1,7 +1,11 @@
 {
   "spec_dir": "spec",
   "spec_files": [
-    "**/*[sS]pec.js"
+    "../auth-spec.js",
+    "../user-spec.js",
+    "../room-sock-spec.js",
+    "../room-http-spec.js",
+    "../playlist-spec.js"
   ],
   "helpers": [
     "helpers/**/*.js"

@@ -36,7 +36,7 @@ describe("action with rooms", function () {
             url: base_url + 'room/' + roomData.id + '/user/' + userTest.id,
             headers: { 'x-access-token': userTest.accessToken },
         }).then(function (res) {
-        }).catch((err) => { console.log(err) });
+        }).catch((err) => { });
     });
 
     it("get rooms", function (done) {
@@ -44,15 +44,6 @@ describe("action with rooms", function () {
             headers: { 'x-access-token': userTest.accessToken }
         }).then(function (res) {
             expect(res.data.status).toEqual(true);
-            done();
-        });
-    });
-
-    it("check room name", function (done) {
-        axios.get(base_url + 'room/test/check-name', {
-            headers: { 'x-access-token': userTest.accessToken }
-        }).then(function (res) {
-            expect(res.data.room).toEqual(null);
             done();
         });
     });
@@ -70,7 +61,7 @@ describe("action with rooms", function () {
             roomData.id = res.data.room._id;
             expect(res.data.status).toBe(true);
             done();
-        }).catch((err) => { console.log(err) });
+        }).catch((err) => {  });
     });
 
     it("check room name", function (done) {

@@ -38,8 +38,8 @@ describe("action with rooms in socket", function () {
 
     beforeAll(() => {
         socket = io(base_url, {
-            auth: {
-                token: 'socketToken'
+            query: {
+                token: 'secret-token'
             }
         });
         axios.post(base_url + '/user/authenticate', {
