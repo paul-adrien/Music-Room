@@ -26,6 +26,11 @@ const config: CapacitorConfig = {
       resizeOnFullScreen: true,
     },
   },
+  cordova: {
+    preferences: {
+      OverrideUserAgent: 'Mozilla/5.0 Google',
+    },
+  },
 };
 
 export default config;

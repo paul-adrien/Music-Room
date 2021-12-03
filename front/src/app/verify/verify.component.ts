@@ -7,6 +7,7 @@ import { AuthService } from '../_services/auth_service';
 @Component({
   selector: 'app-verify',
   template: `
+    <img class="log-out" src="./assets/log-out.svg" (click)="this.logOut()" />
     <div class="no-verify-container">
       Veuillez vérifier votre mail en cliquant sur le lien du mail de
       vérification.
@@ -14,6 +15,10 @@ import { AuthService } from '../_services/auth_service';
     <div>Vous n'avez rien reçu ?</div>
     <div (click)="this.resendMail()" class="primary-button">
       Renvoyer le mail
+    </div>
+
+    <div (click)="this.ngOnInit()" class="primary-button">
+      Recharger la page
     </div>
   `,
   styleUrls: ['./verify.component.scss'],
@@ -45,6 +50,10 @@ export class VerifyComponent implements OnInit {
       }
       this.cd.detectChanges();
     });
+  }
+
+  logOut() {
+    this.authService.logOut();
   }
 
   resendMail() {
