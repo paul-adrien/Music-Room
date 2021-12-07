@@ -38,6 +38,18 @@ import { WebsocketService } from '../_services/websocketService';
           </span>
           vous a envoyé une demande d'ami
         </div>
+        <div class="buttons">
+          <img
+            class="img"
+            (click)="this.removeNotif(notif, notif.type)"
+            src="./assets/close-outline.svg"
+          />
+          <img
+            class="img"
+            (click)="this.acceptNotif(notif.id, notif.type)"
+            src="./assets/checkmark-outline.svg"
+          />
+        </div>
       </div>
     </div>
     <ng-template #noNotifs>
