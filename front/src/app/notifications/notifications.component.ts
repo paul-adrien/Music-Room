@@ -193,7 +193,7 @@ export class NotificationsComponent implements OnInit {
       this.router.navigate([`tabs/tab-profile/user-profile/${id}`]);
     } else {
       this.spotifyService.getPlayerInfo().subscribe(async (res) => {
-        if (this.device.platform === null && res?.device !== null) {
+        if (this.device.platform === null && res !== null && res.device) {
           if (type === 'rooms') {
             this.socketService.emitToServer('room enter', {
               userId: this.user.id,
@@ -204,7 +204,10 @@ export class NotificationsComponent implements OnInit {
           } else if (type === 'playlist') {
             this.router.navigate([`tabs/tab-home/playlist/${id}`]);
           }
-        } else if (this.device.platform === null && res?.device === null) {
+        } else if (
+          (this.device.platform === null && res === null) ||
+          res?.device === null
+        ) {
           await this.presentAlert();
         }
       });
