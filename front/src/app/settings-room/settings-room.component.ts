@@ -51,7 +51,10 @@ declare var google: any;
         (click)="this.changeTypeInvited($event)"
       ></ion-toggle>
     </div>
-    <div *ngIf="this.type === 'room'" class="item-container">
+    <div
+      *ngIf="this.type === 'room' || this.type === undefined"
+      class="item-container"
+    >
       <div class="item-name">Plage horaire de la room:</div>
       <ion-toggle [(ngModel)]="this.zone" [checked]="this.zone"></ion-toggle>
     </div>
@@ -200,7 +203,15 @@ export class SettingsRoomComponent implements OnInit {
     if (this.type === 'room') {
       this.toggle = this.room.type === 'private' ? true : false;
       this.invited = this.room?.onlyInvited;
+    } else if (this.type === 'playlist') {
+      this.toggle = this.playlist.type === 'private' ? true : false;
+      this.invited = this.playlist?.onlyInvited;
+    }
+    this.cd.detectChanges();
+  }
 
+  ngAfterViewInit(): void {
+    if (this.type === 'room') {
       this.mapInitializer();
       if (this.room?.limits) {
         if (this.room.limits.end && this.room.limits.start) {
@@ -219,14 +230,10 @@ export class SettingsRoomComponent implements OnInit {
       }
       $('#pac-input3').on('input', function (e) {
         $('.pac-container').append(`<style>.pac-container {
-          z-index: 10000 !important;
-        }</style>`);
+            z-index: 10000 !important;
+          }</style>`);
       });
-    } else if (this.type === 'playlist') {
-      this.toggle = this.playlist.type === 'private' ? true : false;
-      this.invited = this.playlist?.onlyInvited;
     }
-    this.cd.detectChanges();
   }
 
   mapInitializer() {

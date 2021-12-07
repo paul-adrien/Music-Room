@@ -168,7 +168,7 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
 export class RoomComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
-    public router: Router,
+    private router: Router,
     private roomService: RoomService,
     private cd: ChangeDetectorRef,
     private spotifyService: SpotifyService,
@@ -177,49 +177,50 @@ export class RoomComponent implements OnInit, OnDestroy {
     public modalController: ModalController,
     private popoverCtrl: PopoverController,
     private socketService: WebsocketService,
-    private geolocation: Geolocation,
-    private navCtrl: NavController
+    private geolocation: Geolocation
   ) {
     this.socketService
       .listenToServer(`room update ${this.roomId}`)
       .subscribe((data) => {
+        this.user = this.authService.getUser();
         this.room = data;
-        if (this.room === null) this.router.navigate(['tabs/tab-home']);
 
-        this.isInvited =
-          this.room?.invited.indexOf(this.user?.id) >= 0 ||
-          this.room?.created_by === this.user?.id
-            ? true
-            : false;
-        if (this.isInvited === false && this.room?.type === 'private')
-          this.quitRoom();
+        if (this.room.users.find((user) => user.id === this.user.id)) {
+          this.isInvited =
+            this.room?.invited.indexOf(this.user?.id) >= 0 ||
+            this.room?.created_by === this.user?.id
+              ? true
+              : false;
+          if (this.isInvited === false && this.room?.type === 'private')
+            this.quitRoom();
 
-        if (this.room?.limits) {
-          this.geolocation
-            .getCurrentPosition()
-            .then((resp) => {
-              this.roomService
-                .checkLimit(
-                  this.room._id,
-                  resp.coords.latitude,
-                  resp.coords.longitude
-                )
-                .subscribe((res) => {
-                  if (res.status) {
-                    this.zone = res.isIn;
-                  }
-                  this.cd.detectChanges();
-                });
-            })
-            .catch((error) => {});
-        } else {
-          this.zone = undefined;
-        }
+          if (this.room?.limits) {
+            this.geolocation
+              .getCurrentPosition()
+              .then((resp) => {
+                this.roomService
+                  .checkLimit(
+                    this.room._id,
+                    resp.coords.latitude,
+                    resp.coords.longitude
+                  )
+                  .subscribe((res) => {
+                    if (res.status) {
+                      this.zone = res.isIn;
+                    }
+                    this.cd.detectChanges();
+                  });
+              })
+              .catch((error) => {});
+          } else {
+            this.zone = undefined;
+          }
 
-        if (data?.musics?.length > 0) {
-          this.getTracksInfo(data.musics);
-        } else {
-          this.tracks = [];
+          if (data?.musics?.length > 0) {
+            this.getTracksInfo(data.musics);
+          } else {
+            this.tracks = [];
+          }
         }
         this.cd.detectChanges();
       });
@@ -399,6 +400,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     });
     this.location.historyGo(-1);
     //this.navCtrl.navigateRoot('tabs/tab-home');
+
     //this.navCtrl.navigateBack('');
     //this.navCtrl.navigateBack('/tabs/home');
   }
