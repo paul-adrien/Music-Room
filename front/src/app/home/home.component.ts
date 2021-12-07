@@ -171,6 +171,33 @@ export class HomeComponent implements OnInit {
           this.hasNotif = false;
         }
 
+        forkJoin([
+          this.roomService.getAllRoom(),
+          this.playlistService.getAllPlaylist(),
+        ]).subscribe(([rooms, playlists]) => {
+          this.rooms = rooms.filter((room: Room) => {
+            if (
+              room.type === 'public' ||
+              (room.type === 'private' &&
+                (room.created_by === this.user.id ||
+                  room.invited.indexOf(this.user.id) >= 0))
+            )
+              return true;
+            else return false;
+          });
+          this.playlists = playlists.filter((playlist: Playlist) => {
+            if (
+              playlist.type === 'public' ||
+              (playlist.type === 'private' &&
+                (playlist.created_by === this.user.id ||
+                  playlist.invited.indexOf(this.user.id) >= 0))
+            )
+              return true;
+            else return false;
+          });
+          this.cd.detectChanges();
+        });
+
         this.cd.detectChanges();
       });
   }
