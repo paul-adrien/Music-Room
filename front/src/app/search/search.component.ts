@@ -78,9 +78,9 @@ export class SearchComponent {
 
   play(track: any) {
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
-      if (res?.device === undefined) {
+      if (res?.device === null) {
         await this.presentAlert();
-      } else if (res?.device !== undefined) {
+      } else if (res?.device !== null) {
         this.spotifyService.playTrack(track.uri, track.id).subscribe();
       }
     });

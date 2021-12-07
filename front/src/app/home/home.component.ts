@@ -309,7 +309,7 @@ export class HomeComponent implements OnInit {
         (this.device.platform === null ||
           this.device.platform.toLocaleLowerCase() === 'ios' ||
           this.device.platform.toLocaleLowerCase() === 'android') &&
-        res?.device !== undefined
+        res?.device !== null
       ) {
         this.socketService.emitToServer('room enter', {
           userId: this.user.id,
@@ -317,7 +317,7 @@ export class HomeComponent implements OnInit {
           device: res?.device?.id,
         });
         this.router.navigate([`tabs/tab-home/room/${roomId}`]);
-      } else if (!res?.device === undefined) {
+      } else if (!res?.device === null) {
         await this.presentAlert();
       }
     });
@@ -329,10 +329,10 @@ export class HomeComponent implements OnInit {
         (this.device.platform === null ||
           this.device.platform.toLocaleLowerCase() === 'ios' ||
           this.device.platform.toLocaleLowerCase() === 'android') &&
-        res?.device !== undefined
+        res?.device !== null
       ) {
         this.router.navigate([`tabs/tab-home/playlist/${playlistId}`]);
-      } else if (!res?.device === undefined) {
+      } else if (!res?.device === null) {
         await this.presentAlert();
       }
     });

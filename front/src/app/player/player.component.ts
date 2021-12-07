@@ -206,9 +206,9 @@ export class PlayerComponent {
 
   play() {
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
-      if (!res?.device === undefined) {
+      if (!res?.device === null) {
         await this.presentAlert();
-      } else if (res?.device !== undefined) {
+      } else if (res?.device !== null) {
         this.spotifyService.play().subscribe((data) => {
           this.playerInfo.is_playing = true;
           this.cd.detectChanges();
@@ -219,9 +219,9 @@ export class PlayerComponent {
 
   playTrack(trackId: string, uri: string) {
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
-      if (!res?.device === undefined) {
+      if (!res?.device === null) {
         await this.presentAlert();
-      } else if (res?.device !== undefined) {
+      } else if (res?.device !== null) {
         this.spotifyService.playTrack(uri, trackId).subscribe((data) => {
           this.playerInfo.is_playing = true;
           this.cd.detectChanges();
@@ -232,9 +232,9 @@ export class PlayerComponent {
 
   pause() {
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
-      if (!res?.device === undefined) {
+      if (!res?.device === null) {
         await this.presentAlert();
-      } else if (res?.device !== undefined) {
+      } else if (res?.device !== null) {
         this.spotifyService.pause().subscribe((data) => {
           this.playerInfo.is_playing = false;
           this.cd.detectChanges();
@@ -298,9 +298,9 @@ export class PlayerComponent {
 
   seekTrack(position: any) {
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
-      if (!res?.device === undefined) {
+      if (!res?.device === null) {
         await this.presentAlert();
-      } else if (res?.device !== undefined) {
+      } else if (res?.device !== null) {
       }
     });
     this.spotifyService.seek(position.value * 1000).subscribe();
@@ -308,9 +308,9 @@ export class PlayerComponent {
 
   nextTrack() {
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
-      if (!res?.device === undefined) {
+      if (!res?.device === null) {
         await this.presentAlert();
-      } else if (res?.device !== undefined) {
+      } else if (res?.device !== null) {
         this.spotifyService.next().subscribe();
       }
     });
@@ -318,9 +318,9 @@ export class PlayerComponent {
 
   previousTrack() {
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
-      if (!res?.device === undefined) {
+      if (!res?.device === null) {
         await this.presentAlert();
-      } else if (res?.device !== undefined) {
+      } else if (res?.device !== null) {
         this.spotifyService.previous().subscribe();
       }
     });
