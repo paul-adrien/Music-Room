@@ -177,7 +177,8 @@ export class RoomComponent implements OnInit, OnDestroy {
     public modalController: ModalController,
     private popoverCtrl: PopoverController,
     private socketService: WebsocketService,
-    private geolocation: Geolocation
+    private geolocation: Geolocation,
+    private navCtrl: NavController
   ) {
     this.socketService
       .listenToServer(`room update ${this.roomId}`)
@@ -396,8 +397,8 @@ export class RoomComponent implements OnInit, OnDestroy {
       userId: this.user.id,
       roomId: this.roomId,
     });
-    //this.location.back();
-    this.router.navigate(['tabs/tab-home']);
+    this.location.historyGo(-1);
+    //this.navCtrl.navigateRoot('tabs/tab-home');
     //this.navCtrl.navigateBack('');
     //this.navCtrl.navigateBack('/tabs/home');
   }
