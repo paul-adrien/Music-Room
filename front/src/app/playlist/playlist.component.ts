@@ -410,7 +410,7 @@ export class PlaylistComponent implements OnInit {
 
   checkRight() {
     return (
-      this.isPublic ||
+      (this.isPublic && !this.playlist.onlyInvited) ||
       this.playlist.invited.find((userId) => userId === this.user.id) ||
       this.playlist.created_by === this.user.id
     );

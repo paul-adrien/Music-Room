@@ -215,7 +215,8 @@ export class ProfileComponent implements OnInit {
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
       if (
         (this.device.platform === null ||
-          this.device.platform.toLocaleLowerCase() === 'ios') &&
+          this.device.platform.toLocaleLowerCase() === 'ios' ||
+          this.device.platform.toLocaleLowerCase() === 'android') &&
         res?.device !== undefined
       ) {
         this.roomService
@@ -237,7 +238,8 @@ export class ProfileComponent implements OnInit {
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
       if (
         (this.device.platform === null ||
-          this.device.platform.toLocaleLowerCase() === 'ios') &&
+          this.device.platform.toLocaleLowerCase() === 'ios' ||
+          this.device.platform.toLocaleLowerCase() === 'android') &&
         res?.device !== undefined
       ) {
         this.router.navigate([`tabs/tab-home/playlist/${playlistId}`]);

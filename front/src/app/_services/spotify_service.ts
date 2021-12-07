@@ -199,7 +199,7 @@ export class SpotifyService {
         .pipe(
           tap((res) => {
             this.saveToken(res);
-            this.route.navigate(['/tabs/search']);
+            this.route.navigate(['/tabs/tab-home']);
           })
         );
     } else return;
@@ -231,7 +231,7 @@ export class SpotifyService {
         .pipe(
           tap((res) => {
             this.saveToken(res);
-            this.route.navigate(['/tabs/search']);
+            this.route.navigate(['/tabs/tab-home']);
           })
         );
     }

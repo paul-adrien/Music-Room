@@ -33,7 +33,6 @@ const io = require("socket.io")(server, options);
 server.on("listening", () => {
   const address = server.address();
   const bind = typeof address === "string" ? "pipe " + address : "port " + 8080;
-  
 });
 
 app.get("/explorer_socket", (req, res) => {
@@ -42,7 +41,7 @@ app.get("/explorer_socket", (req, res) => {
 
 io.use(function (socket, next) {
   if (socket.handshake.query && socket.handshake.query.token) {
-    if (socket.handshake.query.token === 'secret-token') {
+    if (socket.handshake.query.token === "secret-token") {
       next();
     } else
       jwt.verify(
@@ -63,7 +62,7 @@ io.use(function (socket, next) {
     //
   });
   // socket.on("test", (data) => {
-  //   
+  //
   //   io.emit("test", data);
   // });
 
@@ -79,11 +78,9 @@ io.use(function (socket, next) {
   });
 
   socket.on("user update type", (data) => {
-    
     user_controller
       .userUpdateAccountSocket(data.userId, data.type)
       .then((res) => {
-        
         if (res?.status) {
           io.emit(`user update ${data.userId}`, res?.user);
         }
@@ -91,11 +88,9 @@ io.use(function (socket, next) {
   });
 
   socket.on("user update history", (data) => {
-    
     user_controller
       .userUpdateMusicHistorySocket(data.userId, data.trackId)
       .then((res) => {
-        
         if (res?.status) {
           io.emit(`user update ${data.userId}`, res?.user);
         }
@@ -175,14 +170,12 @@ io.use(function (socket, next) {
     friends_controller
       .deleteFriendSocket(data.userId, data.friendId)
       .then((res) => {
-        
         if (res.status) {
           Promise.all([
             getUser({ id: data.userId }),
             getUser({ id: data.friendId }),
           ]).then(([resUser, resFriend]) => {
             if (resUser !== null && resFriend !== null) {
-              
               logs.logsSOCKS(
                 `friend update ${data.friendId} delete`,
                 res.status,
@@ -192,8 +185,6 @@ io.use(function (socket, next) {
 
               io.emit(`user update ${data.friendId}`, resFriend);
             } else {
-              
-
               logs.logsSOCKS(
                 "Error when delete a friend",
                 res.status,
@@ -220,7 +211,6 @@ io.use(function (socket, next) {
         messaging_controller
           .getConversationDetailSocket(data.userId, data.convId)
           .then((res) => {
-            
             if (res.status) {
               logs.logsSOCKS(
                 "a message was send",
@@ -713,6 +703,29 @@ io.use(function (socket, next) {
       );
   });
 
+  socket.on("playlist change type invited", (data) => {
+    playlist_controller
+      .changeTypeInvitedSocket(data.userId, data.playlistId, data.type)
+      .then(() =>
+        playlist_controller.getPlaylistSocket(data.playlistId).then((res) => {
+          if (res.status) {
+            logs.logsSOCKS(
+              `playlist update ${data.playlistId} change type user invited`,
+              res.status,
+              socket.handshake.query.token
+            );
+            io.emit(`playlist update ${data.playlistId}`, res.playlist);
+          } else {
+            logs.logsSOCKS(
+              "Error when change type of a user in playlist",
+              res.status,
+              socket.handshake.query.token
+            );
+          }
+        })
+      );
+  });
+
   socket.on("playlist delete", (data) => {
     playlist_controller
       .delPlaylistSocket(data.userId, data.playlistId)
@@ -744,7 +757,6 @@ io.use(function (socket, next) {
       music_controller
         .giveDelegationPermission(data.userId, data.friendId)
         .then((res) => {
-          
           if (res) {
             logs.logsSOCKS(
               `${data.friendId} give delegation permission to ${data.friendId}`,
@@ -786,6 +798,4 @@ io.use(function (socket, next) {
   });
 });
 
-server.listen(8080, () => {
-  
-});
+server.listen(8080, () => {});

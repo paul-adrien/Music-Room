@@ -15,12 +15,6 @@ const routes: Routes = [
   },
   { path: 'login', component: LoginComponent },
   { path: 'verify-email', component: VerifyComponent },
-  // { path: 'search', component: SearchComponent },
-  // {
-  //   path: '',
-  //   redirectTo: '/search',
-  //   pathMatch: 'full',
-  // },
   { path: '**', redirectTo: '/login', pathMatch: 'full' },
 ];
 @NgModule({

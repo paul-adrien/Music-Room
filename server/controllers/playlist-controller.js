@@ -330,7 +330,8 @@ exports.inviteToPlaylist = async (req, res, next) => {
         playlist: null,
       });
     } else if (!playlist) {
-      res.message = "this playlist doesn't exist or you dont have the good right";
+      res.message =
+        "this playlist doesn't exist or you dont have the good right";
       res.status(200).json({
         status: true,
         message: "this playlist doesn't exist or you dont have the good right",
@@ -381,7 +382,7 @@ exports.inviteToPlaylist = async (req, res, next) => {
                   (playlist) => playlist.id === playlistId
                 )
               ) {
-                res.message =  "this user is already invited";
+                res.message = "this user is already invited";
                 res.status(200).json({
                   status: false,
                   message: "this user is already invited",
@@ -576,7 +577,8 @@ exports.acceptInvitePlaylist = async (req, res, next) => {
         message: err,
       });
     } else if (!playlist) {
-      res.message = "this playlist doesn't exist or you dont have the good right";
+      res.message =
+        "this playlist doesn't exist or you dont have the good right";
       res.status(200).json({
         status: true,
         message: "this playlist doesn't exist or you dont have the good right",
@@ -682,7 +684,8 @@ exports.addMusicPlaylist = async (req, res, next) => {
         message: err,
       });
     } else if (!playlist) {
-      res.message = "this playlist doesn't exist or you dont have the good right";
+      res.message =
+        "this playlist doesn't exist or you dont have the good right";
       res.status(200).json({
         status: true,
         message: "this playlist doesn't exist or you dont have the good right",
@@ -757,7 +760,8 @@ exports.delMusicPlaylist = async (req, res, next) => {
         message: err,
       });
     } else if (!playlist) {
-      res.message = "this playlist doesn't exist or you dont have the good right";
+      res.message =
+        "this playlist doesn't exist or you dont have the good right";
       res.status(200).json({
         status: true,
         message: "this playlist doesn't exist or you dont have the good right",
@@ -834,7 +838,8 @@ exports.changeType = async (req, res, next) => {
           message: err,
         });
       } else if (!playlist) {
-        res.message = "this playlist doesn't exist or you dont have the good right";
+        res.message =
+          "this playlist doesn't exist or you dont have the good right";
         res.status(200).json({
           status: true,
           message:
@@ -886,6 +891,32 @@ exports.changeTypeSocket = async (userId, playlistId, type) => {
           return {
             status: true,
             message: "this playlist change type",
+          };
+        });
+      }
+    }
+  );
+};
+
+exports.changeTypeInvitedSocket = async (userId, playlistId, type) => {
+  return Playlist.findOne({ _id: playlistId, created_by: userId }).then(
+    (playlist) => {
+      if (!playlist) {
+        return {
+          status: false,
+          message:
+            "this playlist doesn't exist or you dont have the good right",
+        };
+      } else {
+        return Playlist.updateOne(
+          { _id: playlistId },
+          {
+            onlyInvited: type,
+          }
+        ).then((playlist) => {
+          return {
+            status: true,
+            message: "this playlist change type onlyInvited",
           };
         });
       }

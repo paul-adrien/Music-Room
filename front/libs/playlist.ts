@@ -12,4 +12,5 @@ export interface Playlist {
     duration?: string;
   }[];
   type: 'public' | 'private';
+  onlyInvited: boolean;
 }

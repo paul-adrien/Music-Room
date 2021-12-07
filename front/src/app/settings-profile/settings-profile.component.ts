@@ -70,8 +70,8 @@ export class SettingsProfileComponent implements OnInit {
     this.socketService
       .listenToServer(`user update ${this.user?.id}`)
       .subscribe((data) => {
-        this.isGoogleId = this.user.id.includes('google');
-
+        this.isGoogleId =
+          this.user?.id.includes('google') || this.user?.id.includes('42_');
         this.toggle = data.type === 'premium' ? true : false;
         this.cd.detectChanges();
       });
@@ -82,7 +82,8 @@ export class SettingsProfileComponent implements OnInit {
 
   ngOnInit() {
     this.user = this.authService.getUser();
-    this.isGoogleId = this.user?.id.includes('google');
+    this.isGoogleId =
+      this.user?.id.includes('google') || this.user?.id.includes('42_');
     if (this.user?.type === 'premium') {
       this.toggle = true;
     }

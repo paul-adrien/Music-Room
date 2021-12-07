@@ -36,11 +36,18 @@ declare var google: any;
         (click)="this.changeType($event)"
       ></ion-toggle>
     </div>
-    <div *ngIf="this.type === 'room'" class="item-container">
+    <div class="item-container" [class.last]="this.type === 'playlist'">
       <div class="item-name">Seul les invités peuvent voter</div>
       <ion-toggle
+        *ngIf="this.type === 'room'"
         [(ngModel)]="this.invited"
-        [checked]="this.room.onlyInvited"
+        [checked]="this.room?.onlyInvited"
+        (click)="this.changeTypeInvited($event)"
+      ></ion-toggle>
+      <ion-toggle
+        *ngIf="this.type === 'playlist'"
+        [(ngModel)]="this.invited"
+        [checked]="this.playlist?.onlyInvited"
         (click)="this.changeTypeInvited($event)"
       ></ion-toggle>
     </div>
@@ -192,7 +199,8 @@ export class SettingsRoomComponent implements OnInit {
   ngOnInit(): void {
     if (this.type === 'room') {
       this.toggle = this.room.type === 'private' ? true : false;
-      this.invited = this.room.onlyInvited;
+      this.invited = this.room?.onlyInvited;
+
       this.mapInitializer();
       if (this.room?.limits) {
         if (this.room.limits.end && this.room.limits.start) {
@@ -216,6 +224,7 @@ export class SettingsRoomComponent implements OnInit {
       });
     } else if (this.type === 'playlist') {
       this.toggle = this.playlist.type === 'private' ? true : false;
+      this.invited = this.playlist?.onlyInvited;
     }
     this.cd.detectChanges();
   }
@@ -331,6 +340,12 @@ export class SettingsRoomComponent implements OnInit {
       this.socketService.emitToServer('room change type invited', {
         userId: this.userId,
         roomId: this.room?._id,
+        type: !this.invited,
+      });
+    } else if (this.type === 'playlist') {
+      this.socketService.emitToServer('playlist change type invited', {
+        userId: this.userId,
+        playlistId: this.playlist?._id,
         type: !this.invited,
       });
     }

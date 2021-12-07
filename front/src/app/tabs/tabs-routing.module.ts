@@ -31,7 +31,7 @@ const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: '/tabs/search',
+        redirectTo: '/tabs/tab-home',
         canActivate: [AuthGuard],
 
         pathMatch: 'full',

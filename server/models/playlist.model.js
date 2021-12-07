@@ -19,6 +19,7 @@ const Playlist = mongoose.model(
       },
     ],
     type: "public" | "private",
+    onlyInvited: Boolean,
   })
 );
 
