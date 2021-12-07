@@ -117,7 +117,7 @@ export class SettingsProfileComponent implements OnInit {
     };
     if (this.device?.platform === null) {
       location.href =
-        'http://localhost:8080/user/authenticate/google-link/' + this.user.id;
+        environment.AUTH_API + 'user/authenticate/google-link/' + this.user.id;
     } else {
       const browser = this.iab.create(
         environment.AUTH_API + 'user/authenticate/google-link/' + this.user.id,

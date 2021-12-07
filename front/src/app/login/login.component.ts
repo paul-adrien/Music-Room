@@ -545,7 +545,8 @@ export class LoginComponent implements OnInit {
     };
     if (this.device?.platform === null) {
       location.href =
-        'http://localhost:8080/user/authenticate/42?model=PC&platform=PC&version=1.0.0';
+        environment.AUTH_API +
+        'user/authenticate/42?model=PC&platform=PC&version=1.0.0';
     } else {
       const browser = this.iab.create(
         environment.AUTH_API +
@@ -570,23 +571,18 @@ export class LoginComponent implements OnInit {
           browser.close();
         }
       });
-      // browser.on('exit').subscribe((event) => {
-      //   console.log('end', event);
-
-      //   browser.close();
-      // });
     }
   }
 
   public OauthGoogle() {
-    //location.href = 'http://localhost:8080/user/authenticate/google';
     const options: InAppBrowserOptions = {
       zoom: 'no',
       location: 'no',
     };
     if (this.device?.platform === null) {
       location.href =
-        'http://localhost:8080/user/authenticate/google?model=PC&platform=PC&version=1.0.0';
+        environment.AUTH_API +
+        'user/authenticate/google?model=PC&platform=PC&version=1.0.0';
     } else {
       const browser = this.iab.create(
         environment.AUTH_API +
@@ -610,45 +606,6 @@ export class LoginComponent implements OnInit {
           browser.close();
         }
       });
-      // browser.on('exit').subscribe((event) => {
-      //   console.log('end', event);
-
-      //   browser.close();
-      // });
-    }
-  }
-
-  public OauthGithub() {
-    //location.href = 'http://localhost:8080/user/authenticate/github';
-    const options: InAppBrowserOptions = {
-      zoom: 'no',
-      location: 'no',
-    };
-    if (this.device?.platform === null) {
-      location.href = 'http://localhost:8080/user/authenticate/github';
-    } else {
-      const browser = this.iab.create(
-        environment.AUTH_API + 'user/authenticate/github',
-        'defaults',
-        options
-      );
-      browser.on('loadstart').subscribe((event) => {
-        console.log('start', event);
-        if (event.url.includes('localhost:8100/login?data')) {
-          const data = event.url.slice(
-            event.url.indexOf('?data=') + '?data='.length
-          );
-          this.ngZone.run(() => {
-            this.route.navigate([`/login`], { queryParams: { data: data } });
-          });
-          browser.close();
-        }
-      });
-      // browser.on('exit').subscribe((event) => {
-      //   console.log('end', event);
-
-      //   browser.close();
-      // });
     }
   }
 }

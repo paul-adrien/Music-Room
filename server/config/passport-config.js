@@ -63,9 +63,7 @@ passport.use(
       clientID: keys["google"].clientID,
       clientSecret: keys["google"].clientSecret,
       passReqToCallback: true,
-      callbackURL:
-        //  `http://localhost:8080/user/authenticate/google/callback`,
-        `https://music.room.projet42web.fr/user/authenticate/google/callback`,
+      callbackURL: `https://music.room.projet42web.fr/user/authenticate/google/callback`,
     },
     async function (req, accessToken, refreshToken, profile, done) {
       const user = await getUser({
@@ -119,9 +117,7 @@ passport.use(
       clientID: keys["google"].clientID,
       clientSecret: keys["google"].clientSecret,
       passReqToCallback: true,
-      callbackURL:
-        //  `http://localhost:8080/user/authenticate/google/callback-link`,
-        `https://music.room.projet42web.fr/user/authenticate/google/callback-link`,
+      callbackURL: `https://music.room.projet42web.fr/user/authenticate/google/callback-link`,
     },
     async function (req, accessToken, refreshToken, profile, done) {
       const user = await getUser({
