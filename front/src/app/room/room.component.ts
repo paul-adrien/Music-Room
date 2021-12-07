@@ -397,7 +397,7 @@ export class RoomComponent implements OnInit, OnDestroy {
       roomId: this.roomId,
     });
     //this.location.back();
-    this.location.historyGo(-1);
+    this.router.navigate(['tabs/tab-home']);
     //this.navCtrl.navigateBack('');
     //this.navCtrl.navigateBack('/tabs/home');
   }
