@@ -144,19 +144,16 @@ export class PlayerComponent {
     this.socketService
       .listenToServer(`user update ${user?.id}`)
       .subscribe((data) => {
-        console.log(data);
         if (
           JSON.stringify(data) !== JSON.stringify(this.authService.getUser())
         ) {
           this.authService.saveUser(data);
-          console.log("différent comme la musique d'Orelsan");
         }
         this.cd.detectChanges();
       });
     this.socketService
       .listenToServer(`give delegation permission to ${user?.id}`)
       .subscribe((data) => {
-        console.log(data);
         if ((data?.token, data?.userId, data?.userName)) {
           this.authService.saveDelegation(
             data.token,
@@ -169,8 +166,6 @@ export class PlayerComponent {
     this.socketService
       .listenToServer(`action delegation ${user?.id}`)
       .subscribe((data) => {
-        console.log(data, 'ça marche');
-
         if (data?.action === 'PLAY') {
           this.play();
         } else if (data?.action === 'PAUSE') {
@@ -211,7 +206,6 @@ export class PlayerComponent {
 
   play() {
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
-      console.log(res);
       if (!res?.device === undefined) {
         await this.presentAlert();
       } else if (res?.device !== undefined) {
@@ -259,7 +253,6 @@ export class PlayerComponent {
     await alert.present();
 
     const { role } = await alert.onDidDismiss();
-    console.log('onDidDismiss resolved with role', role);
   }
 
   async presentModal() {
@@ -286,7 +279,6 @@ export class PlayerComponent {
     });
 
     modal.onWillDismiss().then((res: any) => {
-      console.log(res);
       if (res?.data?.device) {
         this.authService.savePlayerId(res?.data?.device);
       } else {

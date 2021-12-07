@@ -22,12 +22,10 @@ export class AppComponent implements OnInit {
 
   ngOnInit() {
     this.platform.ready().then(() => {
-      console.log(this.platform);
       if (this.platform.is('mobile') && !this.platform.is('mobileweb')) {
         StatusBar.setStyle({ style: Style.Dark });
         if (this.platform.is('ios')) {
           Keyboard.addListener('keyboardDidShow', async (info) => {
-            console.log('keyboard did show with height:', info.keyboardHeight);
             await Keyboard.setScroll({ isDisabled: false });
             this.cd.detectChanges();
           });

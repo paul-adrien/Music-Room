@@ -109,10 +109,8 @@ export class DelegationComponent implements OnInit {
       },
     });
     modal.onWillDismiss().then((res) => {
-      console.log(res);
       if (res?.data?.user) {
         const user = res.data.user;
-        console.log(user);
         this.socketService.emitToServer('give delegation permission', {
           userId: this.user.id,
           friendId: user.id,
@@ -125,8 +123,6 @@ export class DelegationComponent implements OnInit {
 
   play() {
     const isDeleg = this.authService.getPlayerId() !== null ? true : false;
-    console.log(isDeleg);
-
     this.spotifyService.play(undefined, isDeleg).subscribe((data) => {
       this.cd.detectChanges();
     });
@@ -172,7 +168,6 @@ export class DelegationComponent implements OnInit {
     await alert.present();
 
     const { role } = await alert.onDidDismiss();
-    console.log('onDidDismiss resolved with role', role);
   }
 
   dismiss() {
@@ -195,7 +190,6 @@ export class DelegationComponent implements OnInit {
     modal.onWillDismiss().then((res) => {
       if (res?.data?.track) {
         const track = res.data.track;
-        console.log(track);
 
         this.playTrack(track.id, track.uri);
       }

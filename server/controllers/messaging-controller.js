@@ -81,7 +81,7 @@ exports.getConversationDetailSocket = (userId, conversationId) => {
   return Conversation.findOne({
     $and: [{ "users.userId": userId }, { _id: conversationId }],
   }).then((conversation) => {
-    console.log("Conversation: ", conversation);
+    
     if (!conversation) {
       return {
         status: false,

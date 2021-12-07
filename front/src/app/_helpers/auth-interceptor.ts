@@ -14,14 +14,12 @@ const TOKEN_HEADER_KEY = 'x-access-token'; // for Spring Boot back-end
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  constructor(private token: AuthService,
-    private device: Device) {}
+  constructor(private token: AuthService, private device: Device) {}
 
   intercept(
     req: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    //console.log(this.device)
     let authReq = req;
     if (
       !req.url.includes('https://api.spotify.com/') &&
@@ -33,7 +31,7 @@ export class AuthInterceptor implements HttpInterceptor {
       const version = '1.0.0';
       if (token != null) {
         authReq = req.clone({
-          headers: req.headers.set('x-access-token', token)
+          headers: req.headers.set('x-access-token', token),
         });
       }
     }

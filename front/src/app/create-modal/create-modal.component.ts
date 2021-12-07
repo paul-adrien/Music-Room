@@ -26,10 +26,7 @@ import { SearchComponent } from '../search/search.component';
     <div class="title" *ngIf="this.isConv">Membres de la conversation</div>
     <div *ngIf="this.users?.length > 0; else noUser" class="users">
       <div class="user-container" *ngFor="let user of this.users">
-        <img
-          class="logo round"
-          [src]="user.picture || './assets/person.svg'"
-        />
+        <img class="logo round" [src]="user.picture || './assets/person.svg'" />
         <div class="user-info">
           <div class="info-top">{{ user.userName }}</div>
           <div class="info-bottom">
@@ -142,7 +139,6 @@ export class CreateModalComponent implements OnInit {
     modal.onWillDismiss().then((res) => {
       if (res?.data?.user) {
         const user = res.data.user;
-        console.log(user);
         this.users.push(user);
         this.cd.detectChanges();
       }

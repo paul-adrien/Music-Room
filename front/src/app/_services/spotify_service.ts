@@ -54,7 +54,6 @@ export class SpotifyService {
         })
       );
     // return this.spotifyApi.search.searchTracks(search).then((data) => {
-    //   console.log(data);
     //   return data;
     // });
   }
@@ -152,7 +151,6 @@ export class SpotifyService {
       setTimeout(() => {
         const browser = this.iab.create(url, 'defaults');
         browser.on('loadstart').subscribe((event) => {
-          console.log('start spotify', event);
           if (
             event.url.indexOf('localhost') !== -1 &&
             event.url.indexOf('?code=') !== -1
@@ -160,11 +158,9 @@ export class SpotifyService {
             code = event.url.slice(
               event.url.indexOf('?code=') + '?code='.length
             );
-            console.log(code);
             this.ngZone.run(() => {
               this.route.navigate([`/login`], { queryParams: { code: code } });
             });
-            console.log('close spotify');
             browser.close();
           }
         });
@@ -243,9 +239,6 @@ export class SpotifyService {
 
   saveToken(res: any) {
     if (res.access_token !== undefined || res.refresh_token !== undefined) {
-      // var res = JSON.parse(res);
-      console.log('save token', res);
-      // var res = JSON.parse(res);
       if (res.access_token !== undefined) {
         const access_token = res.access_token;
         localStorage.setItem('access_token', access_token);
@@ -262,7 +255,6 @@ export class SpotifyService {
         //this.spotifyApi.getRefreshedAccessToken(refresh_token);
       }
     } else {
-      console.log(res);
       httpApiSpotifyOptions = {
         headers: new HttpHeaders({
           Authorization: 'Bearer ' + localStorage.getItem('access_token'),
@@ -289,7 +281,6 @@ export class SpotifyService {
       );
     // return this.spotifyApi.player
     //   .getMyDevices()
-    //   .then((res) => console.log(res));
   }
 
   getPlayerInfo() {
@@ -305,7 +296,6 @@ export class SpotifyService {
         })
       );
     // return this.spotifyApi.player.getCurrentlyPlayingTrack().then((res) => {
-    //   console.log(res);
     //   return res;
     // });
   }
@@ -368,7 +358,6 @@ export class SpotifyService {
         )
         .pipe(
           catchError((err) => {
-            console.log('ici petit cul');
             if (err?.status === 401) {
               return this.getRefreshToken();
             } else {

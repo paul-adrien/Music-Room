@@ -181,7 +181,6 @@ export class EditProfileComponent implements OnInit {
 
     this.platform.ready().then(() => {
       if (this.platform.is('cordova')) {
-        console.log('ça rentre mon con');
         this.camera.getPicture(options).then(
           async (imageData) => {
             // imageData is either a base64 encoded string or a file URI
@@ -205,7 +204,6 @@ export class EditProfileComponent implements OnInit {
         );
         this.cd.detectChanges();
       } else {
-        console.log('donc ici');
         let input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/jpeg, image/png';
@@ -286,7 +284,6 @@ export class EditProfileComponent implements OnInit {
     }
 
     if (this.uploadPicture.has('file') && !stop) {
-      console.log('icicicicicici');
       this.userService
         .updatePicture(this.uploadPicture, this.user.id)
         .subscribe((res) => {

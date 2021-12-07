@@ -38,7 +38,7 @@ import { SettingsProfileComponent } from './settings-profile/settings-profile.co
 // const config: SocketIoConfig = { url: environment.AUTH_API, options: {} };
 
 @NgModule({
-  declarations: [	
+  declarations: [
     AppComponent,
     LoginComponent,
     SearchComponent,
@@ -55,8 +55,8 @@ import { SettingsProfileComponent } from './settings-profile/settings-profile.co
     EditProfileComponent,
     VerifyComponent,
     UserProfileComponent,
-      SettingsProfileComponent
-   ],
+    SettingsProfileComponent,
+  ],
   entryComponents: [],
   imports: [
     FormsModule,

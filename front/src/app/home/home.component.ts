@@ -125,7 +125,6 @@ export class HomeComponent implements OnInit {
     const user = this.authService.getUser();
 
     this.socketService.listenToServer('room create').subscribe((data) => {
-      console.log(data);
       if (JSON.stringify(this.rooms) !== JSON.stringify(data)) {
         this.rooms = data.filter((room: Room) => {
           if (
@@ -142,7 +141,6 @@ export class HomeComponent implements OnInit {
     });
 
     this.socketService.listenToServer('playlist create').subscribe((data) => {
-      console.log(data);
       if (JSON.stringify(this.playlists) !== JSON.stringify(data)) {
         this.playlists = data.filter((playlist: Playlist) => {
           if (
@@ -236,7 +234,6 @@ export class HomeComponent implements OnInit {
         // this.roomService
         //   .createRoom(this.user, res?.data?.name)
         //   .subscribe((res) => {
-        //     console.log(res);
         //     this.rooms = this.roomService.getAllRoom();
         //     this.cd.detectChanges();
         //   });
@@ -266,7 +263,6 @@ export class HomeComponent implements OnInit {
         // this.playlistService
         //   .createPlaylist(this.user, res?.data?.name)
         //   .subscribe((res) => {
-        //     console.log(res);
         //     // this.playlists = this.playlistService.getAllPlaylist();
         //     this.cd.detectChanges();
         //   });
@@ -282,7 +278,6 @@ export class HomeComponent implements OnInit {
 
   openRoom(roomId: string) {
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
-      console.log(this.device.platform, res);
       if (
         (this.device.platform === null ||
           this.device.platform.toLocaleLowerCase() === 'ios' ||
@@ -303,7 +298,6 @@ export class HomeComponent implements OnInit {
 
   openPlaylist(playlistId: string) {
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
-      console.log(this.device.platform, res);
       if (
         (this.device.platform === null ||
           this.device.platform.toLocaleLowerCase() === 'ios' ||
@@ -337,11 +331,9 @@ export class HomeComponent implements OnInit {
     await alert.present();
 
     const { role } = await alert.onDidDismiss();
-    console.log('onDidDismiss resolved with role', role);
   }
 
   async premiumAlert() {
-    console.log('premiumAlert trigered', this.user.type);
     const alert = await this.alertController.create({
       header: 'Attention',
       message:
@@ -352,6 +344,5 @@ export class HomeComponent implements OnInit {
     await alert.present();
 
     const { role } = await alert.onDidDismiss();
-    console.log('onDidDismiss resolved with role', role);
   }
 }

@@ -130,7 +130,6 @@ export class PlaylistComponent implements OnInit {
     this.socketService
       .listenToServer(`playlist update ${this.playlistId}`)
       .subscribe((data) => {
-        console.log(data);
         if (JSON.stringify(this.playlist) !== JSON.stringify(data)) {
           this.playlist = data;
           this.isInvited =
@@ -178,7 +177,6 @@ export class PlaylistComponent implements OnInit {
   public indexTrack = undefined;
 
   ngOnInit() {
-    console.log(this.playlistId);
     this.user = this.authService.getUser();
 
     this.playlistService.getPlaylist(this.playlistId).subscribe((res) => {
@@ -213,7 +211,6 @@ export class PlaylistComponent implements OnInit {
   doReorder(ev: any) {
     // Before complete is called with the items they will remain in the
     // order before the drag
-    console.log('Before complete', ev);
 
     // Finish the reorder and position the item in the DOM based on
     // where the gesture ended. Update the items variable to the
@@ -229,7 +226,7 @@ export class PlaylistComponent implements OnInit {
     });
 
     // After complete is called the items will be in the new order
-    console.log('After complete', this.tracks);
+
     this.indexTrack = this.tracks.findIndex(
       (track) => track.id === this.playerInfo.item.id
     );
@@ -304,7 +301,7 @@ export class PlaylistComponent implements OnInit {
     modal.onWillDismiss().then((res) => {
       if (res?.data?.track) {
         const track = res.data.track;
-        console.log(track);
+
         if (!this.tracks.find((res) => res.id === track.id)) {
           this.socketService.emitToServer('playlist add music', {
             userId: this.user.id,
@@ -330,7 +327,7 @@ export class PlaylistComponent implements OnInit {
     modal.onWillDismiss().then((res) => {
       if (res?.data?.user) {
         const user = res.data.user;
-        console.log(user);
+
         this.socketService.emitToServer('playlist invite', {
           userId: this.user.id,
           playlistId: this.playlistId,
@@ -364,13 +361,13 @@ export class PlaylistComponent implements OnInit {
   }
 
   pause() {
-    // console.log(this.wait);
+    //
     // if (
     //   !this.wait &&
     //   this.playerInfo.is_playing &&
     //   this.playlist.users.find((user) => user.id === this.user.id && user.right)
     // ) {
-    //   console.log(this.wait);
+    //
     //   this.wait = true;
     //   this.cd.detectChanges();
     //   forkJoin(

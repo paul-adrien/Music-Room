@@ -30,7 +30,10 @@ import { Location } from '@angular/common';
         src="./assets/add-outline.svg"
       />
     </div>
-    <div *ngIf="this.convList?.length > 0; else noConv" class="messages-container">
+    <div
+      *ngIf="this.convList?.length > 0; else noConv"
+      class="messages-container"
+    >
       <div
         (click)="this.openConversation(conv._id)"
         *ngFor="let conv of this.convList"
@@ -78,7 +81,6 @@ export class MessagesComponent implements OnInit {
     this.socketService
       .listenToServer(`chat convs ${user?.id}`)
       .subscribe((data) => {
-        console.log(data);
         let index = this.convList.findIndex((conv) => conv._id === data._id);
         if (index >= 0) {
           this.convList[index] = data;
@@ -93,7 +95,6 @@ export class MessagesComponent implements OnInit {
   ngOnInit() {
     this.user = this.authService.getUser();
     this.messageService.getConvList(this.user?.id).subscribe((res) => {
-      console.log(res);
       if (res.status) {
         this.convList = res.conversations;
       }
@@ -130,12 +131,10 @@ export class MessagesComponent implements OnInit {
     // this.messageService
     //   .createConv('60b7dc84c32e29ce6919e2a6', 'ionicTest2', this.users)
     //   .subscribe((res) => {
-    //     console.log(res);
     //   });
     // this.messageService
     //   .getConvList('60b7dc84c32e29ce6919e2a6')
     //   .subscribe((res) => {
-    //     console.log(res);
     //     this.convList = res;
     //     this.cd.detectChanges();
     //   });

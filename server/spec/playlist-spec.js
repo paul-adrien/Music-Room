@@ -74,10 +74,10 @@ describe("action with playlist in socket", function () {
 
     afterAll(() => {
         if (socket.connected) {
-            console.log('disconnecting...');
+            
             socket.disconnect();
         } else {
-            console.log('no connection to break...');
+            
         }
         axios({
             method: 'delete',

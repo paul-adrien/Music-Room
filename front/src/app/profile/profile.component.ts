@@ -213,7 +213,6 @@ export class ProfileComponent implements OnInit {
 
   openRoom(roomId: string) {
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
-      console.log(this.device.platform, res);
       if (
         (this.device.platform === null ||
           this.device.platform.toLocaleLowerCase() === 'ios') &&
@@ -236,7 +235,6 @@ export class ProfileComponent implements OnInit {
 
   openPlaylist(playlistId: string) {
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
-      console.log(this.device.platform, res);
       if (
         (this.device.platform === null ||
           this.device.platform.toLocaleLowerCase() === 'ios') &&
@@ -256,7 +254,6 @@ export class ProfileComponent implements OnInit {
       .getTracksInfo(musics)
       .pipe(map((res: any) => res.tracks))
       .subscribe((res) => {
-        console.log(res);
         if (JSON.stringify(this.musicsHistory) !== JSON.stringify(res)) {
           this.musicsHistory = res;
         }
@@ -274,7 +271,6 @@ export class ProfileComponent implements OnInit {
     await alert.present();
 
     const { role } = await alert.onDidDismiss();
-    console.log('onDidDismiss resolved with role', role);
   }
 
   async presentModalEdit() {
@@ -288,10 +284,7 @@ export class ProfileComponent implements OnInit {
       },
     });
     modal.onWillDismiss().then((res) => {
-      console.log(res);
       if (res?.data?.picture) {
-        console.log('pq ?');
-
         this.user.picture = res?.data?.picture;
       }
       this.cd.detectChanges();
@@ -312,7 +305,7 @@ export class ProfileComponent implements OnInit {
     modal.onWillDismiss().then((res) => {
       if (res?.data?.user) {
         const user = res.data.user;
-        console.log('user ==+== user.id ', user, user.id);
+
         this.router.navigate([`tabs/tab-profile/user-profile/${user.id}`]);
       }
       this.cd.detectChanges();
@@ -357,7 +350,6 @@ export class ProfileComponent implements OnInit {
   }
 
   async premiumAlert() {
-    console.log('premiumAlert trigered', this.user.type);
     const alert = await this.alertController.create({
       header: 'Attention',
       message:
@@ -368,6 +360,5 @@ export class ProfileComponent implements OnInit {
     await alert.present();
 
     const { role } = await alert.onDidDismiss();
-    console.log('onDidDismiss resolved with role', role);
   }
 }

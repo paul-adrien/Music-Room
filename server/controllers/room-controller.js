@@ -597,7 +597,7 @@ exports.enterRoom = async (req, res, next) => {
 
 exports.enterRoomSocket = async (userId, roomId, deviceId) => {
   const user = await getUser({ id: userId });
-  // console.log(roomId);
+  // 
 
   return Room.findOne({ _id: roomId }).then((room) => {
     if (!room) {
@@ -1168,7 +1168,7 @@ exports.changeTypeInvitedSocket = async (userId, roomId, type) => {
 };
 
 async function isInCirc(latitude, longitude, radius, center) {
-  console.log(latitude, longitude, radius, center);
+  
   return new Promise((res, rej) => {
     if (
       geolib.isPointWithinRadius(
@@ -1245,7 +1245,7 @@ async function checkLimits(lat, lng, limits) {
 
 exports.addGeoHours = async (data) => {
   return new Promise((res, rej) => {
-    // console.log(data);
+    // 
     if (data && data.roomId && data.userId) {
       Room.findOne({ _id: data.roomId, created_by: data.userId }).exec(
         (err, room) => {
@@ -1279,7 +1279,7 @@ exports.addGeoHours = async (data) => {
                   message: err,
                 });
               } else {
-                // console.log(await checkLimits(0, 0, limits));
+                // 
                 return res({
                   status: true,
                   message: "this room change limits",

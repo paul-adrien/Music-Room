@@ -87,7 +87,7 @@ describe("action with user", function () {
                 userTest.email = res.data.email;
                 expect(res.data.email).toEqual("test2@gmail.com");
                 done();
-            }).catch((err) => { console.log(err) });
+            }).catch((err) => { });
     });
 
     it("get user", function (done) {

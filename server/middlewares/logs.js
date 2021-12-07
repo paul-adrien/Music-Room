@@ -17,8 +17,8 @@ logsHTTP = (req, res) => {
                 log += "message=" + res.message + "\r\n";
             fs.appendFile(__dirname + fileName, log, (err) => {
                 if (err) {
-                    // console.log(err)
-                    // console.log("Error when trying to write log!")
+                    // 
+                    // 
                 }
             })
         } else {
@@ -33,13 +33,13 @@ logsHTTP = (req, res) => {
                 log += "message=" + res.message + "\r\n";
             fs.appendFile(__dirname + fileName, log, (err) => {
                 if (err) {
-                    // console.log(err)
-                    // console.log("Error when trying to write log!")
+                    // 
+                    // 
                 }
             })
         }
     })
-    // console.log(log)
+    // 
 };
 
 //soit on récupère les infos avec le token -> userId, soit on les mets dans la query a coté du token
@@ -57,13 +57,13 @@ logsSOCKS = (message, status, token) => {
     log += "message=" + message + "\r\n";
     fs.appendFile(__dirname + fileName, log, (err) => {
         if (err) {
-            console.log(err)
-            console.log("Error when trying to write log!")
+            
+            
         } else {
-            // console.log("correctly written logs!")
+            // 
         }
     })
-    // console.log(log)
+    // 
 };
 
 const logs = {

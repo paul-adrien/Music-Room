@@ -168,6 +168,7 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
 export class RoomComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
+    public router: Router,
     private roomService: RoomService,
     private cd: ChangeDetectorRef,
     private spotifyService: SpotifyService,
@@ -181,16 +182,15 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.socketService
       .listenToServer(`room update ${this.roomId}`)
       .subscribe((data) => {
-        console.log(data);
         this.room = data;
-        console.log(this.room.progress_ms);
+        if (this.room === null) this.router.navigate(['tabs/tab-home']);
 
         this.isInvited =
-          this.room.invited.indexOf(this.user.id) >= 0 ||
-          this.room.created_by === this.user.id
+          this.room?.invited.indexOf(this.user?.id) >= 0 ||
+          this.room?.created_by === this.user?.id
             ? true
             : false;
-        if (this.isInvited === false && this.room.type === 'private')
+        if (this.isInvited === false && this.room?.type === 'private')
           this.quitRoom();
 
         if (this.room?.limits) {
@@ -210,9 +210,7 @@ export class RoomComponent implements OnInit, OnDestroy {
                   this.cd.detectChanges();
                 });
             })
-            .catch((error) => {
-              console.log('Error getting location', error);
-            });
+            .catch((error) => {});
         } else {
           this.zone = undefined;
         }
@@ -227,7 +225,7 @@ export class RoomComponent implements OnInit, OnDestroy {
     this.socketService
       .listenToServer(`room delete ${this.roomId}`)
       .subscribe((data) => {
-        this.location.historyGo(-1);
+        this.router.navigate(['tabs/tab-profile/profile']);
       });
   }
 
@@ -283,7 +281,6 @@ export class RoomComponent implements OnInit, OnDestroy {
             this.tracks = res?.filter(
               (music) => music.id !== this.trackPlaying?.id
             );
-            console.log('celui la10101');
 
             this.spotifyService
               .playTrack(
@@ -292,9 +289,7 @@ export class RoomComponent implements OnInit, OnDestroy {
                 undefined,
                 this.room?.progress_ms
               )
-              .subscribe((res) => {
-                console.log('celui la');
-              });
+              .subscribe((res) => {});
 
             this.cd.detectChanges();
           });
@@ -323,8 +318,6 @@ export class RoomComponent implements OnInit, OnDestroy {
             this.tracks.length >= 0 &&
             this.trackPlaying
           ) {
-            console.log('wesh');
-
             if (
               this.room.created_by === this.user.id ||
               this.room.users[0].id === this.user.id
@@ -338,13 +331,9 @@ export class RoomComponent implements OnInit, OnDestroy {
 
             if (this.tracks[0]) {
               this.trackPlaying = this.tracks[0];
-              console.log('celui la');
-
               this.spotifyService
                 .playTrack(this.tracks[0]?.uri, this.tracks[0]?.id)
-                .subscribe((res) => {
-                  console.log('celui la');
-                });
+                .subscribe((res) => {});
             }
           } else if (
             res.progress_ms >= 0 &&
@@ -392,13 +381,9 @@ export class RoomComponent implements OnInit, OnDestroy {
         );
 
         if (this.trackPlaying === undefined && this.room?.musics?.length > 0) {
-          console.log('celui la1');
-
           this.spotifyService
             .playTrack(this.tracks[0]?.uri, this.tracks[0]?.id)
-            .subscribe((res) => {
-              console.log('celui la');
-            });
+            .subscribe((res) => {});
           this.trackPlaying = this.tracks[0];
         }
 
@@ -429,7 +414,6 @@ export class RoomComponent implements OnInit, OnDestroy {
     modal.onWillDismiss().then((res) => {
       if (res?.data?.track) {
         const track = res.data.track;
-        console.log(track);
         if (!this.tracks.find((res) => res.id === track.id)) {
           this.socketService.emitToServer('room add music', {
             userId: this.user.id,
@@ -438,13 +422,9 @@ export class RoomComponent implements OnInit, OnDestroy {
           });
 
           if (this.trackPlaying === undefined) {
-            console.log('celui la');
-
             this.spotifyService
               .playTrack(track.uri, track.id)
-              .subscribe((res) => {
-                console.log('celui la');
-              });
+              .subscribe((res) => {});
             this.trackPlaying = track;
           }
         } else {
@@ -468,7 +448,6 @@ export class RoomComponent implements OnInit, OnDestroy {
     modal.onWillDismiss().then((res) => {
       if (res?.data?.user) {
         const user = res.data.user;
-        console.log(user);
         this.socketService.emitToServer('room invite', {
           userId: this.user.id,
           roomId: this.roomId,
@@ -495,10 +474,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   play() {
-    console.log(this.wait);
-
     if (!this.wait && !this.playerInfo.is_playing) {
-      console.log(this.wait);
       this.wait = true;
       this.cd.detectChanges();
 
@@ -507,7 +483,6 @@ export class RoomComponent implements OnInit, OnDestroy {
       )
         .toPromise()
         .then((data) => {
-          console.log("pourauoi c'est luo");
           this.playerInfo.is_playing = true;
           this.wait = false;
           this.cd.detectChanges();
@@ -517,10 +492,7 @@ export class RoomComponent implements OnInit, OnDestroy {
   }
 
   pause() {
-    console.log(this.wait);
-
     if (!this.wait && this.playerInfo.is_playing) {
-      console.log(this.wait);
       this.wait = true;
 
       this.cd.detectChanges();

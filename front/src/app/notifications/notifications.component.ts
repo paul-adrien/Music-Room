@@ -83,7 +83,6 @@ export class NotificationsComponent implements OnInit {
   ) {
     const user = this.authService.getUser();
 
-    console.log(`user update ${user?.id}`);
     this.socketService
       .listenToServer(`user update ${user?.id}`)
       .subscribe((data) => {
@@ -170,7 +169,6 @@ export class NotificationsComponent implements OnInit {
       });
       this.openNotif(id, type);
     } else if (type === 'friends') {
-      console.log(id, type);
       this.socketService.emitToServer('friend accept invite', {
         userId: this.user.id,
         friendId: id,
@@ -183,7 +181,6 @@ export class NotificationsComponent implements OnInit {
       this.router.navigate([`tabs/tab-profile/user-profile/${id}`]);
     } else {
       this.spotifyService.getPlayerInfo().subscribe(async (res) => {
-        console.log(this.device.platform, res);
         if (this.device.platform === null && res?.device !== undefined) {
           if (type === 'rooms') {
             this.socketService.emitToServer('room enter', {
@@ -211,7 +208,6 @@ export class NotificationsComponent implements OnInit {
         el?.id === notif?.id && new Date(el?.date) === new Date(notif?.date)
     );
     this.user = user;
-    console.log(user);
     this.cd.detectChanges();
     this.socketService.emitToServer('user edit', {
       userId: user.id,
@@ -229,6 +225,5 @@ export class NotificationsComponent implements OnInit {
     await alert.present();
 
     const { role } = await alert.onDidDismiss();
-    console.log('onDidDismiss resolved with role', role);
   }
 }

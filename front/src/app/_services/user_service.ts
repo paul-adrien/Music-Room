@@ -36,7 +36,6 @@ export class UserService {
   }
 
   updateUser(user: User) {
-    console.log(user.id);
     return this.http.put(
       environment.AUTH_API + `user/${user.id}`,
       { user },
@@ -59,7 +58,6 @@ export class UserService {
   }
 
   updateUserAccount(userId: string, type: 'free' | 'premium') {
-    console.log("updateUserAccount called");
     return this.http.post<any>(
       environment.AUTH_API + `user/${userId}/premium`,
       {

@@ -404,14 +404,11 @@ export class LoginComponent implements OnInit {
       buttons: [
         {
           text: 'Annuler',
-          handler: (data: any) => {
-            console.log('Canceled', data);
-          },
+          handler: (data: any) => {},
         },
         {
           text: 'Confirmer',
           handler: (data: any) => {
-            console.log('Saved Information', data);
             const validEmail = this.validEmail(data?.email);
             if (validEmail === true) {
               this.authService.forgotPass_s(data?.email).subscribe((data) => {
@@ -431,7 +428,6 @@ export class LoginComponent implements OnInit {
     await alert.present();
 
     alert.onDidDismiss().then((res) => {
-      console.log(isSend);
       if (isSend) {
         this.alertController
           .create({
@@ -454,14 +450,11 @@ export class LoginComponent implements OnInit {
             buttons: [
               {
                 text: 'Annuler',
-                handler: (data: any) => {
-                  console.log('Canceled', data);
-                },
+                handler: (data: any) => {},
               },
               {
                 text: 'Confirmer',
                 handler: async (data: any) => {
-                  console.log('Saved Information', data);
                   const validEmail = this.validEmail(data?.email);
                   const validPass = this.validPass(data?.NewPassword);
                   if (validEmail !== true) {
@@ -520,7 +513,6 @@ export class LoginComponent implements OnInit {
   }
 
   validPass(password: string) {
-    console.log(password);
     const re = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
     if (!re.test(String(password).toLowerCase())) {
       return 'le mot de passe doit comporter minimum 8 caractères, un chiffre et un caractère spéciale';
@@ -559,7 +551,6 @@ export class LoginComponent implements OnInit {
         options
       );
       browser.on('loadstart').subscribe((event) => {
-        console.log('start', event);
         if (event.url.includes('localhost:8100/login?data')) {
           const data = event.url.slice(
             event.url.indexOf('?data=') + '?data='.length
@@ -567,7 +558,6 @@ export class LoginComponent implements OnInit {
           this.ngZone.run(() => {
             this.route.navigate([`/login`], { queryParams: { data: data } });
           });
-          console.log('close login');
           browser.close();
         }
       });
@@ -595,7 +585,6 @@ export class LoginComponent implements OnInit {
         options
       );
       browser.on('loadstart').subscribe((event) => {
-        console.log('start', event);
         if (event.url.includes('localhost:8100/login?data')) {
           const data = event.url.slice(
             event.url.indexOf('?data=') + '?data='.length

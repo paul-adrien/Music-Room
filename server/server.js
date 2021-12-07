@@ -33,7 +33,7 @@ const io = require("socket.io")(server, options);
 server.on("listening", () => {
   const address = server.address();
   const bind = typeof address === "string" ? "pipe " + address : "port " + 8080;
-  console.log("Listening on " + bind);
+  
 });
 
 app.get("/explorer_socket", (req, res) => {
@@ -58,12 +58,12 @@ io.use(function (socket, next) {
     next(new Error("Authentication error"));
   }
 }).on("connection", (socket) => {
-  //console.log("a user connected");
+  //
   socket.on("disconnect", () => {
-    //console.log("user disconnected");
+    //
   });
   // socket.on("test", (data) => {
-  //   console.log(data);
+  //   
   //   io.emit("test", data);
   // });
 
@@ -79,11 +79,11 @@ io.use(function (socket, next) {
   });
 
   socket.on("user update type", (data) => {
-    console.log(data);
+    
     user_controller
       .userUpdateAccountSocket(data.userId, data.type)
       .then((res) => {
-        console.log(res);
+        
         if (res?.status) {
           io.emit(`user update ${data.userId}`, res?.user);
         }
@@ -91,11 +91,11 @@ io.use(function (socket, next) {
   });
 
   socket.on("user update history", (data) => {
-    console.log(data);
+    
     user_controller
       .userUpdateMusicHistorySocket(data.userId, data.trackId)
       .then((res) => {
-        console.log(res);
+        
         if (res?.status) {
           io.emit(`user update ${data.userId}`, res?.user);
         }
@@ -175,14 +175,14 @@ io.use(function (socket, next) {
     friends_controller
       .deleteFriendSocket(data.userId, data.friendId)
       .then((res) => {
-        console.log(res);
+        
         if (res.status) {
           Promise.all([
             getUser({ id: data.userId }),
             getUser({ id: data.friendId }),
           ]).then(([resUser, resFriend]) => {
             if (resUser !== null && resFriend !== null) {
-              console.log(resUser);
+              
               logs.logsSOCKS(
                 `friend update ${data.friendId} delete`,
                 res.status,
@@ -192,7 +192,7 @@ io.use(function (socket, next) {
 
               io.emit(`user update ${data.friendId}`, resFriend);
             } else {
-              console.log("merde");
+              
 
               logs.logsSOCKS(
                 "Error when delete a friend",
@@ -220,7 +220,7 @@ io.use(function (socket, next) {
         messaging_controller
           .getConversationDetailSocket(data.userId, data.convId)
           .then((res) => {
-            console.log(res);
+            
             if (res.status) {
               logs.logsSOCKS(
                 "a message was send",
@@ -744,7 +744,7 @@ io.use(function (socket, next) {
       music_controller
         .giveDelegationPermission(data.userId, data.friendId)
         .then((res) => {
-          console.log(res)
+          
           if (res) {
             logs.logsSOCKS(
               `${data.friendId} give delegation permission to ${data.friendId}`,
@@ -787,5 +787,5 @@ io.use(function (socket, next) {
 });
 
 server.listen(8080, () => {
-  console.log(`Server is running on port 8080.`);
+  
 });

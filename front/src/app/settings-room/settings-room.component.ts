@@ -193,32 +193,31 @@ export class SettingsRoomComponent implements OnInit {
     if (this.type === 'room') {
       this.toggle = this.room.type === 'private' ? true : false;
       this.invited = this.room.onlyInvited;
+      this.mapInitializer();
+      if (this.room?.limits) {
+        if (this.room.limits.end && this.room.limits.start) {
+          this.form.start = this.room.limits.start;
+          this.form.end = this.room.limits.end;
+        }
+        if (this.room.limits.center)
+          this.pushCirc(
+            {
+              lat: this.room.limits.center.latitude,
+              lng: this.room.limits.center.longitude,
+            },
+            this.room.limits.radius
+          );
+        this.cd.detectChanges();
+      }
+      $('#pac-input3').on('input', function (e) {
+        $('.pac-container').append(`<style>.pac-container {
+          z-index: 10000 !important;
+        }</style>`);
+      });
     } else if (this.type === 'playlist') {
       this.toggle = this.playlist.type === 'private' ? true : false;
     }
     this.cd.detectChanges();
-
-    this.mapInitializer();
-    if (this.room?.limits) {
-      if (this.room.limits.end && this.room.limits.start) {
-        this.form.start = this.room.limits.start;
-        this.form.end = this.room.limits.end;
-      }
-      if (this.room.limits.center)
-        this.pushCirc(
-          {
-            lat: this.room.limits.center.latitude,
-            lng: this.room.limits.center.longitude,
-          },
-          this.room.limits.radius
-        );
-      this.cd.detectChanges();
-    }
-    $('#pac-input3').on('input', function (e) {
-      $('.pac-container').append(`<style>.pac-container {
-        z-index: 10000 !important;
-      }</style>`);
-    });
   }
 
   mapInitializer() {
@@ -283,7 +282,6 @@ export class SettingsRoomComponent implements OnInit {
   }
 
   submitForm() {
-    console.log(this.form, this.circlesData);
     this.roomService.addGeoAndHoursLimit(
       this.form,
       this.circlesData,

@@ -96,21 +96,18 @@ export class SearchComponent {
     await alert.present();
 
     const { role } = await alert.onDidDismiss();
-    console.log('onDidDismiss resolved with role', role);
   }
 
   search(event: any) {
     const user = this.authService.getUser();
-    console.log(event);
+
     if (!this.isUser) {
       this.spotifyService.searchMusic(event.target.value).subscribe((data) => {
-        console.log(data);
         this.searchRes = data.tracks;
         this.cd.detectChanges();
       });
     } else if (this.isUser) {
       this.userService.searchUser(event.target.value).subscribe((data) => {
-        console.log(data);
         this.searchRes = data.filter((el) => el.id !== user.id);
         if (this.onlyFriend) {
           this.searchRes = data.filter((el) =>

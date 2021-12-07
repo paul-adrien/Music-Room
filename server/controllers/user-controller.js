@@ -19,7 +19,7 @@ exports.userBoard = (req, res) => {
 
 exports.userUpdate = async (req, res, next) => {
   const { user } = req.body;
-  // console.log("test socket", res);
+  // 
 
   if (await updateUser(req.params.id, user)) {
     const user = await getUser({ id: req.params.id });
@@ -53,7 +53,7 @@ exports.userUpdateSocket = async (userId, user) => {
 
 exports.userUpdatePicture = async (req, res, next) => {
   const userId = req.userId;
-  // console.log("picture", req.files, userId);
+  // 
 
   User.updateOne(
     { id: userId },
@@ -84,7 +84,7 @@ exports.userUpdatePicture = async (req, res, next) => {
 };
 
 exports.getProfile = async (req, res, next) => {
-  // console.log("lololo", req.params.id);
+  // 
   const user = await getUser({ id: req.params.id });
   if (user) {
     res.message = "send user";
@@ -182,7 +182,7 @@ exports.forgotPass_send = async (req, res) => {
     transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
       } else {
-        console.log("an email was send");
+        
       }
     });
     user.rand = rand;
@@ -210,11 +210,11 @@ exports.forgotPass_send = async (req, res) => {
 
 exports.forgotPass_check = async (req, res, next) => {
   const { email, password, rand } = req.body;
-  console.log(req.body);
+  
   const user = await getUser({ email: email });
   if (user) {
     ForgotPass.findOne({ email: email }).exec(async (err, data) => {
-      console.log(data);
+      
       if (err) {
         res.status(400).json({
           status: false,
@@ -226,7 +226,7 @@ exports.forgotPass_check = async (req, res, next) => {
           message: "No code",
         });
       } else {
-        console.log(bcrypt.compareSync(password, user.password));
+        
         if (bcrypt.compareSync(password, user.password) === true) {
           res.status(200).json({
             status: false,
@@ -265,7 +265,7 @@ exports.forgotPass_check = async (req, res, next) => {
 };
 
 exports.userUpdateAccount = async (req, res, next) => {
-  console.log("userUpdateAccount called !");
+  
   const { userId, type } = req.body;
   const user = await getUser({ id: userId });
   if (user) {
@@ -293,7 +293,7 @@ exports.userUpdateAccount = async (req, res, next) => {
 };
 
 exports.userUpdateAccountSocket = async (userId, type) => {
-  console.log("userUpdateAccount called !");
+  
   const user = await getUser({ id: userId });
   if (user) {
     user.type = type;
@@ -327,7 +327,7 @@ exports.userUpdateMusicHistorySocket = async (userId, trackId) => {
     } else if (user?.musicHistory?.length >= 5) {
       user?.musicHistory?.pop();
     }
-    console.log("ici connard", user?.musicHistory);
+    
     user.musicHistory.unshift(trackId);
     if (await updateUser(user.id, user)) {
       const tmp = await getUser({ id: userId });
@@ -388,7 +388,7 @@ exports.sendVerifyEmail = async (req, res) => {
 
     transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
-        console.log(error);
+        
         res.status(200).json({
           status: true,
           message: error,
@@ -398,7 +398,7 @@ exports.sendVerifyEmail = async (req, res) => {
           status: true,
           message: "an email was send",
         });
-        console.log("an email was send");
+        
       }
     });
   } else {
@@ -411,7 +411,7 @@ exports.sendVerifyEmail = async (req, res) => {
 
 exports.verifyEmail = async (req, res, next) => {
   const { rand, email } = req.params;
-  console.log(rand, email, path.join(appRoot, "/html/verifEmail.html"));
+  
 
   const user = await getUser({
     $and: [
@@ -423,13 +423,13 @@ exports.verifyEmail = async (req, res, next) => {
       { id: { $not: { $regex: /git_/ } } },
     ],
   });
-  console.log(user);
+  
   if (user) {
-    console.log(rand, user.rand);
+    
     if (parseInt(rand) === user.rand) {
       user.rand = null;
       user.validEmail = true;
-      console.log(user);
+      
       await updateUser(user._id, user);
       res.sendFile(path.join(appRoot, "/html/verifEmail.html"));
     } else {

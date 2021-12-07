@@ -125,7 +125,6 @@ export class SettingsProfileComponent implements OnInit {
         options
       );
       browser.on('loadstart').subscribe((event) => {
-        console.log('start', event);
         if (
           event.url.includes('localhost:8100/tabs/tab-profile/settings?data')
         ) {
@@ -151,14 +150,11 @@ export class SettingsProfileComponent implements OnInit {
       buttons: [
         {
           text: 'Annuler',
-          handler: (data: any) => {
-            console.log('Canceled', data);
-          },
+          handler: (data: any) => {},
         },
         {
           text: 'Confirmer',
           handler: (data: any) => {
-            console.log('Saved Information', data);
             this.authService
               .deleteAccount(this.user.id)
               .subscribe((res: any) => {
@@ -174,6 +170,5 @@ export class SettingsProfileComponent implements OnInit {
     await alert.present();
 
     const { role } = await alert.onDidDismiss();
-    console.log('onDidDismiss resolved with role', role);
   }
 }

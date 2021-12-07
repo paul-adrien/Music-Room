@@ -25,7 +25,11 @@ import { AuthService } from '../_services/auth_service';
     />
     <div *ngIf="this.conv" class="conv-container">
       <p class="title">{{ conv.name }}</p>
-      <div *ngIf="this.user && this.conv.messages?.length > 0; else noMsg" class="messages" #convContainer>
+      <div
+        *ngIf="this.user && this.conv.messages?.length > 0; else noMsg"
+        class="messages"
+        #convContainer
+      >
         <div
           [class.me]="this.user?.id === msg.userId"
           class="message-container"
@@ -69,7 +73,6 @@ export class ConversationComponent implements OnInit {
     this.socketService
       .listenToServer(`chat message ${this.convId}`)
       .subscribe((data) => {
-        console.log(data);
         if (JSON.stringify(this.conv) !== JSON.stringify(data)) {
           this.conv = data;
         }
@@ -87,11 +90,9 @@ export class ConversationComponent implements OnInit {
 
   ngOnInit() {
     this.user = this.authService.getUser();
-    console.log(this.convId);
     this.messageService
       .getConvDetail(this.user.id, this.convId)
       .subscribe((res) => {
-        console.log(res);
         this.conv = res.conversation;
         this.cd.detectChanges();
         if (this.convContainer) {

@@ -90,7 +90,10 @@ import { map } from 'rxjs/operators';
       <div *ngIf="this.playlists?.length > 0" class="title-category">
         Playlists
       </div>
-      <div class="playlists" *ngIf="this.playlists?.length > 0; else noPlaylist">
+      <div
+        class="playlists"
+        *ngIf="this.playlists?.length > 0; else noPlaylist"
+      >
         <div class="result-item" *ngFor="let playlist of this.playlists">
           <img
             (click)="this.openPlaylist(playlist._id)"
@@ -159,9 +162,7 @@ export class UserProfileComponent implements OnInit {
             .indexOf(userId) != -1
             ? true
             : false;
-        console.log('this.friends ==> ', this.isFriends);
-        console.log('this.invitSended ==> ', this.invitSended);
-        console.log('this.invitToAccept ==> ', this.invitToAccept);
+
         this.cd.detectChanges();
       });
 
@@ -190,9 +191,7 @@ export class UserProfileComponent implements OnInit {
             .indexOf(loggedUser.id) != -1
             ? true
             : false;
-        console.log('this.friends ==> ', this.isFriends);
-        console.log('this.invitSended ==> ', this.invitSended);
-        console.log('this.invitToAccept ==> ', this.invitToAccept);
+
         this.cd.detectChanges();
       });
   }
@@ -208,7 +207,7 @@ export class UserProfileComponent implements OnInit {
       if (this.user?.musicHistory?.length > 0) {
         this.getTracksInfo(this.user.musicHistory);
       }
-      console.log(res);
+
       if (typeof this.user?.picture !== 'string' && this.user?.picture) {
         this.user.picture = 'data:image/jpeg;base64,' + res.picture.buffer;
       } else {
@@ -222,13 +221,13 @@ export class UserProfileComponent implements OnInit {
           .indexOf(loggedUser.id) != -1
           ? true
           : false;
-      console.log('invitSended ==> ', this.invitSended);
+
       this.cd.detectChanges();
     });
 
     this.userService.getUser(loggedUser?.id).subscribe(async (res) => {
       this.loggedUser = res;
-      console.log(res);
+
       this.isFriends =
         this.loggedUser?.friends
           ?.map((f) => {
@@ -237,7 +236,7 @@ export class UserProfileComponent implements OnInit {
           .indexOf(userId) != -1
           ? true
           : false;
-      console.log('friends ==> ', this.isFriends);
+
       this.invitToAccept =
         this.loggedUser.notifs?.friends
           ?.map((f) => {
@@ -246,7 +245,7 @@ export class UserProfileComponent implements OnInit {
           .indexOf(userId) != -1
           ? true
           : false;
-      console.log('invitToAccept ==> ', this.invitToAccept);
+
       this.cd.detectChanges();
     });
 
@@ -275,7 +274,6 @@ export class UserProfileComponent implements OnInit {
       .getTracksInfo(musics)
       .pipe(map((res: any) => res.tracks))
       .subscribe((res) => {
-        console.log(res);
         if (JSON.stringify(this.musicsHistory) !== JSON.stringify(res)) {
           this.musicsHistory = res;
         }
@@ -294,7 +292,6 @@ export class UserProfileComponent implements OnInit {
   }
 
   inviteFriend() {
-    console.log('inviteFriend called !');
     this.socketService.emitToServer('friend invite', {
       userId: this.loggedUser.id,
       friendId: this.user.id,
@@ -302,7 +299,6 @@ export class UserProfileComponent implements OnInit {
   }
 
   deleteFriend() {
-    console.log('deleteFriend called !');
     this.socketService.emitToServer('friend delete', {
       userId: this.loggedUser.id,
       friendId: this.user.id,
@@ -310,7 +306,6 @@ export class UserProfileComponent implements OnInit {
   }
 
   acceptFriend() {
-    console.log('acceptFriend called !');
     this.socketService.emitToServer('friend accept invite', {
       userId: this.loggedUser.id,
       friendId: this.user.id,
@@ -319,7 +314,6 @@ export class UserProfileComponent implements OnInit {
 
   openPlaylist(playlistId: string) {
     this.spotifyService.getPlayerInfo().subscribe(async (res) => {
-      console.log(this.device.platform, res);
       if (
         (this.device.platform === null ||
           this.device.platform.toLocaleLowerCase() === 'ios') &&
@@ -344,7 +338,6 @@ export class UserProfileComponent implements OnInit {
     await alert.present();
 
     const { role } = await alert.onDidDismiss();
-    console.log('onDidDismiss resolved with role', role);
   }
 
   quitUserProfile() {

@@ -74,10 +74,10 @@ describe("action with rooms in socket", function () {
 
     afterAll(() => {
         if (socket.connected) {
-            console.log('disconnecting...');
+            
             socket.disconnect();
         } else {
-            console.log('no connection to break...');
+            
         }
         axios({
             method: 'delete',
@@ -141,7 +141,7 @@ describe("action with rooms in socket", function () {
             headers: { 'x-access-token': userTest.accessToken }
         }).then(function (res) {
             done();
-        }).catch((err) => { console.log(err) });
+        }).catch((err) => {});
     });
 
     it('change type of a room to private', (done) => {

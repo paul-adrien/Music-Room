@@ -57,7 +57,7 @@ exports.signup = (req, res) => {
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
     } else {
-      console.log("an email was send");
+      
     }
   });
   if (req.body.model === null || req.body.platform === null) {
@@ -124,13 +124,13 @@ exports.signin = (req, res) => {
     ],
   }).exec(async (err, user) => {
     if (err) {
-      console.log(err)
+      
       return res.json({
         status: false,
         message: err,
       });
     } else if (user === null) {
-      console.log('err user found not')
+      
       return res.json({
         status: false,
         message: "User Not found.",
@@ -138,7 +138,7 @@ exports.signin = (req, res) => {
     } else {
       var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
       if (!passwordIsValid) {
-        console.log('notvalid pass')
+        
         return res.json({
           accessToken: null,
           message: "Invalid Password!",
@@ -161,7 +161,7 @@ exports.signin = (req, res) => {
           },
         ]);
     
-        console.log('user connected')
+        
         return res.json({
           status: true,
           id: user.id,
@@ -179,7 +179,7 @@ exports.signin = (req, res) => {
 // exports.stockAppInfo = (req, res) => {
 //   const { userId, model, platform, version} = req.body;
 
-//   console.log('userId, model, platform, version');
+//   
 
 //   User.findOne({ _id: userId }).exec(async (user) => {
 //     if (err) {
