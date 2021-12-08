@@ -35,21 +35,23 @@ import { AlertController, ModalController } from '@ionic/angular';
         </div>
       </div>
       <ng-template #user>
-        <div
-          class="result-item"
-          (click)="this.dismiss(item)"
-          *ngFor="let item of this.searchRes"
-        >
-          <img
-            class="logo round"
-            [src]="
-              item?.picture ? this.getPicture(item) : './assets/person.svg'
-            "
-          />
-          <div class="item-info">
-            <div class="info-top">{{ item.userName }}</div>
-            <div class="info-bottom">
-              {{ item.firstName }} {{ item.lastName }}
+        <div *ngIf="searchRes?.length > 0">
+          <div
+            class="result-item"
+            (click)="this.dismiss(item)"
+            *ngFor="let item of this.searchRes"
+          >
+            <img
+              class="logo round"
+              [src]="
+                item?.picture ? this.getPicture(item) : './assets/person.svg'
+              "
+            />
+            <div class="item-info">
+              <div class="info-top">{{ item.userName }}</div>
+              <div class="info-bottom">
+                {{ item.firstName }} {{ item.lastName }}
+              </div>
             </div>
           </div>
         </div>
@@ -102,26 +104,38 @@ export class SearchComponent {
     const user = this.authService.getUser();
 
     if (!this.isUser) {
-      this.spotifyService.searchMusic(event.target.value).subscribe((data) => {
-        this.searchRes = data.tracks;
-        this.cd.detectChanges();
-      });
+      const test = /^(?=.{1,20}$)[a-zA-Z0-9]+(?:[-' ][a-zA-Z0-9]+)*$/;
+      if (!test.test(String(event.target.value).toLowerCase())) {
+        return;
+      } else {
+        this.spotifyService
+          .searchMusic(event.target.value)
+          .subscribe((data) => {
+            this.searchRes = data.tracks;
+            this.cd.detectChanges();
+          });
+      }
     } else if (this.isUser) {
-      this.userService.searchUser(event.target.value).subscribe((data) => {
-        this.searchRes = data?.filter((el) => el.id !== user.id);
-        if (this.onlyFriend) {
-          this.searchRes = data?.filter((el) =>
-            user?.friends
-              ?.map((f) => {
-                return f.id;
-              })
-              .indexOf(el.id) != -1
-              ? true
-              : false
-          );
-        }
-        this.cd.detectChanges();
-      });
+      const test = /^(?=.{1,20}$)[a-zA-Z0-9]+(?:[-' ][a-zA-Z0-9]+)*$/;
+      if (!test.test(String(event.target.value).toLowerCase())) {
+        return;
+      } else {
+        this.userService.searchUser(event.target.value).subscribe((data) => {
+          this.searchRes = data?.filter((el) => el.id !== user.id);
+          if (this.onlyFriend) {
+            this.searchRes = data?.filter((el) =>
+              user?.friends
+                ?.map((f) => {
+                  return f.id;
+                })
+                .indexOf(el.id) != -1
+                ? true
+                : false
+            );
+          }
+          this.cd.detectChanges();
+        });
+      }
     }
   }
 
