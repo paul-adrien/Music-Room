@@ -1220,6 +1220,13 @@ exports.checkLimitRoom = async (req, res, next) => {
             message: "The user isn't in limit",
           });
         }
+      } else {
+        res.message = "The user is in limit";
+        res.status(200).json({
+          status: true,
+          isIn: isIn,
+          message: "The user is in limit",
+        });
       }
     }
   });
@@ -1261,12 +1268,16 @@ exports.addGeoHours = async (data) => {
                 "this room doesn't exist or you dont have the good right",
             });
           } else {
-            let limits = {
-              radius: data.radius,
-              center: data.center,
-              start: data.start,
-              end: data.end,
-            };
+            if (data.radius == 0) {
+              let limits = undefined;
+            } else {
+              let limits = {
+                radius: data.radius,
+                center: data.center,
+                start: data.start,
+                end: data.end,
+              };
+            }
             Room.updateOne(
               { _id: data.roomId },
               {

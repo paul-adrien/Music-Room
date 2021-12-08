@@ -108,9 +108,9 @@ export class SearchComponent {
       });
     } else if (this.isUser) {
       this.userService.searchUser(event.target.value).subscribe((data) => {
-        this.searchRes = data.filter((el) => el.id !== user.id);
+        this.searchRes = data?.filter((el) => el.id !== user.id);
         if (this.onlyFriend) {
-          this.searchRes = data.filter((el) =>
+          this.searchRes = data?.filter((el) =>
             user?.friends
               ?.map((f) => {
                 return f.id;
