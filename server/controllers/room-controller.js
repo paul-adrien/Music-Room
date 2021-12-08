@@ -1268,10 +1268,9 @@ exports.addGeoHours = async (data) => {
                 "this room doesn't exist or you dont have the good right",
             });
           } else {
-            if (data.radius == 0) {
-              let limits = undefined;
-            } else {
-              let limits = {
+            let limits = undefined;
+            if (data.radius != 0) {
+              limits = {
                 radius: data.radius,
                 center: data.center,
                 start: data.start,
