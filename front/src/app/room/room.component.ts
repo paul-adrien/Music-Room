@@ -353,7 +353,7 @@ export class RoomComponent implements OnInit, OnDestroy {
             progress_ms: res.progress_ms,
           };
 
-          if (this.room.users[0].id === this.user.id) {
+          if (this.room?.users[0]?.id === this.user?.id) {
             this.roomService
               .stockPositionTrack(this.roomId, res.progress_ms, res.item.id)
               .subscribe();

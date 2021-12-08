@@ -1277,6 +1277,7 @@ exports.addGeoHours = async (data) => {
                 end: data.end,
               };
             }
+            console.log(limits)
             Room.updateOne(
               { _id: data.roomId },
               {
