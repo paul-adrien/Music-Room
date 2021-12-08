@@ -196,7 +196,7 @@ export class RoomComponent implements OnInit, OnDestroy {
           if (this.isInvited === false && this.room?.type === 'private')
             this.quitRoom();
 
-          if (this.room?.limits) {
+          if (this.room?.limits || (this.room?.limits as any) !== {}) {
             this.geolocation
               .getCurrentPosition()
               .then((resp) => {

@@ -18,7 +18,7 @@ export interface Room {
   track_playing: string;
   type: 'public' | 'private';
   onlyInvited: boolean;
-  limits: {
+  limits?: {
     radius: number;
     center: {
       latitude: number;
