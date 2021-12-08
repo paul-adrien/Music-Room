@@ -424,7 +424,7 @@ io.use(function (socket, next) {
 
   socket.on("room accept invite", (data) => {
     room_controller.acceptInviteRoomSocket(data.userId, data.roomId).then(() =>
-      room_controller.getRoomSocket(data.roomId).then((res) => {
+      room_controller.getRoomSocket(data.roomId).then(async (res) => {
         if (res.status) {
           logs.logsSOCKS(
             `room update ${data.roomId} accepte invite`,
@@ -660,26 +660,28 @@ io.use(function (socket, next) {
     playlist_controller
       .acceptInvitePlaylistSocket(data.userId, data.playlistId)
       .then(() =>
-        playlist_controller.getPlaylistSocket(data.playlistId).then((res) => {
-          if (res.status) {
-            logs.logsSOCKS(
-              `playlist update ${data.playlistId} accepte invite`,
-              res.status,
-              socket.handshake.query.token
-            );
-            const user = await getUser({ id: data.userId });
-            if (user) {
-              io.emit(`user update ${data.userId}`, user);
+        playlist_controller
+          .getPlaylistSocket(data.playlistId)
+          .then(async (res) => {
+            if (res.status) {
+              logs.logsSOCKS(
+                `playlist update ${data.playlistId} accepte invite`,
+                res.status,
+                socket.handshake.query.token
+              );
+              const user = await getUser({ id: data.userId });
+              if (user) {
+                io.emit(`user update ${data.userId}`, user);
+              }
+              io.emit(`playlist update ${data.playlistId}`, res.playlist);
+            } else {
+              logs.logsSOCKS(
+                "Error when accepte invite to playlist",
+                res.status,
+                socket.handshake.query.token
+              );
             }
-            io.emit(`playlist update ${data.playlistId}`, res.playlist);
-          } else {
-            logs.logsSOCKS(
-              "Error when accepte invite to playlist",
-              res.status,
-              socket.handshake.query.token
-            );
-          }
-        })
+          })
       );
   });
 
