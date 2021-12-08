@@ -142,7 +142,7 @@ export class PlaylistComponent implements OnInit {
         }
 
         this.indexTrack = this.playlist.musics.findIndex(
-          (music) => music.trackId === this.playerInfo.item.id
+          (music) => music?.trackId === this.playerInfo?.item?.id
         );
 
         if (data?.musics?.length > 0) {
