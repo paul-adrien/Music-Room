@@ -110,7 +110,9 @@ import { Geolocation } from '@ionic-native/geolocation/ngx';
         <div class="buttons-right">
           <img
             *ngIf="
-              !this.room.onlyInvited || this.room.created_by === this.user.id
+              (!(this.room.onlyInvited && !this.isInvited) &&
+                this.zone !== false) ||
+              this.room.created_by === this.user.id
             "
             class="add"
             (click)="this.presentModalInvite()"
