@@ -56,7 +56,6 @@ declare var google: any;
       class="item-container"
     >
       <div class="item-name">Plage horaire de la room:</div>
-      <ion-toggle [(ngModel)]="this.zone" [checked]="this.zone"></ion-toggle>
     </div>
     <div *ngIf="this.type === 'room'">
       <div class="time-container">

@@ -25,7 +25,7 @@ import { AlertController, ModalController } from '@ionic/angular';
         <div
           class="result-item"
           (click)="this.isModal ? this.dismiss(item) : this.play(item)"
-          *ngFor="let item of this.searchRes.items"
+          *ngFor="let item of this.searchRes?.items"
         >
           <img class="logo" [src]="item.album.images[0].url" />
           <div class="item-info">
@@ -35,7 +35,7 @@ import { AlertController, ModalController } from '@ionic/angular';
         </div>
       </div>
       <ng-template #user>
-        <div *ngIf="searchRes?.length > 0">
+        <div *ngIf="this.isUser && this.searchRes?.length > 0">
           <div
             class="result-item"
             (click)="this.dismiss(item)"
