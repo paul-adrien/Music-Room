@@ -312,9 +312,12 @@ export class SettingsRoomComponent implements OnInit {
     });
     this.circlesData = [];
     this.roomService.addGeoAndHoursLimit(
-      this.form,
       {
         radius: 0,
+        start: 0,
+        end: 0,
+      },
+      {
         center: {
           latitude: 0,
           longitude: 0,
