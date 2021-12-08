@@ -1224,7 +1224,7 @@ exports.checkLimitRoom = async (req, res, next) => {
         res.message = "The user is in limit";
         res.status(200).json({
           status: true,
-          isIn: isIn,
+          isIn: true,
           message: "The user is in limit",
         });
       }
