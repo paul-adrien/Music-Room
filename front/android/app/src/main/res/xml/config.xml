@@ -19,4 +19,5 @@
   </feature>
 
   
+  <preference name="OverrideUserAgent" value="Mozilla/5.0 Google" />
 </widget>

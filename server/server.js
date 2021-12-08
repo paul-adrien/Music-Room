@@ -431,6 +431,10 @@ io.use(function (socket, next) {
             res.status,
             socket.handshake.query.token
           );
+          const user = await getUser({ id: data.userId });
+          if (user) {
+            io.emit(`user update ${data.userId}`, user);
+          }
           io.emit(`room update ${data.roomId}`, res.room);
         } else {
           logs.logsSOCKS(
@@ -663,6 +667,10 @@ io.use(function (socket, next) {
               res.status,
               socket.handshake.query.token
             );
+            const user = await getUser({ id: data.userId });
+            if (user) {
+              io.emit(`user update ${data.userId}`, user);
+            }
             io.emit(`playlist update ${data.playlistId}`, res.playlist);
           } else {
             logs.logsSOCKS(
