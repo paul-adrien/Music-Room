@@ -40,7 +40,7 @@ exports.signup = (req, res) => {
         "704787272588-v0aava438lpq06jbqkj3pkue0qv98os8.apps.googleusercontent.com",
       clientSecret: "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",
       refreshToken:
-        "1//04-vTHZ11A0NyCgYIARAAGAQSNwF-L9IrVmtV2WYGONx1m_fymv_F-_dRYAf92AyUp97Cx6wXunTDXVH4HPBNrH4D4nTMzK1xVoo",
+        "1//04LthjLvmXx6aCgYIARAAGAQSNwF-L9IriR5qSihiPChbBOtqwREH1p9mqlN0XvgvecftRiIKMD37j0G9cIIo02Zd2bIOvq1h62M",
     },
   });
 
