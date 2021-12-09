@@ -71,32 +71,34 @@ module.exports = function (app) {
       },
       async (err, data) => {
         // Successful authentication, redirect home.
-        const userDb = await getUser({ id: data.userId });
+        if (data?.userId) {
+          const userDb = await getUser({ id: data.userId });
 
-        const token = jwt.sign({ id: userDb._id }, config.secret, {
-          expiresIn: 86400, // 24 hours
-        });
+          const token = jwt.sign({ id: userDb._id }, config.secret, {
+            expiresIn: 86400, // 24 hours
+          });
 
-        userDb.application = data.application;
-        await updateUser(data.userId, userDb);
+          userDb.application = data.application;
+          await updateUser(data.userId, userDb);
 
-        await Token.insertMany([
-          {
-            token: token,
-            userId: userDb._id,
-            date: Date.now(),
-          },
-        ]);
+          await Token.insertMany([
+            {
+              token: token,
+              userId: userDb._id,
+              date: Date.now(),
+            },
+          ]);
 
-        return res.redirect(
-          "http://localhost:8100/login?data=" +
-            encodeURI(
-              JSON.stringify({
-                user: userDb,
-                token: token,
-              })
-            )
-        );
+          return res.redirect(
+            "http://localhost:8100/login?data=" +
+              encodeURI(
+                JSON.stringify({
+                  user: userDb,
+                  token: token,
+                })
+              )
+          );
+        }
       }
     )(req, res, next);
   });
