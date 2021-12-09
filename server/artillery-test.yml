@@ -5,12 +5,12 @@ config:
     rejectUnauthorized: false
   phases:
     - duration: 10
-      arrivalRate: 10
+      arrivalRate: 1
       name: "Phase 1"
-    # - duration: 10
-    #   arrivalRate: 40
-    #   # rampTo: 100
-    #   name: "Phase 2"
+    - duration: 10
+      arrivalRate: 10
+      # rampTo: 100
+      name: "Phase 2"
     # - duration: 20
     #   arrivalRate: 40
     #   rampTo: 500
