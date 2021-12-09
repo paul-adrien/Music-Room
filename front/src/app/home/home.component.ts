@@ -205,9 +205,9 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
     this.user = this.authService.getUser();
     if (
-      this.user.notifs.friends.length > 0 ||
-      this.user.notifs.playlist.length > 0 ||
-      this.user.notifs.rooms.length > 0
+      this.user?.notifs?.friends?.length > 0 ||
+      this.user?.notifs?.playlist?.length > 0 ||
+      this.user?.notifs?.rooms?.length > 0
     ) {
       this.hasNotif = true;
     } else {
